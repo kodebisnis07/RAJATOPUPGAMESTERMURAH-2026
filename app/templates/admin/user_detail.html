@@ -1,0 +1,137 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-head">
+    <h1>Detail User</h1>
+    <p>Full akses Super Admin untuk melihat dan mengelola data user terdaftar. Password asli tidak ditampilkan karena disimpan aman dalam bentuk hash.</p>
+</div>
+
+<div class="cards" style="margin-bottom:18px">
+    <div class="card-admin"><h2>{{ stats.total_orders }}</h2><p>Total Order</p></div>
+    <div class="card-admin"><h2>{{ stats.paid_orders }}</h2><p>Order Dibayar</p></div>
+    <div class="card-admin"><h2>{{ stats.pending_orders }}</h2><p>Pending</p></div>
+    <div class="card-admin"><h2>Rp {{ "{:,.0f}".format(stats.total_spend or 0).replace(',', '.') }}</h2><p>Total Belanja</p></div>
+</div>
+
+<div class="admin-detail-grid">
+    <section class="settings-form">
+        <h2>Informasi Akun</h2>
+        <div class="user-profile-head">
+            {% if user.avatar %}
+                <img class="admin-avatar" src="{{ url_for('static', filename='img/avatars/' ~ user.avatar) }}" alt="Avatar">
+            {% else %}
+                <div class="admin-avatar placeholder">{{ user.name[:2]|upper }}</div>
+            {% endif %}
+            <div>
+                <h3>{{ user.name }}</h3>
+                <p class="muted">Username: {{ user.username or '-' }} | ID User: {{ user.id }} | Role: {{ user.role }} | {{ 'Aktif' if user.is_active else 'Nonaktif' }}</p>
+            </div>
+        </div>
+        <table class="admin-table compact-table">
+            <tr><th>Nama</th><td>{{ user.name }}</td></tr>
+            <tr><th>Username Login</th><td>{{ user.username or '-' }}</td></tr>
+            <tr><th>Email</th><td>{{ user.email }}</td></tr>
+            <tr><th>No. Telepon</th><td>{{ user.phone or '-' }}</td></tr>
+            <tr><th>Member Level</th><td>{{ user.member_level or 'Bronze' }}</td></tr>
+            <tr><th>Tanggal Daftar</th><td>{{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else '-' }}</td></tr>
+            <tr><th>Password</th><td><span class="badge">Tersimpan aman / hash</span> <small>Gunakan reset password jika user lupa.</small></td></tr>
+        </table>
+    </section>
+
+    <section class="settings-form">
+        <h2>Edit Data User</h2>
+        <form method="post" action="{{ url_for('admin.update_user', id=user.id) }}">
+            <label>Nama
+                <input type="text" name="name" value="{{ user.name }}" required>
+            </label>
+            <label>Username Login
+                <input type="text" name="username" value="{{ user.username or '' }}" required>
+            </label>
+            <small class="field-help">Username dipakai user untuk login.</small>
+            <label>Email
+                <input type="email" name="email" value="{{ user.email }}" required>
+            </label>
+            <label>Nomor Telepon
+                <input type="text" name="phone" value="{{ user.phone or '' }}">
+            </label>
+            <label>Member Level
+                <select name="member_level">
+                    {% for level in ['Bronze','Silver','Gold','Platinum'] %}
+                        <option value="{{ level }}" {{ 'selected' if (user.member_level or 'Bronze') == level else '' }}>{{ level }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Role
+                <select name="role">
+                    <option value="user" {{ 'selected' if user.role == 'user' else '' }}>User</option>
+                </select>
+            </label>
+            <label class="check"><input type="checkbox" name="is_active" value="1" {{ 'checked' if user.is_active else '' }}> Akun aktif</label>
+            <button type="submit">Simpan Perubahan</button>
+        </form>
+    </section>
+</div>
+
+<div class="admin-detail-grid">
+    <section class="settings-form">
+        <h2>Reset Password User</h2>
+        {% if can_reset_user_password %}
+            <p class="muted">Anda dapat membuat password baru, tetapi tidak dapat melihat password lama.</p>
+            <form method="post" action="{{ url_for('admin.reset_user_password', id=user.id) }}" onsubmit="return confirm('Reset password user ini?')">
+                <label>Password Baru
+                    <input type="text" name="new_password" placeholder="Minimal 6 karakter" required minlength="6">
+                </label>
+                <button type="submit">Reset Password</button>
+            </form>
+        {% else %}
+            <p class="muted">Role Anda tidak diizinkan mereset password user. Izin ini hanya bisa diatur oleh Super Admin.</p>
+        {% endif %}
+    </section>
+
+    <section class="settings-form">
+        <h2>Aksi Akun</h2>
+        <form method="post" action="{{ url_for('admin.toggle_user', id=user.id) }}" style="margin-bottom:10px">
+            <button type="submit">{{ 'Nonaktifkan User' if user.is_active else 'Aktifkan User' }}</button>
+        </form>
+        <form method="post" action="{{ url_for('admin.delete_user', id=user.id) }}" onsubmit="return confirm('Hapus user ini? Riwayat order akan tetap disimpan tanpa akun user.')">
+            <button type="submit" class="danger">Hapus User</button>
+        </form>
+    </section>
+</div>
+
+<section class="settings-form full-width-section">
+    <h2>Riwayat Pesanan User</h2>
+    <table class="admin-table">
+        <thead><tr><th>Invoice</th><th>Produk</th><th>Harga</th><th>Pembayaran</th><th>Status Order</th><th>Tanggal</th></tr></thead>
+        <tbody>
+        {% for order in orders %}
+            <tr>
+                <td>{{ order.invoice }}</td>
+                <td>{{ order.product.name if order.product else '-' }}<br><small>ID Game: {{ order.game_user_id or '-' }} | Server: {{ order.game_server_id or '-' }}</small></td>
+                <td>Rp {{ "{:,.0f}".format(order.price or 0).replace(',', '.') }}</td>
+                <td>{{ order.payment_method or '-' }}<br><span class="badge">{{ order.payment_status }}</span></td>
+                <td><span class="badge">{{ order.order_status }}</span></td>
+                <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">User belum memiliki pesanan.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="settings-form full-width-section">
+    <h2>Game Favorit</h2>
+    <table class="admin-table">
+        <thead><tr><th>Game</th><th>Tanggal Ditambahkan</th></tr></thead>
+        <tbody>
+        {% for fav in favorites %}
+            <tr><td>{{ fav.category.name if fav.category else '-' }}</td><td>{{ fav.created_at.strftime('%d/%m/%Y %H:%M') if fav.created_at else '-' }}</td></tr>
+        {% else %}
+            <tr><td colspan="2">Belum ada game favorit.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<p><a class="btn" href="{{ url_for('admin.users') }}">← Kembali ke Data User</a></p>
+{% endblock %}

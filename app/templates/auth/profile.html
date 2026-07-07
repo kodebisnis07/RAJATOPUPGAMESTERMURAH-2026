@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Profil Akun - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page">
+    {% include 'auth/_account_nav.html' %}
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    <div class="profile-layout">
+        <div class="profile-card profile-main-card">
+            <div class="profile-avatar photo">
+                {% if avatar_url %}<img src="{{ avatar_url }}" alt="Foto profil {{ user.name }}">{% else %}{{ (user.name or 'U')[:1]|upper }}{% endif %}
+            </div>
+            <h1>{{ user.name }}</h1>
+            <p class="muted">Member {{ stats.member_level }} • Bergabung {{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '-' }}</p>
+            <div class="summary-row"><span>Username</span><b>{{ user.username or '-' }}</b></div>
+            <div class="summary-row"><span>Email</span><b>{{ user.email }}</b></div>
+            <div class="summary-row"><span>Nomor Telepon</span><b>{{ user.phone or '-' }}</b></div>
+            <div class="summary-row"><span>Status Akun</span><b>{{ 'Aktif' if user.is_active else 'Nonaktif' }}</b></div>
+            <div class="profile-actions-row">
+                <a class="btn-checkout" href="{{ url_for('auth.edit_profile') }}">Edit Profil</a>
+                <a class="btn-small outline" href="{{ url_for('auth.change_password') }}">Ubah Password</a>
+            </div>
+        </div>
+        <div class="profile-card">
+            <h2>Ringkasan Transaksi</h2>
+            <div class="summary-row"><span>Total Pesanan</span><b>{{ stats.total_orders }}</b></div>
+            <div class="summary-row"><span>Pending</span><b>{{ stats.pending_orders }}</b></div>
+            <div class="summary-row"><span>Diproses/Selesai</span><b>{{ stats.success_orders }}</b></div>
+            <div class="summary-row"><span>Dibatalkan</span><b>{{ stats.cancelled_orders }}</b></div>
+            <div class="summary-row"><span>Total Belanja</span><b>Rp {{ "{:,}".format(stats.total_spent).replace(",", ".") }}</b></div>
+        </div>
+    </div>
+    <div class="profile-card order-history">
+        <h2>Riwayat Transaksi Terakhir</h2>
+        {% if orders %}
+        <div class="history-table"><table><thead><tr><th>Invoice</th><th>Produk</th><th>Total</th><th>Pembayaran</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+            {% for order in orders %}<tr>
+                <td>{{ order.invoice }}</td><td>{{ order.product.name if order.product else '-' }}</td>
+                <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td><td>{{ order.payment_method or '-' }}</td>
+                <td><span class="status-pill {{ order.payment_status }}">{{ order.payment_status|upper }}</span></td>
+                <td class="history-actions"><a href="{{ url_for('home.checkout', invoice=order.invoice) }}">Detail</a>{% if order.payment_status == 'pending' and order.order_status == 'pending' %}<form method="POST" action="{{ url_for('home.cancel_order', invoice=order.invoice) }}" onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?');"><button type="submit">Batalkan</button></form>{% endif %}</td>
+            </tr>{% endfor %}
+        </tbody></table></div>
+        {% else %}<div class="empty-state">Belum ada transaksi.</div>{% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="admin-card">
+    <h1>💬 Live Chat User</h1>
+    <p>Admin dan Operator dapat membalas pesan user di sini. Super Admin tetap dapat memantau seluruh percakapan.</p>
+</div>
+
+<div class="chat-admin-layout">
+    <div class="admin-card chat-thread-list">
+        <h3>Daftar Chat</h3>
+        {% for thread in threads %}
+            <a class="chat-thread-item {{ 'active' if selected_thread and selected_thread.id == thread.id else '' }}" href="{{ url_for('admin.live_chat', thread_id=thread.id) }}">
+                <strong>{{ thread.user.name if thread.user else 'User' }}</strong>
+                <small>{{ thread.user.username if thread.user else '' }} · {{ thread.status }}</small>
+                <small>{{ thread.last_message_at.strftime('%d/%m/%Y %H:%M') if thread.last_message_at else '-' }}</small>
+            </a>
+        {% else %}
+            <p class="muted">Belum ada chat masuk.</p>
+        {% endfor %}
+    </div>
+
+    <div class="admin-card chat-panel-admin">
+        {% if selected_thread %}
+            <div class="chat-panel-head">
+                <div>
+                    <h3>{{ selected_thread.user.name if selected_thread.user else 'User' }}</h3>
+                    <p>{{ selected_thread.user.email if selected_thread.user else '' }} · {{ selected_thread.user.phone if selected_thread.user else '' }}</p>
+                </div>
+                <form method="post" action="{{ url_for('admin.close_live_chat', thread_id=selected_thread.id) }}">
+                    <button class="btn danger" type="submit">Tutup Chat</button>
+                </form>
+            </div>
+            <div class="chat-messages admin-chat-messages" id="admin-chat-messages">
+                {% for msg in messages %}
+                    <div class="chat-message {{ 'mine' if msg.sender_type != 'user' else 'staff' }}">
+                        <div class="chat-bubble">
+                            <strong>{{ msg.sender_name or msg.sender_type }}</strong>
+                            <p>{{ msg.message }}</p>
+                            <small>{{ msg.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state">Belum ada pesan pada chat ini.</div>
+                {% endfor %}
+            </div>
+            <form class="chat-form" method="post">
+                <input type="hidden" name="thread_id" value="{{ selected_thread.id }}">
+                <input type="text" name="message" placeholder="Tulis balasan untuk user..." autocomplete="off" required>
+                <button type="submit">Kirim</button>
+            </form>
+        {% else %}
+            <div class="empty-state">Pilih chat user di sebelah kiri.</div>
+        {% endif %}
+    </div>
+</div>
+<script>
+(function(){ var box=document.getElementById('admin-chat-messages'); if(box){ box.scrollTop=box.scrollHeight; } })();
+</script>
+{% endblock %}

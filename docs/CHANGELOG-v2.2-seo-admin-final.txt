@@ -1,0 +1,8 @@
+Raja Topup Games v2.2 SEO Admin Final
+
+- Menambahkan/menegaskan route /admin/seo.
+- Menu SEO Website tersedia di sidebar admin.
+- Form SEO menyimpan data ke tabel settings.
+- Meta title, description, keywords, Search Console, GA4, Facebook Pixel, canonical, Open Graph, Twitter Card, dan Schema WebSite aktif di base.html.
+- robots.txt tetap mengizinkan crawl halaman publik dan memblokir area admin/login.
+- sitemap.xml memakai SITE_URL/domain aktif.

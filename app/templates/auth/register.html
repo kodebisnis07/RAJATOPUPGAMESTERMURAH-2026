@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun - Raja Topup Games</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=fix-sosmed-20260701">
+</head>
+<body class="auth-register-modern">
+    <main class="register-modern-card">
+        <h1>Buat Akun</h1>
+        <p>Silakan lengkapi data diri Anda untuk bergabung.</p>
+
+        <form action="{{ url_for('auth.register') }}" method="POST" class="register-modern-form" autocomplete="on">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }} register-alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div>
+                <label>Nama Lengkap</label>
+                <input type="text" name="name" value="{{ name or '' }}" required>
+            </div>
+
+            <div>
+                <label>Username</label>
+                <input type="text" name="username" value="{{ username or '' }}" autocomplete="username" required>
+            </div>
+
+            <div class="full">
+                <label>Alamat Email</label>
+                <input type="email" name="email" value="{{ email or '' }}" required>
+            </div>
+
+            <div class="full">
+                <label>Nomor WhatsApp</label>
+                <div class="phone-row">
+                    <span class="phone-code">🇮🇩 62</span>
+                    <input type="tel" name="phone" value="{{ phone or '' }}" placeholder="81234567890" required>
+                </div>
+            </div>
+            <div class="register-help">Untuk nomor internasional, silakan lanjutkan pendaftaran memakai nomor aktif. Nomor dapat diperbarui melalui profil setelah akun aktif.</div>
+
+            <div>
+                <label>Kata Sandi</label>
+                <div class="password-row">
+                    <input id="registerPassword" type="password" name="password" autocomplete="new-password" required>
+                    <button type="button" class="password-eye" data-target="registerPassword" aria-label="Lihat password">👁</button>
+                </div>
+            </div>
+
+            <div>
+                <label>Konfirmasi Sandi</label>
+                <div class="password-row">
+                    <input id="confirmPassword" type="password" name="confirm_password" autocomplete="new-password" required>
+                    <button type="button" class="password-eye" data-target="confirmPassword" aria-label="Lihat konfirmasi sandi">👁</button>
+                </div>
+            </div>
+
+            <label class="terms-row full">
+                <input type="checkbox" required>
+                <span>Saya setuju dengan <a href="#">Syarat & Ketentuan</a> serta <a href="#">Kebijakan Privasi</a>.</span>
+            </label>
+
+            <button class="register-submit" type="submit">DAFTAR SEKARANG</button>
+            <div class="login-bottom">Sudah punya akun? <a href="{{ url_for('auth.login') }}">Masuk disini</a></div>
+        </form>
+    </main>
+<script>
+document.querySelectorAll('.password-eye').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        var input = document.getElementById(btn.dataset.target);
+        if(!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+        btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
+    <link rel="manifest" href="{{ url_for('manifest') }}">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=mobile-pc-fix-20260707">
+    <style>
+      /* Hapus total menu kecil kategori di bawah header (Home, Voucher, Pulsa, dll). */
+      .market-category-nav, .quick-pills, nav.market-category-nav, section.quick-pills {
+        display:none!important; visibility:hidden!important; height:0!important; max-height:0!important;
+        overflow:hidden!important; margin:0!important; padding:0!important; border:0!important;
+      }
+    </style>
+</head>
+<body class="site-body marketplace-home">
+<header class="market-nav">
+    <div class="market-nav-top">
+        <a class="market-logo" href="{{ url_for('home.index') }}"><span>👑</span><b>RAJA TOPUP<br>GAMES</b></a>
+        <form class="market-search" method="GET" action="{{ url_for('home.index') }}#games">
+            <span>🔍</span>
+            <input type="text" name="q" value="{{ q }}" placeholder="Cari game, voucher, atau produk...">
+            <button type="submit">Cari</button>
+        </form>
+        <div class="market-actions">
+            <a class="market-action" href="{{ url_for('home.index') }}#games">📥<span>Download<br>Aplikasi</span></a>
+            {% if session.get('user_id') %}
+                <a class="market-action" href="{{ url_for('auth.orders') }}">📄<span>Invoice</span></a>
+                <a class="market-action notif-link" href="{{ url_for('auth.notifications') }}">🔔<span>Inbox</span>{% if unread_notifications_count %}<em>{{ unread_notifications_count }}</em>{% endif %}</a>
+                {% if current_user %}
+                    <a class="market-wallet" href="{{ url_for('auth.wallet_topup') }}">💰<span>Saldo</span><b>Rp {{ "{:,}".format(current_user.balance or 0).replace(',', '.') }}</b></a>
+                {% endif %}
+                <div class="user-menu market-user-menu">
+                    <button class="user-menu-btn" type="button" aria-expanded="false" aria-haspopup="true">👤 Halo, {{ session.get('user_name') }} ▾</button>
+                    <div class="user-menu-panel" role="menu">
+                        <a href="{{ url_for('auth.dashboard') }}">🏠 Dashboard Akun</a>
+                        <a href="{{ url_for('auth.profile') }}">👤 Profil Saya</a>
+                        <a href="{{ url_for('auth.wallet_topup') }}">💰 Top Up Saldo</a>
+                        <a href="{{ url_for('auth.orders') }}">📄 Invoice / Pesanan</a>
+                        <a href="{{ url_for('auth.notifications') }}">🔔 Inbox</a>
+                        <a href="{{ url_for('auth.live_chat') }}">💬 Live Chat</a>
+                        <a class="danger" href="{{ url_for('auth.logout') }}">🚪 Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a class="market-login" href="{{ url_for('auth.login') }}">Masuk</a>
+                <a class="market-register" href="{{ url_for('auth.register') }}">Daftar</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<script>
+/* Guard tambahan: hapus menu kecil kategori jika masih muncul dari cache/template lama. */
+(function(){
+  function removeSmallCategoryMenu(){
+    var badWords = ['Home','Voucher','Pulsa','Dolar','Sosial Media','Aplikasi Premium','Top Up Games','Reseller'];
+    document.querySelectorAll('.market-category-nav,.quick-pills,nav,section,div').forEach(function(el){
+      var txt = (el.textContent || '').replace(/\s+/g,' ').trim();
+      var hit = badWords.filter(function(w){ return txt.indexOf(w) !== -1; }).length;
+      if(hit >= 4 && el.closest('header.market-nav') === null && el.id !== 'games'){ el.remove(); }
+    });
+    document.querySelectorAll('body > a').forEach(function(a){
+      var txt = (a.textContent || '').trim();
+      if(badWords.some(function(w){ return txt.indexOf(w) !== -1; })){ a.remove(); }
+    });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', removeSmallCategoryMenu); }
+  else { removeSmallCategoryMenu(); }
+})();
+</script>
+
+<section class="market-hero">
+    <button class="hero-arrow left" type="button">‹</button>
+    <div class="hero-side hero-side-left"></div>
+    <div class="hero-stage">
+        {% for banner in banners %}
+        <article class="market-slide {% if loop.first %}active{% endif %}" style="background-image:linear-gradient(90deg,rgba(5,8,15,.30),rgba(5,8,15,.10)),url('{% if banner.image %}{% if '/' in banner.image %}{{ url_for('static', filename=banner.image) }}{% else %}{{ url_for('static', filename='img/products/' + banner.image) }}{% endif %}{% else %}{{ url_for('static', filename='img/banner/rtg-banner-20260707.png') }}{% endif %}')">
+            <div class="market-slide-content">
+                <span class="market-badge">{{ banner.tag|default('RAJA TOPUP GAMES', true) }}</span>
+                <h1>{{ banner.title }}</h1>
+                <p>{{ banner.subtitle or settings.get('site_tagline', 'Top Up game cepat, murah, dan terpercaya.') }}</p>
+                <a class="market-cta" href="{{ banner.link or '#games' }}">{{ banner.button_text or 'Top Up Sekarang' }} →</a>
+            </div>
+        </article>
+        {% else %}
+        <article class="market-slide active default-hero">
+            <div class="market-slide-content">
+                <span class="market-badge">PROMO SPESIAL</span>
+                <h1>TOP UP GAME<br><strong>TERCEPAT & TERMURAH</strong></h1>
+                <p>Top up game, voucher, pulsa, e-wallet, dan aplikasi premium dalam satu tempat.</p>
+                <a class="market-cta" href="#games">Mulai Top Up →</a>
+            </div>
+        </article>
+        {% endfor %}
+        <div class="hero-dots">
+          {% set total_dots = banners|length if banners else 1 %}
+          {% for _ in range(total_dots) %}<span class="{% if loop.first %}active{% endif %}"></span>{% endfor %}
+        </div>
+    </div>
+    <div class="hero-side hero-side-right"></div>
+    <button class="hero-arrow right" type="button">›</button>
+</section>
+{% if website_banners %}
+<section class="website-banner-block" id="promo-website">
+  <div class="website-banner-grid">
+    {% for wb in website_banners %}
+    <a class="website-promo-card" href="{{ wb.link or '#games' }}" {% if wb.image %}style="background-image:linear-gradient(90deg,rgba(6,10,20,.88),rgba(6,10,20,.28)),url('{{ url_for('static', filename='img/products/' + wb.image) }}')"{% endif %}>
+      <span>{{ wb.badge or 'PROMO WEBSITE' }}</span>
+      <h2>{{ wb.title }}</h2>
+      <p>{{ wb.subtitle }}</p>
+      <b>{{ wb.button_text or 'Lihat Promo' }} →</b>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="market-section" id="games">
+    <div class="market-section-head">
+        <div><h2>🔥 Produk Populer</h2><p>Top up dan voucher paling populer minggu ini</p></div>
+        <a href="{{ url_for('home.index') }}#games">Lihat Semua →</a>
+    </div>
+
+    <form class="market-filter" method="GET" action="{{ url_for('home.index') }}#games">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cari produk favoritmu...">
+        <select name="section_id">
+            <option value="">Semua section</option>
+            {% for section in catalog_sections %}<option value="{{ section.id }}" {% if selected_section|string == section.id|string %}selected{% endif %}>{{ section.title }}</option>{% endfor %}
+        </select>
+        <select name="category_id">
+            <option value="">Semua kategori</option>
+            {% for category in categories %}<option value="{{ category.id }}" {% if selected_category|string == category.id|string %}selected{% endif %}>{{ category.name }}</option>{% endfor %}
+        </select>
+        <button type="submit">Cari</button>
+        <a href="{{ url_for('home.index') }}#games">Reset</a>
+    </form>
+
+    <div class="market-product-grid">
+        {% for game in games %}
+        <a href="{{ url_for('home.topup', category_id=game.id) }}" class="market-product-card">
+            {% if game.badge %}<span class="discount-badge">{{ game.badge }}</span>{% else %}<span class="discount-badge">-5%</span>{% endif %}
+            <div class="market-product-image">
+                {% if game.icon %}{% if game.icon.startswith('http') %}<img src="{{ game.icon }}" alt="{{ game.name }}">{% else %}<img src="{{ url_for('static', filename='img/games/' + game.icon) }}" alt="{{ game.name }}">{% endif %}{% else %}<span>{{ game.name[:2] }}</span>{% endif %}
+            </div>
+            <div class="market-product-info">
+                <h3>{{ game.name }}</h3>
+                {% set active_products = game.products|selectattr('status', 'equalto', 'active')|list %}
+                {% if active_products %}<p>Mulai Rp {{ "{:,}".format((active_products|min(attribute='price')).price).replace(',', '.') }}</p>{% else %}<p>Produk segera hadir</p>{% endif %}
+            </div>
+        </a>
+        {% else %}
+        <p class="empty-state">Produk tidak ditemukan.</p>
+        {% endfor %}
+    </div>
+</section>
+
+
+{% macro category_grid(section_id, title, subtitle, items, empty_text) -%}
+<section class="market-section" id="{{ section_id }}">
+    <div class="market-section-head">
+        <div><h2>{{ title }}</h2><p>{{ subtitle }}</p></div>
+        {% if items %}<a href="#{{ section_id }}">Pilih Produk →</a>{% endif %}
+    </div>
+    <div class="market-product-grid compact-product-grid">
+        {% for item in items %}
+        <a href="{{ url_for('home.topup', category_id=item.id) }}" class="market-product-card">
+            {% if item.badge %}<span class="discount-badge">{{ item.badge }}</span>{% endif %}
+            <div class="market-product-image">
+                {% if item.icon %}
+                    {% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}">{% endif %}
+                {% else %}<span>{{ item.name[:2] }}</span>{% endif %}
+            </div>
+            <div class="market-product-info">
+                <h3>{{ item.name }}</h3>
+                {% set active_products = item.products|selectattr('status', 'equalto', 'active')|list %}
+                {% if active_products %}<p>Mulai Rp {{ "{:,}".format((active_products|min(attribute='price')).price).replace(',', '.') }}</p>{% else %}<p>Produk segera hadir</p>{% endif %}
+            </div>
+        </a>
+        {% else %}
+        <p class="empty-state">{{ empty_text }}</p>
+        {% endfor %}
+    </div>
+</section>
+{%- endmacro %}
+
+{{ category_grid('voucher', '🎟️ Voucher', 'Voucher game, Google Play, Steam, Garena, dan layanan digital lainnya.', voucher_categories, 'Produk voucher belum tersedia.') }}
+{{ category_grid('pulsa', '📱 Pulsa', 'Pulsa Telkomsel, XL, Axis, Indosat, Tri, dan Smartfren.', pulsa_categories, 'Produk pulsa belum tersedia.') }}
+{{ category_grid('ewallet', '💳 E-Wallet', 'Top up saldo DANA, OVO, GoPay, ShopeePay, LinkAja, dan e-wallet lainnya.', ewallet_categories, 'Produk e-wallet belum tersedia.') }}
+{{ category_grid('premium', '⭐ Aplikasi Premium', 'Aplikasi premium dan langganan digital populer.', premium_categories, 'Produk aplikasi premium belum tersedia.') }}
+
+
+<section class="market-section sosmed-section" id="sosmed">
+    <div class="market-section-head">
+        <div><span class="market-badge">Reseller Sosmed Terlengkap</span><h2>✨ Pilihan Sosial Media</h2><p>Layanan followers, likes, views, subscribers, traffic, dan engagement.</p></div>
+        <a href="{{ url_for('home.index', section_id=(social_categories[0].catalog_section_id if social_categories else '')) }}#games">Lihat Semua →</a>
+    </div>
+    <div class="sosmed-chip-grid">
+        {% for item in social_categories %}
+        <a href="{{ url_for('home.topup', category_id=item.id) }}" class="sosmed-chip">
+            <span class="sosmed-chip-icon">
+                {% if item.icon %}{% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}">{% endif %}{% else %}{{ item.name[:1] }}{% endif %}
+            </span>
+            <b>{{ item.name.replace(' Sosmed','') }}</b>
+        </a>
+        {% else %}
+        <p class="empty-state">Layanan sosial media belum tersedia.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="market-section" id="promo">
+    <div class="market-section-head"><div><h2>🎁 Promo & Benefit</h2><p>Promo terbaik dari Raja Topup Games</p></div></div>
+    <div class="market-promo-grid">
+        {% for promo in promos %}
+        <a class="market-promo-card" href="{{ promo.link or '#games' }}"><span>{{ promo.badge }}</span><h3>{{ promo.title }}</h3><p>{{ promo.description }}</p></a>
+        {% else %}
+        <div class="market-promo-card"><span>PROMO</span><h3>Promo segera hadir</h3><p>Tambahkan promo dari dashboard admin.</p></div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="market-section" id="faq">
+    <div class="market-section-head"><div><h2>❓ FAQ</h2><p>Pertanyaan umum pengguna</p></div></div>
+    <div class="faq-list market-faq">
+        {% for f in faqs %}<details><summary>{{ f.question }}</summary><p>{{ f.answer }}</p></details>{% endfor %}
+    </div>
+</section>
+
+<a class="floating-chat" href="{{ url_for('auth.live_chat') if session.get('user_id') else url_for('auth.login') }}">💬</a>
+<button id="install-pwa-btn" class="install-pwa-btn market-install" type="button" hidden>📲 Pasang Aplikasi</button>
+
+<footer class="market-footer">
+    <div><b>👑 RAJA TOPUP GAMES</b><p>Platform top up game, voucher, e-wallet, dan aplikasi premium.</p></div>
+    <div><b>Metode Pembayaran</b><p>QRIS · Bank · E-Wallet · Saldo Raja Topup</p></div>
+    <div><b>Support</b><p>Live Chat Admin / Operator 24 Jam</p></div>
+</footer>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.market-slide')];
+  const dots=[...document.querySelectorAll('.hero-dots span')];
+  let i=0;
+  function show(n){
+    if(!slides.length) return;
+    slides[i].classList.remove('active'); if(dots[i]) dots[i].classList.remove('active');
+    i=(n+slides.length)%slides.length;
+    slides[i].classList.add('active'); if(dots[i]) dots[i].classList.add('active');
+  }
+  document.querySelector('.hero-arrow.left')?.addEventListener('click',()=>show(i-1));
+  document.querySelector('.hero-arrow.right')?.addEventListener('click',()=>show(i+1));
+  if(slides.length>1){ setInterval(()=>show(i+1),4500); }
+})();
+(function(){
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.user-menu-btn');
+    document.querySelectorAll('.user-menu.open').forEach(function(menu){
+      if(!btn && !menu.contains(e.target)){ menu.classList.remove('open'); }
+    });
+    if(btn){ e.preventDefault(); var menu = btn.closest('.user-menu'); if(menu){ var open = menu.classList.toggle('open'); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); } }
+  });
+})();
+if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ navigator.serviceWorker.register('{{ url_for('service_worker') }}').catch(function(err){ console.warn('SW gagal:', err); }); }); }
+var deferredPrompt; var installBtn = document.getElementById('install-pwa-btn');
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt=e; if(installBtn){installBtn.hidden=false;} });
+if(installBtn){ installBtn.addEventListener('click', async function(){ if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; installBtn.hidden=true; }); }
+</script>
+</body>
+</html>

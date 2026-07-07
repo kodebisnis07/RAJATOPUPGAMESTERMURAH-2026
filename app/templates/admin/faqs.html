@@ -1,0 +1,15 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head"><h1>FAQ</h1><p>Kelola pertanyaan yang sering ditanyakan.</p></div>
+<form class="admin-form grid-form" method="POST">
+    <input name="question" placeholder="Pertanyaan" required>
+    <input name="sort_order" type="number" value="0" placeholder="Urutan">
+    <textarea name="answer" placeholder="Jawaban" required></textarea>
+    <label class="check"><input type="checkbox" name="is_active" checked> Aktif</label>
+    <button type="submit">Tambah FAQ</button>
+</form>
+<table class="admin-table">
+<thead><tr><th>Pertanyaan</th><th>Jawaban</th><th>Urutan</th><th>Aksi</th></tr></thead>
+<tbody>{% for f in faqs %}<tr><td>{{ f.question }}</td><td>{{ f.answer }}</td><td>{{ f.sort_order }}</td><td><form method="POST" action="{{ url_for('admin.delete_faq', id=f.id) }}"><button class="danger">Hapus</button></form></td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

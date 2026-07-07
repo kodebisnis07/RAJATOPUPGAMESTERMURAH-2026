@@ -1,0 +1,50 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head"><h1>Manajemen Admin</h1><p>Khusus Super Admin. Kelola admin, role, status, dan reset password.</p></div>
+<form class="admin-form grid-form" method="POST">
+    <input name="username" placeholder="Username" required>
+    <input name="name" placeholder="Nama admin">
+    <div class="password-field"><input id="newAdminPassword" type="password" name="password" placeholder="Password awal minimal 6 karakter" required><button type="button" class="toggle-pass" data-target="newAdminPassword">👁</button></div>
+    <select name="role"><option value="admin">Admin</option><option value="operator">Operator</option><option value="super_admin">Super Admin</option></select>
+    <label class="check"><input type="checkbox" name="is_active" checked> Aktif</label>
+    <button type="submit">Tambah Admin</button>
+</form>
+<table class="admin-table">
+<thead><tr><th>Admin</th><th>Role</th><th>Status</th><th>Edit</th></tr></thead>
+<tbody>
+{% for a in admins %}
+<tr>
+    <td><strong>{{ a.username }}</strong><br><small>{{ a.name or '-' }}</small></td>
+    <td><span class="badge">{{ a.role }}</span></td>
+    <td>{{ 'Aktif' if a.is_active else 'Nonaktif' }}</td>
+    <td>
+        <details><summary>Edit</summary>
+            <form class="mini-edit" method="POST" action="{{ url_for('admin.update_admin', id=a.id) }}">
+                <input name="name" value="{{ a.name or '' }}" placeholder="Nama">
+                <select name="role">
+                    {% for role in ['super_admin','admin','operator'] %}<option value="{{ role }}" {% if a.role == role %}selected{% endif %}>{{ role }}</option>{% endfor %}
+                </select>
+                <div class="password-field"><input id="password_{{ a.id }}" type="password" name="password" placeholder="Password baru (kosongkan jika tidak diganti)"><button type="button" class="toggle-pass" data-target="password_{{ a.id }}">👁</button></div>
+                <label><input type="checkbox" name="is_active" {% if a.is_active %}checked{% endif %}> Aktif</label>
+                <button>Update</button>
+            </form>
+            {% if a.id != session.get('admin_id') %}
+            <form method="POST" action="{{ url_for('admin.delete_admin', id=a.id) }}" onsubmit="return confirm('Hapus admin ini?')"><button class="danger">Hapus</button></form>
+            {% endif %}
+        </details>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<script>
+document.querySelectorAll('.toggle-pass').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var input = document.getElementById(btn.dataset.target);
+    if(!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+});
+</script>
+
+{% endblock %}

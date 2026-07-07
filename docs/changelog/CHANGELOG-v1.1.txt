@@ -1,0 +1,22 @@
+RAJA TOPUP v1.1
+
+Perubahan:
+1. Menambahkan seed data awal agar daftar game langsung tampil di halaman utama.
+2. Memperbaiki search dan filter game di halaman utama.
+3. Menambahkan harga mulai dari pada kartu game.
+4. Memperbaiki upload gambar produk di dashboard admin.
+5. Menambahkan preview gambar produk sebelum submit.
+6. Menambahkan route /login dan /register sebagai alias ke /auth/login dan /auth/register.
+7. Menambahkan callback dasar Tripay di /tripay/callback.
+8. Menambahkan default setting payment gateway manual dan Tripay sandbox.
+
+Cara pakai:
+1. Extract ZIP.
+2. Buka folder raja-topup di CMD.
+3. Jalankan: pip install -r requirements.txt
+4. Jalankan: python run.py
+5. Buka: http://127.0.0.1:5000
+
+Catatan:
+- Tripay akan fallback ke pembayaran manual kalau credential belum diisi.
+- Isi credential Tripay di Admin > Pengaturan.

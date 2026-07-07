@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>🤝 Reseller</h1>
+<p class="muted">Kelola pendaftaran reseller, level, dan komisi.</p>
+<table class="admin-table">
+    <tr><th>User</th><th>Toko</th><th>Level</th><th>Komisi</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr>
+    {% for r in items %}
+    <tr>
+        <form method="POST" action="{{ url_for('admin.update_reseller', id=r.id) }}">
+            <td>{{ r.user.name if r.user else '-' }}<br><small>{{ r.user.email if r.user else '' }}</small></td>
+            <td>{{ r.store_name or '-' }}</td>
+            <td><input name="level" value="{{ r.level }}"></td>
+            <td><input type="number" name="commission_percent" value="{{ r.commission_percent or 0 }}" style="width:80px">%</td>
+            <td><select name="status"><option value="pending" {% if r.status=='pending' %}selected{% endif %}>Pending</option><option value="approved" {% if r.status=='approved' %}selected{% endif %}>Approved</option><option value="rejected" {% if r.status=='rejected' %}selected{% endif %}>Rejected</option></select></td>
+            <td><input name="note" value="{{ r.note or '' }}"></td>
+            <td><button class="btn-small">Update</button></td>
+        </form>
+    </tr>
+    {% else %}<tr><td colspan="7">Belum ada reseller.</td></tr>{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head"><h1>Testimoni</h1><p>Kelola ulasan pelanggan di halaman depan.</p></div>
+<form class="admin-form grid-form" method="POST">
+    <input name="name" placeholder="Nama pelanggan" required>
+    <input name="rating" type="number" min="1" max="5" value="5">
+    <textarea name="message" placeholder="Isi testimoni" required></textarea>
+    <label class="check"><input type="checkbox" name="is_active" checked> Aktif</label>
+    <button type="submit">Tambah Testimoni</button>
+</form>
+<table class="admin-table">
+<thead><tr><th>Nama</th><th>Pesan</th><th>Rating</th><th>Aksi</th></tr></thead>
+<tbody>{% for t in testimonials %}<tr><td>{{ t.name }}</td><td>{{ t.message }}</td><td>{{ '⭐' * t.rating }}</td><td><form method="POST" action="{{ url_for('admin.delete_testimonial', id=t.id) }}"><button class="danger">Hapus</button></form></td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

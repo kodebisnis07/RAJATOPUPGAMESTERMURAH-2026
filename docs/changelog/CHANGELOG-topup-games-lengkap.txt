@@ -1,0 +1,10 @@
+Update Top Up Games Lengkap
+
+- Menambahkan kategori Top Up Games secara statis melalui seed catalog.
+- Panel admin tidak diubah.
+- Game baru yang ditambahkan mencakup Terlaris, Populer, dan Game Lainnya dari daftar screenshot.
+- Menambahkan gambar placeholder untuk setiap game agar kartu produk tidak kosong.
+- Produk lama tetap dipertahankan dan harga dasar yang sudah ada tetap digunakan untuk ML, PUBG, Free Fire, Valorant, Genshin, dan Steam Wallet.
+
+Catatan:
+- Untuk beberapa game yang belum ada daftar nominal resmi, dibuat paket awal "Paket Top Up" dengan harga Rp10.000 agar produk bisa tampil dan bisa diedit nanti dari panel admin bila diperlukan.

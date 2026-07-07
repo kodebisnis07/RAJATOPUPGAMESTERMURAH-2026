@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Akun - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page">
+    {% include 'auth/_account_nav.html' %}
+    <div class="profile-hero-card">
+        <div class="avatar-large">
+            {% if avatar_url %}<img src="{{ avatar_url }}" alt="Foto profil {{ user.name }}">{% else %}<span>{{ (user.name or 'U')[:1]|upper }}</span>{% endif %}
+        </div>
+        <div>
+            <span class="eyebrow">DASHBOARD USER</span>
+            <h1>Halo, {{ user.name }}</h1>
+            <p>Kelola akun, cek pesanan, simpan game favorit, dan pantau status transaksi Anda.</p>
+        </div>
+        <div class="hero-actions"><a class="btn-checkout hero-action" href="{{ url_for('home.index') }}#games">Top Up Game</a><a class="btn-checkout hero-action outline" href="{{ url_for('auth.wallet_topup') }}">Top Up Saldo</a></div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+
+    <div class="stat-grid">
+        <div class="stat-card"><span>Total Pesanan</span><b>{{ stats.total_orders }}</b></div>
+        <div class="stat-card"><span>Pending</span><b>{{ stats.pending_orders }}</b></div>
+        <div class="stat-card"><span>Diproses/Selesai</span><b>{{ stats.success_orders }}</b></div>
+        <div class="stat-card"><span>Dibatalkan</span><b>{{ stats.cancelled_orders }}</b></div>
+        <div class="stat-card"><span>Total Belanja</span><b>Rp {{ "{:,}".format(stats.total_spent).replace(",", ".") }}</b></div>
+        <div class="stat-card"><span>Member</span><b>{{ stats.member_level }}</b></div>
+        <div class="stat-card"><span>Saldo Akun</span><b>Rp {{ "{:,}".format(user.balance or 0).replace(",", ".") }}</b></div>
+        <div class="stat-card"><span>Koin Bonus</span><b>{{ user.bonus_coins or 0 }}</b></div>
+    </div>
+
+    <div class="profile-layout">
+        <div class="profile-card order-history">
+            <h2>Pesanan Terbaru</h2>
+            {% if orders %}
+            <div class="history-table"><table><thead><tr><th>Invoice</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+            {% for order in orders %}<tr>
+                <td>{{ order.invoice }}</td><td>{{ order.product.name if order.product else '-' }}</td>
+                <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td>
+                <td><span class="status-pill {{ order.order_status }}">{{ order.order_status|upper }}</span></td>
+                <td><a href="{{ url_for('home.checkout', invoice=order.invoice) }}">Detail</a></td>
+            </tr>{% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-state">Belum ada pesanan.</div>{% endif %}
+        </div>
+        <div class="profile-card">
+            <h2>Game Favorit</h2>
+            {% if favorites %}
+                <div class="favorite-mini-list">{% for fav in favorites %}<a href="{{ url_for('home.topup', category_id=fav.category.id) }}">⭐ {{ fav.category.name }}</a>{% endfor %}</div>
+            {% else %}
+                <div class="empty-state">Belum ada game favorit.</div>
+            {% endif %}
+            <a class="btn-small outline profile-logout" href="{{ url_for('auth.favorites') }}">Kelola Favorit</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

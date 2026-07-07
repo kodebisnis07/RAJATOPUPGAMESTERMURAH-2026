@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Game Favorit - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page">
+    {% include 'auth/_account_nav.html' %}
+    <div class="profile-head"><span class="eyebrow">GAME FAVORIT</span><h1>Simpan Game Favorit</h1><p>Pilih game yang sering Anda top up agar lebih cepat ditemukan.</p></div>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    <div class="favorite-grid">
+        {% for category in categories %}
+        <div class="favorite-card">
+            <div class="game-thumb small-thumb">{% if category.icon %}<img src="{{ category.icon if category.icon.startswith('http') else url_for('static', filename='img/games/' ~ category.icon) }}" alt="{{ category.name }}">{% else %}<span>{{ category.name[:2]|upper }}</span>{% endif %}</div>
+            <h3>{{ category.name }}</h3>
+            <form method="POST" action="{{ url_for('auth.toggle_favorite', category_id=category.id) }}">
+                <button class="btn-small {{ 'outline' if category.id in favorite_ids else '' }}" type="submit">{{ 'Hapus Favorit' if category.id in favorite_ids else 'Tambah Favorit' }}</button>
+            </form>
+            <a href="{{ url_for('home.topup', category_id=category.id) }}">Top Up</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

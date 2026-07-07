@@ -1,0 +1,5 @@
+Update kategori RajaTopup:
+- Menambahkan section Aplikasi Premium, Suntik Sosmed, Telegram Premium, dan Telegram Stars.
+- Menambahkan produk dan harga sesuai daftar user.
+- Form topup kini menyesuaikan kategori: game memakai User ID + Server, sosmed memakai username/link, premium apps memakai email/username, Telegram memakai username.
+- Seed dibuat idempotent: aman dijalankan ulang tanpa menggandakan produk yang sama.

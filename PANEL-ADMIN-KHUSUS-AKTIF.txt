@@ -1,0 +1,12 @@
+PANEL ADMIN KHUSUS AKTIF
+
+Link admin/operator:
+https://rajatopupgames-termurah2026.onrender.com/panel-rtg-2026-X7q9K/login
+
+Link super admin:
+https://rajatopupgames-termurah2026.onrender.com/super-panel-rtg-2026-S9kL2/login
+
+Link lama /admin dan /super-admin diblokir 404.
+
+Catatan Render:
+Jika Root Directory di Render diisi RAJATOPUPGAMES-TERMURAH2026, file di folder itu juga sudah diperbaiki.

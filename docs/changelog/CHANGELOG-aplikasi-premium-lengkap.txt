@@ -1,0 +1,8 @@
+Update Aplikasi Premium:
+- Menambahkan 23 produk/menu aplikasi premium sesuai daftar gambar.
+- Menambahkan ikon placeholder untuk setiap produk di app/static/img/games.
+- Memperbarui seed database agar produk otomatis muncul saat aplikasi dijalankan.
+- Memperbarui database bawaan rajatopup.db agar produk langsung tampil tanpa reset database.
+
+Produk baru:
+Netflix Premium, YouTube Premium, CapCut Pro, Canva Pro, ChatGPT, Video Premier, WeTV Premium, SuperGrok, Viu Premium, Bstation Premium, Disney Hotstar, Gemini, iQIYI, Akun Gmail, Vision Plus, Spotify Murah, Amazon Prime Video, Perplexity, Webtoon, Getcontact Premium, Google Play, Alight Motion, Website Topup Games.

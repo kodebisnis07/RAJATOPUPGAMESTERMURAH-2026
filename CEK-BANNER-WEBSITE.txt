@@ -1,0 +1,15 @@
+FIX NYATA BANNER WEBSITE
+
+Setelah push dan deploy, buka:
+1. /admin/website-banners
+2. /super-admin/website-banners
+3. /admin/banner-website
+
+Semua URL itu sudah diarahkan ke halaman yang sama: 🎨 Banner Website Promo.
+Kalau masih 404, berarti Render belum memakai ZIP/commit ini.
+Kalau masih muncul "Slide Banner Website", berarti folder lama masih yang terdeploy.
+
+Perubahan file utama:
+- app/routes/admin.py
+- app/templates/admin/base.html
+- app/templates/admin/website_banners.html

@@ -1,0 +1,11 @@
+FIX DAFTAR / REGISTER
+
+- Memperbaiki service worker agar tidak meng-cache halaman HTML.
+- Menambahkan header no-cache untuk /auth/daftar, /auth/register, /daftar, /register.
+- Membuat root app.py sebagai launcher kompatibel, sehingga tidak lagi menampilkan homepage saja ketika dijalankan dengan python app.py atau flask --app app.
+
+Cara pakai:
+1. Stop server: CTRL+C
+2. Jalankan: python run.py
+3. Buka Chrome DevTools > Application > Service Workers > Unregister jika halaman masih cache.
+4. Buka: http://127.0.0.1:5000/auth/daftar

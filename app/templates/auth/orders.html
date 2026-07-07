@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Pesanan Saya - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page">
+    {% include 'auth/_account_nav.html' %}
+    <div class="profile-head"><span class="eyebrow">PESANAN SAYA</span><h1>Riwayat Pesanan</h1><p>Cek detail invoice dan batalkan pesanan yang masih pending.</p></div>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    <div class="order-filters"><a href="{{ url_for('auth.orders') }}">Semua</a><a href="{{ url_for('auth.orders', status='pending') }}">Pending</a><a href="{{ url_for('auth.orders', status='paid') }}">Paid</a><a href="{{ url_for('auth.orders', status='cancelled') }}">Cancelled</a></div>
+    <div class="profile-card order-history">
+    {% if orders %}<div class="history-table"><table><thead><tr><th>Tanggal</th><th>Invoice</th><th>Produk</th><th>Total</th><th>Pembayaran</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+        {% for order in orders %}<tr>
+            <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</td><td>{{ order.invoice }}</td><td>{{ order.product.name if order.product else '-' }}</td>
+            <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td><td>{{ order.payment_method or '-' }}</td>
+            <td><span class="status-pill {{ order.order_status }}">{{ order.order_status|upper }}</span></td>
+            <td class="history-actions"><a href="{{ url_for('home.checkout', invoice=order.invoice) }}">Detail</a>{% if order.payment_status == 'pending' and order.order_status == 'pending' %}<form method="POST" action="{{ url_for('home.cancel_order', invoice=order.invoice) }}" onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?');"><button type="submit">Batalkan</button></form>{% endif %}</td>
+        </tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty-state">Belum ada pesanan.</div>{% endif %}
+    </div>
+</section>
+{% endblock %}

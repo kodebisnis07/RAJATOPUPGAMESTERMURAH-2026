@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-head">
+  <h1>Audit Log Admin & Operator</h1>
+  <p>Khusus Super Admin. Semua aktivitas penting admin dan operator dicatat di sini.</p>
+</div>
+
+<form class="admin-form" method="get">
+  <label>Cari
+    <input type="text" name="q" value="{{ q }}" placeholder="Username, IP, atau keterangan">
+  </label>
+  <label>Role
+    <select name="role">
+      <option value="" {{ 'selected' if not role else '' }}>Semua</option>
+      {% for r in ['super_admin','admin','operator'] %}
+        <option value="{{ r }}" {{ 'selected' if role == r else '' }}>{{ r }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Aksi
+    <select name="action">
+      <option value="" {{ 'selected' if not action else '' }}>Semua</option>
+      {% for item in actions %}
+        <option value="{{ item }}" {{ 'selected' if action == item else '' }}>{{ item }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>&nbsp;<button type="submit">Filter</button></label>
+  <label>&nbsp;<a class="btn" href="{{ url_for('admin.audit_log') }}">Reset</a></label>
+</form>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Waktu</th>
+      <th>Akun</th>
+      <th>Role</th>
+      <th>Aksi</th>
+      <th>Keterangan</th>
+      <th>IP</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+      <tr>
+        <td>{{ log.created_at.strftime('%d/%m/%Y %H:%M:%S') if log.created_at else '-' }}</td>
+        <td><strong>{{ log.admin_username or '-' }}</strong><br><small>ID: {{ log.admin_id or '-' }}</small></td>
+        <td><span class="badge">{{ log.admin_role or '-' }}</span></td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.description or '-' }}</td>
+        <td>{{ log.ip_address or '-' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">Belum ada aktivitas.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

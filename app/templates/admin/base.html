@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - RAJA TOPUP GAMES</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+<button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>
+<div class="admin-layout">
+    <aside class="sidebar" id="admin-sidebar">
+        <div class="logo">👑 RAJA TOPUP GAMES<br><span>Admin Control Center</span></div>
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}">📊 Dashboard</a>
+            {% if is_super_admin %}<a href="{{ url_for('admin.omset') }}">📈 Riwayat Omset</a>{% endif %}
+            <a href="{{ url_for('admin.seo_settings') }}">🔎 SEO Website</a>
+            {% if is_admin_role %}
+                <a href="{{ url_for('admin.products') }}">🎮 Game / Produk</a>
+                <a href="{{ url_for('admin.nominals') }}">💎 Nominal</a>
+                <a href="{{ url_for('admin.categories') }}">📁 Kategori</a>
+                {% if is_super_admin %}<a href="{{ url_for('admin.catalog_sections') }}">🧩 Section Katalog</a>{% endif %}
+                {% if is_super_admin %}<a href="{{ url_for('admin.slide_banners') }}">🖼️ Slide Banner</a>{% endif %}
+                <a href="{{ url_for('admin.website_banners') }}">🎨 Banner Website</a>
+                <a href="{{ url_for('admin.promos') }}">🎁 Promo</a>
+                <a href="{{ url_for('admin.vouchers') }}">🎫 Voucher</a>
+                <a href="{{ url_for('admin.resellers') }}">🤝 Reseller</a>
+                <a href="{{ url_for('admin.testimonials') }}">⭐ Testimoni</a>
+                <a href="{{ url_for('admin.faqs') }}">❓ FAQ</a>
+            {% endif %}
+            <a href="{{ url_for('admin.orders') }}">🧾 Pesanan</a>
+            <a href="{{ url_for('admin.users') }}">👥 User</a>
+            <a href="{{ url_for('admin.payments') }}">💳 Pembayaran</a>
+            <a href="{{ url_for('admin.wallet_topups') }}">💰 Top Up Saldo</a>
+            <a href="{{ url_for('admin.live_chat') }}">💬 Live Chat</a>
+            {% if is_super_admin %}<a href="{{ url_for('admin.payment_methods') }}">🏦 Metode Pembayaran</a>{% endif %}
+            {% if is_super_admin %}<a href="{{ url_for('admin.auto_order') }}">🤖 Auto Order</a>{% endif %}
+            {% if is_super_admin %}<a href="{{ url_for('admin.admins') }}">👑 Manajemen Admin</a>{% endif %}
+            {% if is_super_admin %}<a href="{{ url_for('admin.role_permissions') }}">🛡️ Izin Role</a>{% endif %}
+            {% if is_super_admin %}<a href="{{ url_for('admin.audit_log') }}">🕵️ Audit Log</a>{% endif %}
+            <a href="{{ url_for('admin.change_password') }}">🔐 Ganti Password</a>
+            {% if is_super_admin %}<a href="{{ url_for('admin.settings') }}">⚙️ Pengaturan</a>{% endif %}
+            <a href="{{ url_for('home.index') }}" target="_blank">🌐 Lihat Website</a>
+            <a href="{{ url_for('admin.logout') }}">🚪 Logout</a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <strong>{{ current_admin.name if current_admin and current_admin.name else current_admin.username if current_admin else 'Admin' }}</strong>
+                <small>{{ current_admin.role if current_admin else '' }}</small>
+            </div>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script>
+(function(){
+  var btn = document.querySelector('.admin-menu-toggle');
+  var sidebar = document.querySelector('.sidebar');
+  if(btn && sidebar){
+    btn.addEventListener('click', function(){
+      var open = sidebar.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = open ? '✕ Tutup' : '☰ Menu';
+    });
+    sidebar.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        if(window.innerWidth <= 900){
+          sidebar.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          btn.textContent = '☰ Menu';
+        }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<div class="account-nav">
+    <a href="{{ url_for('auth.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('auth.profile') }}">Profil</a>
+    <a href="{{ url_for('auth.edit_profile') }}">Edit Profil</a>
+    <a href="{{ url_for('auth.change_password') }}">Password</a>
+    <a href="{{ url_for('auth.orders') }}">📄 Invoice</a>
+    <a href="{{ url_for('auth.wallet_topup') }}">Top Up Saldo</a>
+    <a href="{{ url_for('auth.notifications') }}">🔔 Inbox{% if unread_notifications_count %} <span class="notif-badge">{{ unread_notifications_count }}</span>{% endif %}</a>
+    <a href="{{ url_for('auth.live_chat') }}">Live Chat</a>
+    <a href="{{ url_for('auth.favorites') }}">Favorit</a>
+</div>

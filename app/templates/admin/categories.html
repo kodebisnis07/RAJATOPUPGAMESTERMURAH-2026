@@ -1,0 +1,112 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="admin-page">
+    <div class="page-head">
+        <h1>Kategori / Game</h1>
+        <p>Kelola daftar game yang tampil di halaman depan. Pilih Section Katalog agar game tidak tercampur di area Game Populer.</p>
+    </div>
+
+    <form method="POST" class="admin-form grid-form" enctype="multipart/form-data">
+        <label>
+            Nama Game / Produk Utama
+            <input type="text" name="name" placeholder="Nama game, contoh: Mobile Legends" required>
+        </label>
+        <label>
+            Section Tampilan
+            <select name="catalog_section_id">
+                <option value="">Tanpa section</option>
+                {% for section in sections %}
+                <option value="{{ section.id }}">{{ section.title }}</option>
+                {% endfor %}
+            </select>
+            <small>Contoh section: Game Populer, Aplikasi Premium, Voucher, Steam Wallet.</small>
+        </label>
+        <label>
+            Upload Logo / Foto Game
+            <input type="file" name="icon" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
+            <small>Format: PNG, JPG, JPEG, WEBP, GIF.</small>
+        </label>
+        <label>
+            Badge
+            <input type="text" name="badge" placeholder="Contoh: HOT, BARU, PROMO">
+        </label>
+        <label>
+            Urutan Tampil
+            <input type="number" name="sort_order" value="0">
+        </label>
+        <label>
+            Status
+            <select name="status">
+                <option value="active">Aktif</option>
+                <option value="inactive">Nonaktif</option>
+            </select>
+        </label>
+        <label class="check">
+            <input type="checkbox" name="is_featured" value="1" checked>
+            Tampilkan di halaman depan
+        </label>
+        <button type="submit">Tambah Kategori</button>
+    </form>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Foto</th>
+                <th>Nama</th>
+                <th>Section</th>
+                <th>Badge</th>
+                <th>Urutan</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                    {% if category.icon %}
+                        <img class="admin-thumb" src="{{ category.icon if category.icon.startswith('http') else url_for('static', filename='img/games/' + category.icon) }}" alt="{{ category.name }}">
+                    {% else %}
+                        <div class="admin-thumb placeholder">{{ category.name[:2] }}</div>
+                    {% endif %}
+                </td>
+                <td>
+                    <form class="inline-form category-edit-form" method="POST" enctype="multipart/form-data" action="{{ url_for('admin.edit_category', id=category.id) }}">
+                        <input type="text" name="name" value="{{ category.name }}" required>
+                        <select name="catalog_section_id">
+                            <option value="">Tanpa section</option>
+                            {% for section in sections %}
+                            <option value="{{ section.id }}" {% if category.catalog_section_id == section.id %}selected{% endif %}>{{ section.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="status">
+                            <option value="active" {% if category.status == 'active' %}selected{% endif %}>Aktif</option>
+                            <option value="inactive" {% if category.status == 'inactive' %}selected{% endif %}>Nonaktif</option>
+                        </select>
+                        <input type="text" name="badge" value="{{ category.badge or '' }}" placeholder="Badge">
+                        <input type="number" name="sort_order" value="{{ category.sort_order or 0 }}" placeholder="Urutan">
+                        <label class="check tiny-check"><input type="checkbox" name="is_featured" value="1" {% if category.is_featured %}checked{% endif %}> Tampil</label>
+                        <input type="file" name="icon" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
+                        {% if category.icon %}
+                        <label class="check tiny-check"><input type="checkbox" name="remove_icon" value="1"> Hapus foto</label>
+                        {% endif %}
+                        <button type="submit">Simpan</button>
+                    </form>
+                </td>
+                <td>{{ category.catalog_section.title if category.catalog_section else '-' }}</td>
+                <td>{{ category.badge or '-' }}</td>
+                <td>{{ category.sort_order or 0 }}</td>
+                <td>{{ category.status }}</td>
+                <td>
+                    <a class="delete-btn" href="{{ url_for('admin.delete_category', id=category.id) }}" onclick="return confirm('Hapus kategori ini? Produk di kategori ini bisa ikut bermasalah.')">Hapus</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">Belum ada kategori.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

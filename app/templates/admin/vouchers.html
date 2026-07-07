@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>🎫 Voucher & Diskon</h1>
+<form method="POST" class="form-card">
+    <div class="form-grid">
+        <label>Kode Voucher<input name="code" placeholder="Contoh: RAJA10" required></label>
+        <label>Judul<input name="title" placeholder="Diskon Member Baru"></label>
+        <label>Tipe Diskon<select name="discount_type"><option value="fixed">Nominal Rupiah</option><option value="percent">Persen</option></select></label>
+        <label>Nilai Diskon<input type="number" name="discount_value" value="0"></label>
+        <label>Minimal Order<input type="number" name="min_order" value="0"></label>
+        <label>Kuota<input type="number" name="quota" value="0"><small>0 = tanpa batas</small></label>
+        <label class="check"><input type="checkbox" name="is_active" checked> Aktif</label>
+    </div>
+    <button class="btn" type="submit">Simpan Voucher</button>
+</form>
+<table class="admin-table">
+    <tr><th>Kode</th><th>Judul</th><th>Diskon</th><th>Min. Order</th><th>Pakai/Kuota</th><th>Status</th><th>Aksi</th></tr>
+    {% for v in vouchers %}
+    <tr>
+        <td><b>{{ v.code }}</b></td><td>{{ v.title }}</td>
+        <td>{% if v.discount_type == 'percent' %}{{ v.discount_value }}%{% else %}Rp {{ "{:,}".format(v.discount_value).replace(',', '.') }}{% endif %}</td>
+        <td>Rp {{ "{:,}".format(v.min_order or 0).replace(',', '.') }}</td>
+        <td>{{ v.used_count or 0 }} / {{ v.quota or '∞' }}</td>
+        <td>{{ 'Aktif' if v.is_active else 'Nonaktif' }}</td>
+        <td><form method="POST" action="{{ url_for('admin.delete_voucher', id=v.id) }}" onsubmit="return confirm('Hapus voucher ini?')"><button class="btn-small danger">Hapus</button></form></td>
+    </tr>
+    {% else %}<tr><td colspan="7">Belum ada voucher.</td></tr>{% endfor %}
+</table>
+{% endblock %}

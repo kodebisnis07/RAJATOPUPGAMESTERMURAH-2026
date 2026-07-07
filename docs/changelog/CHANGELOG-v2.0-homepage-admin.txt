@@ -1,0 +1,23 @@
+RAJA TOPUP GAMES v2.0 - Homepage Professional & Admin CMS
+
+Perubahan utama:
+- Homepage dibuat lebih profesional: hero banner slider, fitur unggulan, promo, payment logos, testimoni, FAQ, footer.
+- Brand website menjadi RAJA TOPUP GAMES.
+- Dashboard admin ditingkatkan tampilannya.
+- Menu admin baru: Banner Website, Promo, Testimoni, FAQ, Manajemen Admin.
+- Super Admin full akses dengan role: super_admin, admin, operator.
+- create_admin.py selalu menyiapkan akun Super Admin: admin / Admin@123.
+- Database ditambah tabel banners, promos, testimonials, faqs.
+- Migration SQLite otomatis menambahkan kolom admin: name, role, is_active.
+- Pengaturan website ditambah: site_name, site_tagline, WhatsApp, Telegram, Instagram.
+
+Cara menjalankan:
+1. pip install -r requirements.txt
+2. python create_admin.py
+3. python run.py
+4. Buka http://127.0.0.1:5000
+5. Admin: http://127.0.0.1:5000/admin/login
+
+Login Super Admin:
+Username: admin
+Password: Admin@123

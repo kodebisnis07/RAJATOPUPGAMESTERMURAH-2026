@@ -1,0 +1,6 @@
+Perubahan form Top Up:
+- Section Data Pembeli manual dihapus dari halaman topup.
+- Data pembeli otomatis memakai akun user yang sedang login.
+- Untuk top up game, form hanya meminta User ID dan Zone ID.
+- Untuk kategori aplikasi premium/voucher/wallet, User ID dan Zone ID tidak ditampilkan.
+- Backend tidak lagi mengambil nama/email/WhatsApp dari form topup.

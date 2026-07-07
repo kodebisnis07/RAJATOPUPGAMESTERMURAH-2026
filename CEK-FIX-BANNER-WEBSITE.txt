@@ -1,0 +1,12 @@
+FIX NYATA BANNER WEBSITE
+
+Setelah deploy commit ini, buka:
+/admin/website-banners
+
+Judul halaman yang benar:
+🎨 Banner Website Promo
+
+Menu sidebar harus bertuliskan:
+🎨 Banner Website Promo FIX
+
+Kalau masih 404 atau judul masih Slide Banner Website, Render/GitHub masih memakai commit lama.

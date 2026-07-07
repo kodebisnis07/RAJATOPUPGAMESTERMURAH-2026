@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login User - Raja Topup Games</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=fix-sosmed-20260701">
+</head>
+<body class="site-body auth-page auth-login-page">
+<div class="auth-shell">
+    <section class="auth-banner" aria-label="Banner Raja Topup Games">
+        <div class="auth-banner-overlay"></div>
+        <div class="auth-brand-badge">
+            <div class="auth-crown">♛</div>
+            <div>
+                <span>RAJA TOPUP</span>
+                <strong>GAMES</strong>
+            </div>
+        </div>
+        <div class="auth-banner-content">
+            <p class="auth-kicker">Top Up Cepat • Aman • Terpercaya</p>
+            <h1>RAJA TOPUP<br><span>GAMES</span></h1>
+            <p class="auth-banner-text">Login untuk lanjut membeli diamond, voucher, dan kebutuhan game favorit Anda.</p>
+            <div class="auth-benefits">
+                <div><b>⚡</b><span>Proses Cepat</span></div>
+                <div><b>🛡️</b><span>Aman 100%</span></div>
+                <div><b>🎧</b><span>Support 24 Jam</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-panel">
+        <div class="auth-logo-mini">
+            <span>♛</span>
+            <b>RAJA TOPUP GAMES</b>
+        </div>
+        <h1>Selamat Datang Kembali!</h1>
+        <p class="auth-muted">Masuk menggunakan username Anda untuk melanjutkan.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+
+        <form method="POST" class="auth-form">
+            <label>Username</label>
+            <div class="auth-input-wrap">
+                <span class="auth-input-icon">👤</span>
+                <input type="text" name="username" placeholder="Masukkan username" autocomplete="username" required>
+            </div>
+
+            <label>Password</label>
+            <div class="auth-input-wrap">
+                <span class="auth-input-icon">🔒</span>
+                <input id="loginPassword" type="password" name="password" placeholder="Masukkan password" autocomplete="current-password" required>
+                <button class="password-eye" type="button" data-target="loginPassword" aria-label="Lihat password">👁️</button>
+            </div>
+
+            <div class="auth-link-row">
+                <span></span>
+                <a href="{{ url_for('auth.forgot_password') }}">Lupa password?</a>
+            </div>
+
+            <button class="btn-checkout auth-submit" type="submit">Login</button>
+        </form>
+
+        <div class="auth-divider"><span>Belum punya akun?</span></div>
+        <a class="auth-outline-btn" href="{{ url_for('auth.register') }}">Daftar Sekarang</a>
+        <a class="auth-back" href="{{ url_for('home.index') }}">← Kembali ke beranda</a>
+    </section>
+</div>
+<script>
+document.querySelectorAll('.password-eye').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        var input = document.getElementById(btn.dataset.target);
+        if(!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+        btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+    });
+});
+</script>
+</body>
+</html>

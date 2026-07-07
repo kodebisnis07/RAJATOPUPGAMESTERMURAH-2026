@@ -1,0 +1,104 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-head">
+    <h1>🏦 Metode Pembayaran</h1>
+    <p>Khusus Super Admin. Tambah bank/e-wallet/QRIS, lalu aktifkan atau offline-kan saat layanan sedang gangguan.</p>
+</div>
+
+<form class="admin-form grid-form" method="POST" enctype="multipart/form-data">
+    <label>Nama Metode
+        <input type="text" name="name" placeholder="Contoh: BCA, BRI, GoPay, QRIS" required>
+    </label>
+    <label>Jenis
+        <select name="type">
+            <option value="bank">Bank</option>
+            <option value="ewallet">E-Wallet</option>
+            <option value="qris">QRIS</option>
+            <option value="virtual_account">Virtual Account</option>
+            <option value="manual">Manual</option>
+        </select>
+    </label>
+    <label>Nomor Rekening / Nomor HP
+        <input type="text" name="account_number" placeholder="1234567890 / 08xxxxxxxxxx">
+    </label>
+    <label>Atas Nama
+        <input type="text" name="account_name" placeholder="RAJA TOPUP GAMES">
+    </label>
+    <label>Biaya Admin
+        <input type="number" name="admin_fee" value="0" min="0">
+    </label>
+    <label>Urutan Tampil
+        <input type="number" name="sort_order" value="0">
+    </label>
+    <label>Upload Logo
+        <input type="file" name="logo" accept="image/*">
+    </label>
+    <label>Upload QR Code
+        <input type="file" name="qr_image" accept="image/*">
+    </label>
+    <label style="grid-column:1/-1">Instruksi Pembayaran
+        <textarea name="instruction" placeholder="Contoh: Transfer sesuai nominal, lalu tunggu konfirmasi admin."></textarea>
+    </label>
+    <label class="check"><input type="checkbox" name="is_active" checked> Aktif</label>
+    <label class="check"><input type="checkbox" name="is_offline"> Tandai offline</label>
+    <button type="submit">+ Tambah Metode</button>
+</form>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Logo</th><th>Metode</th><th>Rekening/HP</th><th>Status</th><th>QR</th><th>Aksi Cepat</th><th>Edit</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for m in methods %}
+        <tr>
+            <td>{% if m.logo %}<img class="admin-thumb" src="{{ url_for('static', filename='img/payment_methods/' + m.logo) }}" alt="{{ m.name }}">{% else %}<div class="admin-thumb placeholder">{{ m.name[:2]|upper }}</div>{% endif %}</td>
+            <td><strong>{{ m.name }}</strong><br><span class="badge">{{ m.type }}</span>{% if m.admin_fee %}<br><small>Fee: Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}</small>{% endif %}</td>
+            <td>{{ m.account_number or '-' }}<br><small>{{ m.account_name or '-' }}</small></td>
+            <td>
+                {% if m.is_active and not m.is_offline %}<span class="badge success-badge">ONLINE</span>{% elif m.is_offline %}<span class="badge offline-badge">OFFLINE</span>{% else %}<span class="badge inactive-badge">NONAKTIF</span>{% endif %}
+                <br><small>Urutan: {{ m.sort_order }}</small>
+            </td>
+            <td>{% if m.qr_image %}<img class="admin-thumb" src="{{ url_for('static', filename='img/payment_methods/' + m.qr_image) }}" alt="QR {{ m.name }}">{% else %}-{% endif %}</td>
+            <td>
+                <form method="POST" action="{{ url_for('admin.toggle_payment_method', id=m.id) }}" class="inline-form">
+                    {% if m.is_offline or not m.is_active %}<button class="btn small" name="action" value="online">Online</button>{% else %}<button class="btn small" name="action" value="offline">Offline</button>{% endif %}
+                    {% if m.is_active %}<button class="danger" name="action" value="deactivate">Nonaktif</button>{% else %}<button class="btn small" name="action" value="activate">Aktif</button>{% endif %}
+                </form>
+            </td>
+            <td>
+                <details>
+                    <summary>Edit</summary>
+                    <form class="mini-edit" method="POST" enctype="multipart/form-data" action="{{ url_for('admin.edit_payment_method', id=m.id) }}">
+                        <input name="name" value="{{ m.name }}" required>
+                        <select name="type">
+                            {% for t,label in [('bank','Bank'),('ewallet','E-Wallet'),('qris','QRIS'),('virtual_account','Virtual Account'),('manual','Manual')] %}
+                                <option value="{{ t }}" {% if m.type==t %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <input name="account_number" value="{{ m.account_number or '' }}" placeholder="Nomor rekening/HP">
+                        <input name="account_name" value="{{ m.account_name or '' }}" placeholder="Atas nama">
+                        <input type="number" name="admin_fee" value="{{ m.admin_fee or 0 }}">
+                        <input type="number" name="sort_order" value="{{ m.sort_order or 0 }}">
+                        <textarea name="instruction" placeholder="Instruksi">{{ m.instruction or '' }}</textarea>
+                        <label>Ganti logo<input type="file" name="logo" accept="image/*"></label>
+                        <label>Ganti QR<input type="file" name="qr_image" accept="image/*"></label>
+                        <label class="tiny-check"><input type="checkbox" name="remove_logo" value="1"> Hapus logo</label>
+                        <label class="tiny-check"><input type="checkbox" name="remove_qr" value="1"> Hapus QR</label>
+                        <label class="tiny-check"><input type="checkbox" name="is_active" {% if m.is_active %}checked{% endif %}> Aktif</label>
+                        <label class="tiny-check"><input type="checkbox" name="is_offline" {% if m.is_offline %}checked{% endif %}> Offline</label>
+                        <button type="submit">Simpan</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.delete_payment_method', id=m.id) }}" onsubmit="return confirm('Hapus metode pembayaran ini?');">
+                        <button class="danger" type="submit">Hapus</button>
+                    </form>
+                </details>
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="7">Belum ada metode pembayaran. Tambahkan Bank, GoPay, DANA, OVO, atau QRIS dari form di atas.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

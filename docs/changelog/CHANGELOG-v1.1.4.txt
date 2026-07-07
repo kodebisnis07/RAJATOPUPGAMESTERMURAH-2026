@@ -1,0 +1,48 @@
+RAJA TOPUP v1.1.4 - Admin & Katalog Fix
+
+Perubahan utama:
+1. Route /admin diperbaiki.
+   - /admin dan /admin/ sekarang redirect ke /admin/login.
+   - /admin/login tampil normal.
+   - /admin/dashboard terlindungi login admin.
+
+2. Admin default diperbaiki.
+   - create_admin.py sekarang selalu menyiapkan akun admin.
+   - Username: admin
+   - Password: Admin@123
+
+3. Seeder database diperbaiki.
+   - Admin default dibuat otomatis jika belum ada.
+   - Kategori/game contoh tetap dibuat agar halaman depan tidak kosong.
+
+4. Dashboard admin dirapikan.
+   - Base layout admin dibuat konsisten.
+   - Login admin dibuat lebih rapi.
+   - Kategori dibuat satu layout dengan admin.
+   - Produk dibuat satu layout dengan admin.
+
+5. Manajemen produk ditingkatkan.
+   - Tambah produk.
+   - Upload gambar produk.
+   - Preview gambar saat upload.
+   - Edit cepat produk.
+   - Hapus produk dan gambar lama.
+
+6. Manajemen kategori ditingkatkan.
+   - Tambah kategori/game.
+   - Edit nama dan status kategori.
+   - Hapus kategori.
+
+Cara menjalankan:
+1. Extract ZIP.
+2. Masuk ke folder raja-topup.
+3. Jalankan:
+   pip install -r requirements.txt
+   python create_admin.py
+   python run.py
+4. Buka:
+   http://127.0.0.1:5000/admin
+
+Login admin:
+Username: admin
+Password: Admin@123

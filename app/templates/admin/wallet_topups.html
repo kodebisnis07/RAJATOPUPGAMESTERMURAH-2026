@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Top Up Saldo User</h1>
+        <p>Kelola permintaan top up saldo, bonus koin, dan status pembayaran user.</p>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <a class="btn-small{% if not status %} active{% endif %}" href="{{ url_for('admin.wallet_topups') }}">Semua</a>
+    <a class="btn-small{% if status == 'pending' %} active{% endif %}" href="{{ url_for('admin.wallet_topups', status='pending') }}">Pending</a>
+    <a class="btn-small{% if status == 'approved' %} active{% endif %}" href="{{ url_for('admin.wallet_topups', status='approved') }}">Approved</a>
+    <a class="btn-small{% if status == 'rejected' %} active{% endif %}" href="{{ url_for('admin.wallet_topups', status='rejected') }}">Rejected</a>
+</div>
+
+<div class="card table-card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr><th>Invoice</th><th>User</th><th>Nominal</th><th>Bonus</th><th>Metode</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr>
+            </thead>
+            <tbody>
+                {% for trx in topups %}
+                <tr>
+                    <td>{{ trx.invoice }}</td>
+                    <td>{{ trx.user.username if trx.user else '-' }}<br><small>{{ trx.user.name if trx.user else '' }}</small></td>
+                    <td>Rp {{ "{:,}".format(trx.amount or 0).replace(",", ".") }}</td>
+                    <td>{{ trx.bonus_coins or 0 }} koin</td>
+                    <td>{{ trx.payment_method_name or '-' }}</td>
+                    <td><span class="status-pill {{ trx.status }}">{{ trx.status|upper }}</span></td>
+                    <td>{{ trx.note or '-' }}</td>
+                    <td>
+                        {% if trx.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('admin.update_wallet_topup', id=trx.id) }}" class="inline-action-form">
+                            <input type="text" name="note" placeholder="Catatan opsional">
+                            <button class="btn-small" name="action" value="approve" onclick="return confirm('Setujui top up saldo ini?')">Approve</button>
+                            <button class="btn-small danger" name="action" value="reject" onclick="return confirm('Tolak top up saldo ini?')">Reject</button>
+                        </form>
+                        {% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="empty-state">Belum ada permintaan top up saldo.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

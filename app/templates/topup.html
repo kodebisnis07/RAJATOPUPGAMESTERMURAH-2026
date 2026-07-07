@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="topup-hero">
+    <div>
+        <span class="eyebrow">RAJA TOPUP GAMES</span>
+        <h1>Top Up {{ category.name }}</h1>
+        <p>{{ input_config.help if input_config else 'Pilih paket, pilih pembayaran, lalu selesaikan transaksi dengan aman.' }}</p>
+    </div>
+</section>
+
+<form method="POST" class="topup-layout" id="topupForm">
+    <div class="topup-main">
+        <div class="step-card">
+            <div class="step-title"><span>1</span><div><h2>{{ input_config.title if input_config else 'Data Target' }}</h2><p>{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
+            <div class="form-grid compact-game-fields">
+                <label>{{ input_config.label if input_config else 'Data Target' }}<input type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" required></label>
+                {% if input_config and input_config.needs_server %}
+                <label>{{ input_config.server_label }}<input type="text" name="game_server_id" placeholder="{{ input_config.server_placeholder }}"></label>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-title"><span>2</span><div><h2>Pilih Nominal</h2><p>Pilih paket yang tersedia untuk {{ category.name }}.</p></div></div>
+            <div class="nominal-grid">
+                {% for product in products %}
+                <label class="nominal-card" data-name="{{ product.name }}" data-price="{{ product.price }}">
+                    <input type="radio" name="product_id" value="{{ product.id }}" required>
+                    <div class="nominal-icon">
+                        {% if product.image %}<img src="{{ url_for('static', filename='img/products/' + product.image) }}" alt="{{ product.name }}">{% else %}💎{% endif %}
+                    </div>
+                    <div><strong>{{ product.name }}</strong><small>{{ product.description or 'Paket top-up instan' }}</small></div>
+                    <b>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</b>
+                </label>
+                {% else %}
+                <div class="empty-state">Belum ada nominal aktif untuk game ini.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="step-card buyer-auto-card">
+            <div class="step-title"><span>3</span><div><h2>Data Pembeli Otomatis</h2><p>Invoice dan notifikasi memakai data akun login Anda, jadi tidak perlu diisi ulang.</p></div></div>
+            <div class="buyer-auto-box">
+                <span>{{ current_user.name if current_user else session.get('user_name') }}</span>
+                <small>{{ current_user.email if current_user else session.get('user_email') }}{% if current_user and current_user.phone %} • {{ current_user.phone }}{% endif %}</small>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-title"><span>4</span><div><h2>Kode Voucher</h2><p>Opsional. Masukkan kode diskon jika Anda punya.</p></div></div>
+            <div class="form-grid compact-game-fields">
+                <label>Kode Voucher<input type="text" name="voucher_code" placeholder="Contoh: RAJA10"></label>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-title"><span>5</span><div><h2>Metode Pembayaran</h2><p>Pilih Saldo RajaTopup atau bank/e-wallet/QRIS yang sedang online.</p></div></div>
+            <div class="payment-grid">
+                <label class="pay-card pay-method-card wallet-pay-card" data-fee="0">
+                    <input type="radio" name="payment_method_id" value="saldo" required>
+                    <div class="pay-logo wallet-logo">💰</div>
+                    <span>Saldo RajaTopup</span>
+                    <small>Saldo tersedia: Rp {{ "{:,}".format((current_user.balance if current_user else 0) or 0).replace(",", ".") }}</small>
+                </label>
+                {% for m in payment_methods %}
+                <label class="pay-card pay-method-card" data-fee="{{ m.admin_fee or 0 }}">
+                    <input type="radio" name="payment_method_id" value="{{ m.id }}" required>
+                    {% if m.logo %}<img class="pay-logo" src="{{ url_for('static', filename='img/payment_methods/' + m.logo) }}" alt="{{ m.name }}">{% endif %}
+                    <span>{{ m.name }}</span>
+                    <small>{{ m.type|replace('_',' ')|title }}{% if m.admin_fee %} • Fee Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}{% endif %}</small>
+                </label>
+                {% else %}
+                <div class="empty-state">Belum ada metode pembayaran yang aktif. Silakan hubungi admin.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <aside class="order-summary">
+        <h2>Ringkasan</h2>
+        <div class="summary-row"><span>Produk</span><b>{{ category.name }}</b></div>
+        <div class="summary-row"><span>Nominal</span><b id="summaryProduct">Belum dipilih</b></div>
+        <div class="summary-row"><span>Total</span><b id="summaryPrice">Rp 0</b></div>
+        <button type="submit" class="btn-checkout">Bayar Sekarang</button>
+        <a class="summary-back" href="{{ url_for('home.index') }}">← Kembali ke Home</a>
+    </aside>
+</form>
+<script>
+function rupiah(value){ return 'Rp ' + Number(value || 0).toLocaleString('id-ID'); }
+window.selectedPrice = 0; window.selectedFee = 0;
+function updateSummaryTotal(){ document.getElementById('summaryPrice').textContent = rupiah((window.selectedPrice||0) + (window.selectedFee||0)); }
+document.querySelectorAll('.nominal-card input').forEach(function(input){
+    input.addEventListener('change', function(){
+        const card = this.closest('.nominal-card');
+        document.getElementById('summaryProduct').textContent = card.dataset.name;
+        window.selectedPrice = Number(card.dataset.price || 0);
+        updateSummaryTotal();
+    });
+});
+document.querySelectorAll('.pay-method-card input').forEach(function(input){
+    input.addEventListener('change', function(){
+        const card = this.closest('.pay-method-card');
+        window.selectedFee = Number(card.dataset.fee || 0);
+        updateSummaryTotal();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="admin-page">
+    <div class="page-head">
+        <h1>Nominal / Paket Top Up</h1>
+        <p>Kelola nominal diamond, UC, voucher, wallet, dan paket top-up untuk setiap game.</p>
+    </div>
+
+    <form method="POST" class="admin-form grid-form" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Nama nominal, contoh: 86 Diamonds" required>
+        <input type="number" name="price" placeholder="Harga jual" required>
+        <input type="number" name="price_modal" placeholder="Harga modal" value="0">
+        <input type="number" name="stock" placeholder="Stok" value="999">
+        <select name="category_id" required>
+            <option value="">Pilih game/kategori</option>
+            {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+        </select>
+        <input type="text" name="provider" placeholder="Provider, contoh: Digiflazz">
+        <input type="text" name="provider_code" placeholder="Kode provider">
+        <select name="status"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+        <input type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
+        <textarea name="description" placeholder="Deskripsi singkat"></textarea>
+        <button type="submit">Tambah Nominal</button>
+    </form>
+
+    <form class="admin-form" method="GET">
+        <select name="category_id">
+            <option value="">Semua game</option>
+            {% for category in categories %}<option value="{{ category.id }}" {% if selected_category|string == category.id|string %}selected{% endif %}>{{ category.name }}</option>{% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a class="btn" href="{{ url_for('admin.nominals') }}">Reset</a>
+    </form>
+
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Game</th><th>Nominal</th><th>Harga Modal</th><th>Harga Jual</th><th>Stok</th><th>Provider</th><th>Status</th><th>Edit</th><th>Aksi</th></tr></thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.category.name if product.category else '-' }}</td>
+                <td><strong>{{ product.name }}</strong><br><small>{{ product.description or '' }}</small></td>
+                <td>Rp {{ "{:,}".format(product.price_modal or 0).replace(",", ".") }}</td>
+                <td>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</td>
+                <td>{{ product.stock }}</td>
+                <td>{{ product.provider or '-' }}<br><small>{{ product.provider_code or '' }}</small></td>
+                <td><span class="badge">{{ product.status }}</span></td>
+                <td>
+                    <details>
+                        <summary>Edit</summary>
+                        <form class="mini-edit" method="POST" action="{{ url_for('admin.edit_product', id=product.id) }}" enctype="multipart/form-data">
+                            <input type="hidden" name="next" value="{{ url_for('admin.nominals', category_id=selected_category) }}">
+                            <input type="text" name="name" value="{{ product.name }}" required>
+                            <input type="number" name="price" value="{{ product.price }}" required>
+                            <input type="number" name="price_modal" value="{{ product.price_modal or 0 }}">
+                            <input type="number" name="stock" value="{{ product.stock }}">
+                            <select name="category_id" required>{% for category in categories %}<option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select>
+                            <input type="text" name="provider" value="{{ product.provider or '' }}" placeholder="Provider">
+                            <input type="text" name="provider_code" value="{{ product.provider_code or '' }}" placeholder="Kode provider">
+                            <select name="status"><option value="active" {% if product.status == 'active' %}selected{% endif %}>Aktif</option><option value="inactive" {% if product.status == 'inactive' %}selected{% endif %}>Nonaktif</option></select>
+                            <input type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
+                            <textarea name="description">{{ product.description or '' }}</textarea>
+                            <button type="submit">Simpan</button>
+                        </form>
+                    </details>
+                </td>
+                <td><a class="delete-btn" href="{{ url_for('admin.delete_product', id=product.id) }}" onclick="return confirm('Hapus nominal ini?')">Hapus</a></td>
+            </tr>
+        {% else %}<tr><td colspan="10">Belum ada nominal.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

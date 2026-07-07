@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Live Chat - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page chat-page">
+    <div class="profile-container">
+        {% include 'auth/_account_nav.html' %}
+        <div class="profile-content">
+            <div class="section-heading left">
+                <span>💬 Bantuan</span>
+                <h1>Live Chat Admin / Operator</h1>
+                <p>Kirim pesan kepada tim Raja Topup Games. Balasan admin akan muncul otomatis.</p>
+            </div>
+
+            <div class="chat-box" id="user-chat-box">
+                <div class="chat-messages" id="chat-messages">
+                    {% for msg in messages %}
+                        <div class="chat-message {{ 'mine' if msg.sender_type == 'user' else 'staff' }}">
+                            <div class="chat-bubble">
+                                <strong>{{ msg.sender_name or msg.sender_type }}</strong>
+                                <p>{{ msg.message }}</p>
+                                <small>{{ msg.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">Belum ada pesan. Tulis pesan pertama untuk menghubungi Admin/Operator.</div>
+                    {% endfor %}
+                </div>
+
+                <form class="chat-form" method="post">
+                    <input type="text" name="message" placeholder="Tulis pesan Anda..." autocomplete="off" required>
+                    <button type="submit">Kirim</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+(function(){
+  var box = document.getElementById('chat-messages');
+  function scrollBottom(){ if(box){ box.scrollTop = box.scrollHeight; } }
+  scrollBottom();
+  function render(messages){
+    if(!box || !messages) return;
+    box.innerHTML = messages.map(function(msg){
+      var mine = msg.sender_type === 'user' ? 'mine' : 'staff';
+      var name = (msg.sender_name || msg.sender_type).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+      var message = (msg.message || '').replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+      return '<div class="chat-message '+mine+'"><div class="chat-bubble"><strong>'+name+'</strong><p>'+message+'</p><small>'+msg.created_at+'</small></div></div>';
+    }).join('') || '<div class="empty-state">Belum ada pesan.</div>';
+    scrollBottom();
+  }
+  setInterval(function(){
+    fetch('{{ url_for('auth.live_chat_messages') }}', {headers:{'Accept':'application/json'}})
+      .then(function(r){ return r.json(); })
+      .then(function(data){ if(data.ok){ render(data.messages); } })
+      .catch(function(){});
+  }, 5000);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="admin-page">
+    <div class="page-head">
+        <h1>Section Katalog Homepage</h1>
+        <p>Menu khusus Super Admin untuk memisahkan tampilan katalog di halaman depan, misalnya Game Populer, Aplikasi Premium, Voucher, dan Steam Wallet.</p>
+    </div>
+
+    <form method="POST" class="admin-form grid-form">
+        <label>
+            Nama Section
+            <input type="text" name="title" placeholder="Contoh: Game Populer" required>
+        </label>
+        <label>
+            Deskripsi
+            <input type="text" name="subtitle" placeholder="Contoh: Pilih game, lalu lanjutkan ke halaman top up.">
+        </label>
+        <label>
+            Urutan Tampil
+            <input type="number" name="sort_order" value="0">
+        </label>
+        <label class="check">
+            <input type="checkbox" name="is_active" value="1" checked>
+            Aktif / tampil di homepage
+        </label>
+        <button type="submit">Tambah Section</button>
+    </form>
+
+    {% if unassigned_count %}
+    <div class="alert warning">Ada {{ unassigned_count }} game/kategori yang belum masuk section. Buka menu Kategori untuk memilih section.</div>
+    {% endif %}
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Section</th>
+                <th>Deskripsi</th>
+                <th>Urutan</th>
+                <th>Status</th>
+                <th>Jumlah Item</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for section in sections %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td colspan="5">
+                    <form class="inline-form" method="POST" action="{{ url_for('admin.update_catalog_section', id=section.id) }}">
+                        <input type="text" name="title" value="{{ section.title }}" required>
+                        <input type="text" name="subtitle" value="{{ section.subtitle or '' }}" placeholder="Deskripsi">
+                        <input type="number" name="sort_order" value="{{ section.sort_order or 0 }}">
+                        <label class="check tiny-check"><input type="checkbox" name="is_active" value="1" {% if section.is_active %}checked{% endif %}> Aktif</label>
+                        <span class="badge-soft">{{ section.categories|length }} item</span>
+                        <button type="submit">Simpan</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.delete_catalog_section', id=section.id) }}" onsubmit="return confirm('Hapus section ini? Game di dalamnya tidak ikut terhapus, hanya dilepas dari section.')">
+                        <button class="delete-btn" type="submit">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">Belum ada section katalog.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="helper-card">
+        <strong>Cara pakai:</strong>
+        <p>1. Buat section seperti <b>Game Populer</b>, <b>Aplikasi Premium</b>, atau <b>Voucher</b>.</p>
+        <p>2. Buka menu <b>Kategori</b>, lalu pilih section untuk setiap game/produk utama.</p>
+        <p>3. Halaman depan otomatis memisahkan item sesuai section sehingga tidak tercampur.</p>
+    </div>
+</div>
+{% endblock %}

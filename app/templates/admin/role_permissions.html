@@ -1,0 +1,53 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head">
+    <h1>Izin Role Admin & Operator</h1>
+    <p>Khusus Super Admin. Atur fitur apa saja yang boleh digunakan Admin dan Operator tanpa mengubah kode.</p>
+</div>
+
+<section class="settings-form full-width-section">
+    <h2>Pengaturan Izin</h2>
+    <p class="muted">Super Admin selalu memiliki full akses. Pengaturan di bawah hanya berlaku untuk role Admin dan Operator.</p>
+    <form method="POST">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Fitur</th>
+                    {% for role in roles %}
+                        <th>{{ role|replace('_', ' ')|title }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for permission, label in permissions.items() %}
+                <tr>
+                    <td>
+                        <strong>{{ label }}</strong><br>
+                        <small>Jika aktif, role tersebut dapat mereset password user dari halaman detail user.</small>
+                    </td>
+                    {% for role in roles %}
+                    <td>
+                        <label class="check">
+                            <input type="checkbox" name="{{ role }}_{{ permission }}" value="1" {% if current_permissions[role][permission] %}checked{% endif %}>
+                            Diizinkan
+                        </label>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Simpan Izin Role</button>
+    </form>
+</section>
+
+<section class="settings-form full-width-section">
+    <h2>Catatan Keamanan</h2>
+    <ul>
+        <li>Admin/operator tetap tidak bisa melihat password asli user.</li>
+        <li>Reset password akan mengganti password user dengan password baru.</li>
+        <li>Semua aktivitas reset password tercatat di Audit Log Super Admin.</li>
+        <li>Admin/operator tetap tidak bisa mengakses menu Super Admin.</li>
+    </ul>
+</section>
+{% endblock %}

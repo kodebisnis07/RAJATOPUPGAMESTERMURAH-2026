@@ -1,0 +1,147 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>🤖 Auto Order Center</h1>
+        <p>Menu khusus Super Admin untuk menyiapkan pembayaran otomatis dan pengiriman topup otomatis.</p>
+    </div>
+</div>
+
+<div class="alert warning">
+    Menu ini sudah menyiapkan kontrol Auto Order. Agar transaksi benar-benar otomatis, tahap berikutnya adalah menyambungkan API Payment Gateway dan API Provider Topup.
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card"><span>Menunggu Bayar</span><strong>{{ status_summary.pending_payment }}</strong></div>
+    <div class="stat-card"><span>Sudah Bayar</span><strong>{{ status_summary.paid }}</strong></div>
+    <div class="stat-card"><span>Processing</span><strong>{{ status_summary.processing }}</strong></div>
+    <div class="stat-card"><span>Sukses</span><strong>{{ status_summary.success }}</strong></div>
+    <div class="stat-card"><span>Gagal</span><strong>{{ status_summary.failed }}</strong></div>
+    <div class="stat-card"><span>Batal</span><strong>{{ status_summary.cancelled }}</strong></div>
+</div>
+
+<form method="POST" class="card form-grid" style="margin-top:18px;">
+    <h2>Status Auto Order</h2>
+    <label>
+        Auto Order
+        <select name="auto_order_enabled">
+            <option value="0" {% if settings.get('auto_order_enabled') != '1' %}selected{% endif %}>Nonaktif / Manual</option>
+            <option value="1" {% if settings.get('auto_order_enabled') == '1' %}selected{% endif %}>Aktif</option>
+        </select>
+    </label>
+    <label>
+        Mode Proses
+        <select name="auto_order_mode">
+            <option value="manual_payment_auto_topup" {% if settings.get('auto_order_mode') == 'manual_payment_auto_topup' %}selected{% endif %}>Bayar manual, topup otomatis setelah admin konfirmasi</option>
+            <option value="full_auto" {% if settings.get('auto_order_mode') == 'full_auto' %}selected{% endif %}>Full auto: webhook payment + API topup</option>
+            <option value="manual" {% if settings.get('auto_order_mode', 'manual') == 'manual' %}selected{% endif %}>Manual</option>
+        </select>
+    </label>
+    <label>
+        Retry Order Gagal
+        <select name="auto_order_retry">
+            <option value="0" {% if settings.get('auto_order_retry') != '1' %}selected{% endif %}>Nonaktif</option>
+            <option value="1" {% if settings.get('auto_order_retry') == '1' %}selected{% endif %}>Aktif</option>
+        </select>
+    </label>
+    <label>
+        Callback URL Internal
+        <input name="auto_order_callback_url" value="{{ settings.get('auto_order_callback_url', '') }}" placeholder="https://domainanda.com/webhook/auto-order">
+    </label>
+    <label>
+        Webhook Secret
+        <input name="auto_order_webhook_secret" value="{{ settings.get('auto_order_webhook_secret', '') }}" placeholder="secret-key-anda">
+    </label>
+
+    <h2>Provider Topup</h2>
+    <label>
+        Provider
+        <select name="topup_provider">
+            {% for provider in ['digiflazz','vip_reseller','apigames','manual'] %}
+            <option value="{{ provider }}" {% if settings.get('topup_provider') == provider %}selected{% endif %}>{{ provider|replace('_',' ')|title }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>
+        Status Provider
+        <select name="topup_provider_status">
+            <option value="offline" {% if settings.get('topup_provider_status') != 'online' %}selected{% endif %}>Offline</option>
+            <option value="online" {% if settings.get('topup_provider_status') == 'online' %}selected{% endif %}>Online</option>
+        </select>
+    </label>
+    <label>Username / Merchant ID <input name="topup_username" value="{{ settings.get('topup_username', '') }}"></label>
+    <label>API Key <input name="topup_api_key" value="{{ settings.get('topup_api_key', '') }}"></label>
+    <label>Private Key / Secret <input name="topup_private_key" value="{{ settings.get('topup_private_key', '') }}"></label>
+    <label>Callback Provider <input name="topup_callback_url" value="{{ settings.get('topup_callback_url', '') }}"></label>
+
+    <h2>Payment Gateway Otomatis</h2>
+    <label>
+        Verifikasi Pembayaran Otomatis
+        <select name="payment_auto_verify">
+            <option value="0" {% if settings.get('payment_auto_verify') != '1' %}selected{% endif %}>Nonaktif</option>
+            <option value="1" {% if settings.get('payment_auto_verify') == '1' %}selected{% endif %}>Aktif</option>
+        </select>
+    </label>
+    <label>
+        Gateway
+        <select name="payment_gateway_provider">
+            {% for gateway in ['tripay','midtrans','xendit','duitku','manual'] %}
+            <option value="{{ gateway }}" {% if settings.get('payment_gateway_provider') == gateway %}selected{% endif %}>{{ gateway|title }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>
+        Status Gateway
+        <select name="payment_gateway_status">
+            <option value="offline" {% if settings.get('payment_gateway_status') != 'online' %}selected{% endif %}>Offline</option>
+            <option value="online" {% if settings.get('payment_gateway_status') == 'online' %}selected{% endif %}>Online</option>
+        </select>
+    </label>
+    <label>Merchant Code <input name="payment_merchant_code" value="{{ settings.get('payment_merchant_code', '') }}"></label>
+    <label>API Key <input name="payment_api_key" value="{{ settings.get('payment_api_key', '') }}"></label>
+    <label>Private Key / Secret <input name="payment_private_key" value="{{ settings.get('payment_private_key', '') }}"></label>
+    <label>Webhook URL <input name="payment_webhook_url" value="{{ settings.get('payment_webhook_url', '') }}" placeholder="https://domainanda.com/payment/webhook"></label>
+
+    <button class="btn primary" type="submit">💾 Simpan Pengaturan Auto Order</button>
+</form>
+
+<div class="card" style="margin-top:18px;">
+    <h2>Alur Auto Order</h2>
+    <div class="flow-box">
+        <span>1. User Checkout</span>
+        <b>→</b>
+        <span>2. Payment Gateway</span>
+        <b>→</b>
+        <span>3. Webhook PAID</span>
+        <b>→</b>
+        <span>4. API Topup</span>
+        <b>→</b>
+        <span>5. Sukses/Gagal</span>
+    </div>
+</div>
+
+<div class="card" style="margin-top:18px;">
+    <h2>10 Pesanan Terbaru</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Invoice</th><th>User</th><th>Produk</th><th>Bayar</th><th>Order</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>{{ order.invoice }}</td>
+                    <td>{{ order.customer_name or (order.user.name if order.user else '-') }}</td>
+                    <td>{{ order.product.name if order.product else '-' }}</td>
+                    <td><span class="badge">{{ order.payment_status }}</span></td>
+                    <td><span class="badge">{{ order.order_status }}</span></td>
+                    <td>Rp{{ '{:,.0f}'.format(order.price or 0).replace(',', '.') }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">Belum ada pesanan.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

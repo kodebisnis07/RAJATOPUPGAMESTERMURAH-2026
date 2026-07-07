@@ -1,0 +1,16 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head"><h1>Promo</h1><p>Tambah promo untuk ditampilkan di homepage.</p></div>
+<form class="admin-form grid-form" method="POST">
+    <input name="title" placeholder="Judul promo" required>
+    <input name="badge" placeholder="Badge" value="PROMO">
+    <input name="link" placeholder="Link tujuan">
+    <textarea name="description" placeholder="Deskripsi promo"></textarea>
+    <label class="check"><input type="checkbox" name="is_active" checked> Aktif</label>
+    <button type="submit">Tambah Promo</button>
+</form>
+<table class="admin-table">
+<thead><tr><th>Promo</th><th>Badge</th><th>Status</th><th>Aksi</th></tr></thead>
+<tbody>{% for p in promos %}<tr><td><strong>{{ p.title }}</strong><br><small>{{ p.description }}</small></td><td>{{ p.badge }}</td><td>{{ 'Aktif' if p.is_active else 'Nonaktif' }}</td><td><form method="POST" action="{{ url_for('admin.delete_promo', id=p.id) }}"><button class="danger">Hapus</button></form></td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

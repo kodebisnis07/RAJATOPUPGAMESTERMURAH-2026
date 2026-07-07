@@ -1,0 +1,41 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head"><h1>Pengaturan Website & Payment</h1><p>Atur brand, kontak, dan payment gateway.</p></div>
+<form method="POST" class="settings-form">
+    <h2>Brand Website</h2>
+    <label>Nama Website</label><input type="text" name="site_name" value="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}">
+    <label>Tagline</label><input type="text" name="site_tagline" value="{{ settings.get('site_tagline', '') }}">
+    <label>WhatsApp</label><input type="text" name="whatsapp" value="{{ settings.get('whatsapp', '') }}">
+    <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">
+    <label>Instagram</label><input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">
+
+    <h2>SEO & Google</h2>
+    <label>Meta Title</label><input type="text" name="meta_title" value="{{ settings.get('meta_title', 'Raja Topup Games | Top Up Game Murah, Cepat & Terpercaya') }}">
+    <label>Meta Description</label><textarea name="meta_description" rows="3">{{ settings.get('meta_description', 'Top up game murah, cepat, aman, dan terpercaya 24 jam di Raja Topup Games.') }}</textarea>
+    <label>Meta Keywords</label><textarea name="meta_keywords" rows="3">{{ settings.get('meta_keywords', 'top up game murah, top up mobile legends, top up free fire, diamond murah, raja topup games') }}</textarea>
+    <label>Google Site Verification</label><input type="text" name="google_site_verification" value="{{ settings.get('google_site_verification', 'HrOIxx6wt4mw2eVcXawtrwTp3o2220f-e6vNhBCaato') }}">
+    <label>Google Analytics ID</label><input type="text" name="google_analytics_id" value="{{ settings.get('google_analytics_id', '') }}" placeholder="G-XXXXXXXXXX">
+    <label>Facebook Pixel ID</label><input type="text" name="facebook_pixel_id" value="{{ settings.get('facebook_pixel_id', '') }}">
+
+    <h2>Payment Gateway</h2>
+    <label>Gateway Aktif</label>
+    <select name="payment_gateway">
+        {% set gateway = settings.get('payment_gateway', 'manual') %}
+        <option value="manual" {% if gateway == 'manual' %}selected{% endif %}>Manual</option>
+        <option value="tripay" {% if gateway == 'tripay' %}selected{% endif %}>Tripay</option>
+        <option value="duitku" {% if gateway == 'duitku' %}selected{% endif %}>Duitku</option>
+        <option value="xendit" {% if gateway == 'xendit' %}selected{% endif %}>Xendit</option>
+    </select>
+    <h2>Tripay</h2>
+    <label>Mode</label><select name="tripay_mode"><option value="sandbox" {% if settings.get('tripay_mode','sandbox') == 'sandbox' %}selected{% endif %}>Sandbox</option><option value="production" {% if settings.get('tripay_mode') == 'production' %}selected{% endif %}>Production</option></select>
+    <label>API Key</label><input type="text" name="tripay_api_key" value="{{ settings.get('tripay_api_key', '') }}">
+    <label>Private Key</label><input type="text" name="tripay_private_key" value="{{ settings.get('tripay_private_key', '') }}">
+    <label>Merchant Code</label><input type="text" name="tripay_merchant_code" value="{{ settings.get('tripay_merchant_code', '') }}">
+    <h2>Duitku</h2>
+    <label>Merchant Code</label><input type="text" name="duitku_merchant_code" value="{{ settings.get('duitku_merchant_code', '') }}">
+    <label>API Key</label><input type="text" name="duitku_api_key" value="{{ settings.get('duitku_api_key', '') }}">
+    <h2>Xendit</h2>
+    <label>Secret Key</label><input type="text" name="xendit_secret_key" value="{{ settings.get('xendit_secret_key', '') }}">
+    <button type="submit">Simpan Pengaturan</button>
+</form>
+{% endblock %}

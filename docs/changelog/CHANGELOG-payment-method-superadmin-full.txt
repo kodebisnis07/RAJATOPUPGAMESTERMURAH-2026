@@ -1,0 +1,12 @@
+Update Payment Method Super Admin
+
+- Menambahkan tabel/model PaymentMethod.
+- Menambahkan menu Super Admin: Metode Pembayaran.
+- Super Admin dapat tambah/edit/hapus Bank, E-Wallet, QRIS, Virtual Account, dan Manual.
+- Super Admin dapat upload logo dan QR Code pembayaran.
+- Super Admin dapat aktif/nonaktifkan metode pembayaran.
+- Super Admin dapat menandai metode pembayaran OFFLINE saat bank/e-wallet gangguan.
+- Metode yang offline/nonaktif tidak muncul di checkout user.
+- Checkout user menampilkan metode pembayaran dinamis dari panel Super Admin.
+- Invoice menampilkan nomor rekening/HP, atas nama, QR Code, instruksi, dan tombol salin nomor.
+- Role super_admin diberi bypass penuh pada role_required sehingga memiliki full access ke seluruh panel admin.

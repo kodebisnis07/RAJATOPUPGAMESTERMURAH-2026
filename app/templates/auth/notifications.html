@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Notifikasi - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page notifications-page">
+    {% include 'auth/_account_nav.html' %}
+    <div class="profile-head">
+        <span class="eyebrow">NOTIFIKASI</span>
+        <h1>Notifikasi Akun</h1>
+        <p>Semua informasi order dan pembayaran akan muncul di sini.</p>
+    </div>
+    <div class="profile-card notification-list">
+        {% if notifications %}
+            {% for item in notifications %}
+                <div class="notification-item {{ item.type }} {% if not item.is_read %}unread{% endif %}">
+                    <div>
+                        <h3>{{ item.title }}</h3>
+                        <p>{{ item.message }}</p>
+                        <small>{{ item.created_at.strftime('%d/%m/%Y %H:%M') if item.created_at else '-' }}</small>
+                    </div>
+                    {% if item.order %}
+                        <a class="btn-small outline" href="{{ url_for('home.checkout', invoice=item.order.invoice) }}">Lihat Invoice</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">Belum ada notifikasi.</div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

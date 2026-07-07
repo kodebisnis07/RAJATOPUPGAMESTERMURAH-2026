@@ -1,0 +1,15 @@
+Update PWA + Live Chat
+
+Fitur PWA:
+- manifest.webmanifest untuk install website seperti aplikasi Android/iPhone.
+- service-worker.js untuk cache dasar dan pengalaman akses lebih cepat.
+- icon PWA 192x192 dan 512x512.
+- Tombol Install Aplikasi otomatis muncul jika browser mendukung.
+
+Fitur Live Chat:
+- Menu Live Chat untuk user login.
+- User bisa chat dengan Admin/Operator.
+- Menu Live Chat di panel Admin/Operator/Super Admin.
+- Admin/Operator bisa membalas chat user.
+- Super Admin bisa memantau semua percakapan.
+- Chat tersimpan di database lewat tabel chat_threads dan chat_messages.

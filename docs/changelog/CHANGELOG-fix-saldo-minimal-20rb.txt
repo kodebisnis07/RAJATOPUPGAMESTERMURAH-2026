@@ -1,0 +1,5 @@
+Update:
+- Menghilangkan pesan payment gateway pada invoice yang dibayar memakai Saldo RajaTopup.
+- Top up saldo user sekarang bisa input nominal sendiri.
+- Minimal top up saldo diubah menjadi Rp20.000.
+- Riwayat top up saldo tetap masuk ke panel admin untuk approve/reject.

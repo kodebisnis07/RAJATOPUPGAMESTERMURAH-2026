@@ -1,0 +1,17 @@
+CHANGELOG - Order Timeout & Notifikasi User
+
+Tambahan:
+- Order pending otomatis dibatalkan jika belum dibayar dalam 10 menit.
+- Expired/cancel otomatis berjalan saat ada request website, tanpa scheduler eksternal.
+- Payment manual/placeholder dan Tripay kini memakai batas bayar 10 menit.
+- Invoice menampilkan countdown sisa waktu bayar.
+- Setelah waktu habis, invoice otomatis refresh dan status menjadi expired/cancelled.
+- User mendapat notifikasi saat order dibuat, dibatalkan manual, expired otomatis, pembayaran diterima, atau pembayaran gagal.
+- Menu Notifikasi ditambahkan di dropdown user dan dashboard akun.
+- Badge jumlah notifikasi belum dibaca.
+- Tabel user_notifications ditambahkan.
+- Kolom orders.cancelled_at ditambahkan untuk database lama SQLite/PostgreSQL.
+
+Catatan Render:
+- Jika memakai PostgreSQL Render lama, sistem akan mencoba menambahkan kolom orders.cancelled_at otomatis tanpa menghapus data.
+- Tetap gunakan DATABASE_URL agar data tidak hilang saat deploy/restart Render.

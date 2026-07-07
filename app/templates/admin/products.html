@@ -1,0 +1,72 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="admin-page">
+    <div class="page-head">
+        <h1>Game / Produk</h1>
+        <p>Kelola game dan paket utama. Untuk pengaturan nominal detail, gunakan menu <b>Nominal</b>.</p>
+    </div>
+
+    <form method="POST" class="admin-form product-form grid-form" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Nama produk / paket" required>
+        <input type="number" name="price" placeholder="Harga jual" required>
+        <input type="number" name="price_modal" placeholder="Harga modal" value="0">
+        <input type="number" name="stock" placeholder="Stok" value="999">
+        <select name="category_id" required>
+            <option value="">Pilih game/kategori</option>
+            {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+        </select>
+        <select name="status"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+        <input id="productImageInput" type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
+        <textarea name="description" placeholder="Deskripsi produk"></textarea>
+        <div class="image-preview-wrap"><span>Preview gambar</span><img id="productImagePreview" class="admin-preview" alt="Preview" style="display:none;"></div>
+        <button type="submit">Tambah Produk</button>
+    </form>
+
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Gambar</th><th>Nama</th><th>Game</th><th>Harga</th><th>Stok</th><th>Status</th><th>Edit Cepat</th><th>Aksi</th></tr></thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{% if product.image %}<img class="admin-thumb" src="{{ url_for('static', filename='img/products/' + product.image) }}" alt="{{ product.name }}">{% else %}<div class="admin-thumb placeholder">🎮</div>{% endif %}</td>
+                <td><strong>{{ product.name }}</strong><br><small>{{ product.description or '' }}</small></td>
+                <td>{{ product.category.name if product.category else '-' }}</td>
+                <td>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</td>
+                <td>{{ product.stock }}</td>
+                <td><span class="badge">{{ product.status }}</span></td>
+                <td>
+                    <details>
+                        <summary>Edit</summary>
+                        <form class="mini-edit" method="POST" action="{{ url_for('admin.edit_product', id=product.id) }}" enctype="multipart/form-data">
+                            <input type="hidden" name="next" value="{{ url_for('admin.products') }}">
+                            <input type="text" name="name" value="{{ product.name }}" required>
+                            <input type="number" name="price" value="{{ product.price }}" required>
+                            <input type="number" name="price_modal" value="{{ product.price_modal or 0 }}">
+                            <input type="number" name="stock" value="{{ product.stock }}">
+                            <select name="category_id" required>{% for category in categories %}<option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select>
+                            <select name="status"><option value="active" {% if product.status == 'active' %}selected{% endif %}>Aktif</option><option value="inactive" {% if product.status == 'inactive' %}selected{% endif %}>Nonaktif</option></select>
+                            <input type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
+                            <textarea name="description">{{ product.description or '' }}</textarea>
+                            <button type="submit">Simpan</button>
+                        </form>
+                    </details>
+                </td>
+                <td><a class="delete-btn" href="{{ url_for('admin.delete_product', id=product.id) }}" onclick="return confirm('Hapus produk ini?')">Hapus</a></td>
+            </tr>
+            {% else %}<tr><td colspan="9">Belum ada produk.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+const input = document.getElementById('productImageInput');
+const preview = document.getElementById('productImagePreview');
+if (input && preview) {
+    input.addEventListener('change', function () {
+        const file = this.files && this.files[0];
+        if (!file) { preview.style.display = 'none'; preview.removeAttribute('src'); return; }
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    });
+}
+</script>
+{% endblock %}

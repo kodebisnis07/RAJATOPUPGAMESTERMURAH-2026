@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% set seo_settings = settings if settings is defined else global_settings if global_settings is defined else {} %}
+    {% set default_title = seo_settings.get('meta_title') or seo_settings.get('site_name') or 'Raja Topup Games | Top Up Game Murah, Cepat & Terpercaya' %}
+    {% set default_description = seo_settings.get('meta_description') or 'Top up game murah, cepat, aman, dan terpercaya 24 jam di Raja Topup Games.' %}
+    {% set default_keywords = seo_settings.get('meta_keywords') or 'top up game murah, top up mobile legends, top up free fire, diamond murah, raja topup games' %}
+    <title>{% block title %}{{ default_title }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ default_description }}{% endblock %}">
+    <meta name="keywords" content="{{ default_keywords }}">
+    {% if seo_settings.get('google_site_verification') %}<meta name="google-site-verification" content="{{ seo_settings.get('google_site_verification') }}">{% endif %}
+    <link rel="canonical" href="{{ canonical_url if canonical_url is defined else request.url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ default_title }}">
+    <meta property="og:description" content="{{ default_description }}">
+    <meta property="og:url" content="{{ canonical_url if canonical_url is defined else request.url }}">
+    <meta property="og:site_name" content="{{ seo_settings.get('site_name', 'Raja Topup Games') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ default_title }}">
+    <meta name="twitter:description" content="{{ default_description }}">
+    {% if seo_settings.get('google_analytics_id') %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo_settings.get('google_analytics_id') }}"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ seo_settings.get('google_analytics_id') }}');</script>
+    {% endif %}
+    {% if seo_settings.get('facebook_pixel_id') %}
+    <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','{{ seo_settings.get('facebook_pixel_id') }}');fbq('track','PageView');</script>
+    {% endif %}
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"{{ seo_settings.get('site_name', 'Raja Topup Games') }}","url":"{{ site_url if site_url is defined else request.url_root.rstrip('/') }}"}</script>
+    <link rel="manifest" href="{{ url_for('manifest') }}">
+    <meta name="theme-color" content="#ffc83d">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/pwa/icon-192.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=responsive-final-20260707">
+</head>
+<body class="site-body">
+<header class="navbar">
+    <a class="logo" href="{{ url_for('home.index') }}">👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') if settings is defined else 'RAJA TOPUP GAMES' }}</a>
+    <button class="mobile-nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false">☰</button>
+</header>
+{% block content %}{% endblock %}
+<footer class="footer">
+    <h3>👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') if settings is defined else 'RAJA TOPUP GAMES' }}</h3>
+    <p>{{ settings.get('site_tagline', 'Top Up Game Termurah, Cepat, Aman, dan Terpercaya') if settings is defined else 'Top Up Game Termurah, Cepat, Aman, dan Terpercaya' }}</p>
+    <small>© 2026 RAJA TOPUP GAMES. All Rights Reserved.</small>
+</footer>
+<button id="install-pwa-btn" class="install-pwa-btn" type="button" hidden>📲 Install Aplikasi</button>
+
+<script>
+(function(){
+
+  var navToggle = document.querySelector('.mobile-nav-toggle');
+  var nav = document.querySelector('.navbar nav');
+  if(navToggle && nav){
+    navToggle.addEventListener('click', function(e){
+      e.preventDefault();
+      var open = nav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      navToggle.textContent = open ? '✕' : '☰';
+    });
+    nav.querySelectorAll('a').forEach(function(link){
+      link.addEventListener('click', function(){
+        if(window.innerWidth <= 850){
+          nav.classList.remove('open');
+          navToggle.setAttribute('aria-expanded', 'false');
+          navToggle.textContent = '☰';
+        }
+      });
+    });
+  }
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.user-menu-btn');
+    document.querySelectorAll('.user-menu.open').forEach(function(menu){
+      if(!btn && !menu.contains(e.target)){
+        menu.classList.remove('open');
+        var oldBtn = menu.querySelector('.user-menu-btn');
+        if(oldBtn){ oldBtn.setAttribute('aria-expanded', 'false'); }
+      }
+    });
+    if(btn){
+      e.preventDefault();
+      e.stopPropagation();
+      var menu = btn.closest('.user-menu');
+      var willOpen = menu && !menu.classList.contains('open');
+      document.querySelectorAll('.user-menu.open').forEach(function(other){
+        if(other !== menu){
+          other.classList.remove('open');
+          var otherBtn = other.querySelector('.user-menu-btn');
+          if(otherBtn){ otherBtn.setAttribute('aria-expanded', 'false'); }
+        }
+      });
+      if(menu){
+        menu.classList.toggle('open', willOpen);
+        btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      }
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.user-menu.open').forEach(function(menu){
+        menu.classList.remove('open');
+        var btn = menu.querySelector('.user-menu-btn');
+        if(btn){ btn.setAttribute('aria-expanded', 'false'); }
+      });
+    }
+  });
+})();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('{{ url_for('service_worker') }}').catch(function(err){ console.warn('SW gagal:', err); });
+  });
+}
+var deferredPrompt;
+var installBtn = document.getElementById('install-pwa-btn');
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  if(installBtn){ installBtn.hidden = false; }
+});
+if(installBtn){
+  installBtn.addEventListener('click', async function(){
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.hidden = true;
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head">
+  <h1>SEO Website</h1>
+  <p>Atur judul Google, deskripsi, keyword, verifikasi Search Console, Analytics, dan robots/sitemap.</p>
+</div>
+
+<form method="POST" class="settings-form seo-settings-form">
+  <h2>Pengaturan Google Search</h2>
+  <label>Meta Title / Judul Google</label>
+  <input type="text" name="meta_title" value="{{ settings.get('meta_title', 'Raja Topup Games | Top Up Game Murah, Cepat & Terpercaya') }}" placeholder="Raja Topup Games | Top Up Game Murah">
+
+  <label>Meta Description / Deskripsi Google</label>
+  <textarea name="meta_description" rows="4" placeholder="Deskripsi singkat website untuk hasil pencarian Google">{{ settings.get('meta_description', 'Top up game murah, cepat, aman, dan terpercaya 24 jam di Raja Topup Games.') }}</textarea>
+
+  <label>Meta Keywords</label>
+  <textarea name="meta_keywords" rows="3" placeholder="top up game murah, top up mobile legends, top up free fire">{{ settings.get('meta_keywords', 'top up game murah, top up mobile legends, top up free fire, diamond murah, raja topup games') }}</textarea>
+
+  <h2>Google Tools</h2>
+  <label>Google Site Verification</label>
+  <input type="text" name="google_site_verification" value="{{ settings.get('google_site_verification', 'HrOIxx6wt4mw2eVcXawtrwTp3o2220f-e6vNhBCaato') }}" placeholder="Kode content dari meta google-site-verification">
+
+  <label>Google Analytics ID</label>
+  <input type="text" name="google_analytics_id" value="{{ settings.get('google_analytics_id', '') }}" placeholder="G-XXXXXXXXXX">
+
+  <label>Facebook Pixel ID</label>
+  <input type="text" name="facebook_pixel_id" value="{{ settings.get('facebook_pixel_id', '') }}" placeholder="Opsional">
+
+  <div class="settings-help" style="margin:16px 0;padding:14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);">
+    <strong>Link pengecekan:</strong><br>
+    <a href="{{ url_for('home.index') }}" target="_blank">Homepage</a> ·
+    <a href="/sitemap.xml" target="_blank">Sitemap</a> ·
+    <a href="/robots.txt" target="_blank">Robots</a>
+  </div>
+
+  <button type="submit">Simpan SEO</button>
+</form>
+{% endblock %}

@@ -1,0 +1,9 @@
+Update Upload Foto Game/Kategori
+
+- Menambahkan upload logo/foto game di menu Admin > Kategori / Game.
+- Menambahkan preview foto di tabel kategori.
+- Menambahkan edit/ganti foto game.
+- Menambahkan opsi hapus foto game.
+- Foto disimpan ke app/static/img/games/.
+- Halaman depan otomatis memakai foto game jika tersedia, kalau kosong tetap memakai placeholder inisial.
+- Menambahkan migrasi otomatis kolom categories.icon untuk database SQLite lama.

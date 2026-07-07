@@ -1,0 +1,13 @@
+RAJA TOPUP GAMES - Section Katalog Super Admin
+
+Tambahan:
+- Menu baru Super Admin: Section Katalog
+- Super Admin bisa membuat section seperti Game Populer, Aplikasi Premium, Voucher, Steam Wallet
+- Setiap game/kategori bisa dipilih masuk ke section tertentu
+- Field tambahan kategori: section, badge, urutan tampil, tampil/nonaktif di homepage
+- Homepage otomatis memisahkan katalog berdasarkan section agar tidak tercampur
+- Search/filter homepage bisa filter berdasarkan section dan kategori
+
+Catatan:
+- Fitur Section Katalog hanya muncul untuk Super Admin
+- Game tanpa section akan tampil di blok "Lainnya"

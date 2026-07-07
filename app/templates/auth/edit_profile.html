@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Edit Profil - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page">
+    {% include 'auth/_account_nav.html' %}
+    <div class="profile-head"><span class="eyebrow">EDIT PROFIL</span><h1>Perbarui Data Akun</h1><p>Nama, email, nomor WhatsApp, dan foto profil bisa diganti dari halaman ini. Username tidak bisa diubah.</p></div>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    <div class="profile-card">
+        <form method="POST" enctype="multipart/form-data" class="profile-form">
+            <div class="profile-avatar photo edit-avatar">{% if avatar_url %}<img src="{{ avatar_url }}" alt="Foto profil {{ user.name }}">{% else %}{{ (user.name or 'U')[:1]|upper }}{% endif %}</div>
+            <label>Foto Profil <input type="file" name="avatar" accept="image/*"></label>
+            {% if user.avatar %}<label class="inline-check"><input type="checkbox" name="remove_avatar" value="1"> Hapus foto profil saat ini</label>{% endif %}
+            <label>Username <input type="text" value="{{ user.username or '-' }}" disabled></label>
+            <small class="field-help">Username digunakan untuk login dan tidak bisa diganti.</small>
+            <label>Nama Lengkap <input type="text" name="name" value="{{ user.name }}" required></label>
+            <label>Email <input type="email" name="email" value="{{ user.email }}" required></label>
+            <label>Nomor Telepon / WhatsApp <input type="tel" name="phone" value="{{ user.phone or '' }}" required></label>
+            <button class="btn-checkout" type="submit">Simpan Perubahan</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

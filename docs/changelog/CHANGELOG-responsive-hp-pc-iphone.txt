@@ -1,0 +1,13 @@
+Raja Topup Games - Responsive HP / PC / iPhone
+
+Perubahan:
+- Navbar user dibuat responsive dengan tombol menu di HP.
+- Dropdown profil user lebih rapi di HP, iPhone, tablet, dan desktop.
+- Grid game, promo, payment, checkout, invoice, profil, dan favorit dibuat lebih pas untuk layar kecil.
+- Form login/register tetap nyaman di iPhone dan Android.
+- Panel admin diberi tombol menu mobile agar sidebar tidak menutup konten di HP.
+- Tabel admin dibuat scroll horizontal di layar kecil.
+- Form admin dibuat satu kolom di HP agar tidak berantakan.
+- Input memakai font-size 16px di mobile agar iPhone tidak auto zoom.
+
+Tidak mengubah logic fitur, role, database, atau route.

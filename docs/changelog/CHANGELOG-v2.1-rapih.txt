@@ -1,0 +1,23 @@
+RAJA TOPUP GAMES v2.1 - Rapi Checkout & Nominal
+
+Perubahan:
+- Menambahkan menu admin baru: Nominal / Paket Top Up.
+- Merapikan form produk dan nominal: harga modal, harga jual, stok, provider, kode provider, status.
+- Memperbaiki halaman top-up menjadi lebih profesional: step data akun, pilih nominal, data pembeli, metode pembayaran, ringkasan order.
+- Memperbaiki halaman invoice/checkout: detail pesanan, status pembayaran, instruksi pembayaran, tombol refresh status.
+- Merapikan sidebar admin: Game/Produk, Nominal, Banner, Promo, Testimoni, FAQ, Manajemen Admin.
+- Menghapus file root admin.py yang membingungkan dan tidak dipakai.
+- Mengisi file route placeholder cart.py, checkout.py, product.py agar tidak kosong.
+- Menambahkan CSS baru untuk tampilan top-up, invoice, dan admin.
+- Menambahkan auto-migration ringan untuk kolom produk lama.
+
+Akun admin utama:
+Username: admin
+Password: Admin@123
+
+Cara menjalankan:
+1. pip install -r requirements.txt
+2. python create_admin.py
+3. python run.py
+4. Buka http://127.0.0.1:5000
+5. Admin: http://127.0.0.1:5000/admin/login

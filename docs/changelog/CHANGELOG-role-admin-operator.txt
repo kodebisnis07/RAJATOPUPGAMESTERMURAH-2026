@@ -1,0 +1,18 @@
+Update Role Admin & Operator
+
+1. Super Admin
+- Akses penuh semua menu.
+- Bisa kelola akun admin/operator/super admin.
+
+2. Admin
+- Bisa kelola kategori, produk/nominal, banner, promo, testimoni, FAQ, order, user, payment, dan setting.
+- Tidak bisa kelola akun admin/operator lain.
+
+3. Operator
+- Hanya bisa akses dashboard, pesanan, user, pembayaran, lihat website, dan logout.
+- Tidak bisa kelola produk, nominal, kategori, banner, promo, testimoni, FAQ, setting, atau akun admin.
+- Bisa update status pesanan dari halaman Pesanan.
+
+Status pesanan yang tersedia:
+- payment_status: pending, paid, cancelled, failed, expired
+- order_status: pending, processing, success, completed, cancelled, failed

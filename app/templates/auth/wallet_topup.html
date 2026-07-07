@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Top Up Saldo - RAJA TOPUP GAMES{% endblock %}
+{% block content %}
+<section class="profile-page wallet-page">
+    {% include 'auth/_account_nav.html' %}
+    <div class="profile-head">
+        <span class="eyebrow">DOMPET USER</span>
+        <h1>Top Up Saldo Akun</h1>
+        <p>Isi saldo akun Raja Topup Games dan dapatkan bonus koin sesuai nominal top up.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+
+    <div class="stat-grid wallet-stats">
+        <div class="stat-card"><span>Saldo Akun</span><b>Rp {{ "{:,}".format(user.balance or 0).replace(",", ".") }}</b></div>
+        <div class="stat-card"><span>Koin Bonus</span><b>{{ user.bonus_coins or 0 }} Koin</b></div>
+        <div class="stat-card"><span>Minimal Top Up</span><b>Rp 20.000</b></div>
+        <div class="stat-card"><span>Status</span><b>{{ user.member_level or 'Bronze' }}</b></div>
+    </div>
+
+    <div class="profile-layout">
+        <div class="profile-card wallet-form-card">
+            <h2>Form Top Up Saldo</h2>
+            <form method="POST" class="profile-form">
+                <label>Nominal Top Up</label>
+                <input type="number" name="amount" id="walletAmount" min="20000" step="1000" placeholder="Minimal Rp 20.000" list="walletPresetAmounts" required>
+                <datalist id="walletPresetAmounts">
+                    <option value="20000">Rp 20.000</option>
+                    <option value="50000">Rp 50.000</option>
+                    <option value="100000">Rp 100.000</option>
+                    <option value="250000">Rp 250.000</option>
+                    <option value="500000">Rp 500.000</option>
+                    <option value="1000000">Rp 1.000.000</option>
+                </datalist>
+                <small class="form-help">User sekarang bisa isi nominal sendiri. Minimal top up saldo Rp 20.000.</small>
+
+                <label>Metode Pembayaran</label>
+                {% if payment_methods %}
+                    <select name="payment_method_id" required>
+                        {% for method in payment_methods %}
+                            <option value="{{ method.id }}">{{ method.name }}{% if method.account_number %} - {{ method.account_number }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <div class="empty-state">Belum ada metode pembayaran aktif. Hubungi admin.</div>
+                {% endif %}
+
+                <div class="bonus-info">
+                    <b>Info Bonus Koin</b>
+                    <p>Koin bonus otomatis masuk setelah admin menyetujui pembayaran top up saldo.</p>
+                    <ul>
+                        <li>Minimal top up Rp20.000</li>
+                        <li>Rp50.000 = 50 koin</li>
+                        <li>Rp100.000 = 150 koin</li>
+                        <li>Rp250.000 = 400 koin</li>
+                        <li>Rp500.000 = 1.000 koin</li>
+                        <li>Rp1.000.000 = 2.500 koin</li>
+                    </ul>
+                </div>
+
+                <button class="btn-checkout" type="submit" {% if not payment_methods %}disabled{% endif %}>Buat Top Up Saldo</button>
+            </form>
+        </div>
+
+        <div class="profile-card">
+            <h2>Cara Pembayaran</h2>
+            <p>Isi nominal minimal Rp 20.000, pilih metode pembayaran, lalu lakukan transfer sesuai instruksi rekening/QRIS yang aktif.</p>
+            <p>Jika top up sudah disetujui, saldo dan koin bonus akan otomatis masuk ke akun.</p>
+        </div>
+    </div>
+
+    <div class="profile-card order-history">
+        <h2>Riwayat Top Up Saldo</h2>
+        {% if history %}
+        <div class="history-table"><table>
+            <thead><tr><th>Invoice</th><th>Nominal</th><th>Bonus</th><th>Metode</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>
+            {% for trx in history %}
+                <tr>
+                    <td>{{ trx.invoice }}</td>
+                    <td>Rp {{ "{:,}".format(trx.amount or 0).replace(",", ".") }}</td>
+                    <td>{{ trx.bonus_coins or 0 }} koin</td>
+                    <td>{{ trx.payment_method_name or '-' }}</td>
+                    <td><span class="status-pill {{ trx.status }}">{{ trx.status|upper }}</span></td>
+                    <td>
+                        {% if trx.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('auth.cancel_wallet_topup', invoice=trx.invoice) }}" onsubmit="return confirm('Batalkan top up saldo ini?')">
+                            <button class="btn-small danger" type="submit">Batalkan</button>
+                        </form>
+                        {% else %}-{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+        {% else %}<div class="empty-state">Belum ada riwayat top up saldo.</div>{% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,6 @@
+UPDATE: Menu Slide Banner Super Admin
+
+- Menambahkan menu khusus 🖼️ Slide Banner di sidebar Super Admin.
+- Menambahkan route /admin/slide-banners.
+- Halaman Slide Banner memakai sistem banner homepage yang sudah ada.
+- Super Admin dapat tambah, edit, hapus, aktif/nonaktifkan, upload gambar, link tombol, dan urutan slide.

@@ -1,0 +1,5 @@
+Update:
+- Hapus tombol dan route Login Google.
+- Ikon Sosial Media sekarang memakai URL aset dari file HTML referensi yang diupload.
+- Template index/admin/favorite mendukung icon lokal dan URL eksternal.
+Catatan: harga detail dari website referensi tidak ikut tersedia di HTML karena dimuat via AJAX, jadi harga produk tetap memakai data seed RajaTopup yang sudah ada.

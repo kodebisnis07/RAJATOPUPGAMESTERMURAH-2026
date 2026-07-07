@@ -1,0 +1,14 @@
+Raja Topup Games v2.1 Stable
+
+Perubahan:
+- Memperbaiki robots.txt agar Google tidak diblokir.
+- robots.txt sekarang mengizinkan halaman publik dan memblokir /admin, /super-admin, /auth, /login.
+- Menambahkan meta SEO global: title, description, keywords, canonical, Open Graph, Twitter Card.
+- Menambahkan Schema.org Organization dasar.
+- Menambahkan pengaturan SEO di panel admin.
+- Dashboard admin ditambah pesanan terbaru dan produk terlaris.
+
+Setelah deploy:
+1. Buka /robots.txt dan pastikan tidak ada Disallow: /
+2. Buka /sitemap.xml dan pastikan domain benar.
+3. Buka /admin/settings untuk mengatur SEO.

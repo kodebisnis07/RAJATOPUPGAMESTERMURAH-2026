@@ -1,0 +1,70 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-head">
+    <h1>Data User</h1>
+    <p>Super Admin bisa melihat detail lengkap, mengedit data, reset password, aktif/nonaktifkan, dan menghapus akun user.</p>
+</div>
+
+<form class="admin-form" method="get">
+    <label>Cari user
+        <input type="text" name="q" value="{{ search }}" placeholder="Nama, username, email, atau nomor telepon">
+    </label>
+    <label>Status
+        <select name="status">
+            <option value="" {{ 'selected' if not status else '' }}>Semua</option>
+            <option value="active" {{ 'selected' if status == 'active' else '' }}>Aktif</option>
+            <option value="inactive" {{ 'selected' if status == 'inactive' else '' }}>Nonaktif</option>
+        </select>
+    </label>
+    <label>&nbsp;<button type="submit">Filter</button></label>
+    <label>&nbsp;<a class="btn" href="{{ url_for('admin.users') }}">Reset</a></label>
+</form>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Kontak</th>
+            <th>Status</th>
+            <th>Transaksi</th>
+            <th>Terdaftar</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            {% set st = user_stats.get(user.id, {}) %}
+            <tr>
+                <td>
+                    <strong>{{ user.name }}</strong><br>
+                    <small>Username: {{ user.username or '-' }}</small><br>
+                    <small>ID: {{ user.id }} | Role: {{ user.role }}</small><br>
+                    <small>Member: {{ user.member_level or 'Bronze' }}</small>
+                </td>
+                <td>
+                    {{ user.email }}<br>
+                    <small>HP: {{ user.phone or '-' }}</small>
+                </td>
+                <td>
+                    <span class="badge">{{ 'Aktif' if user.is_active else 'Nonaktif' }}</span>
+                </td>
+                <td>
+                    Total: {{ st.total_orders or 0 }}<br>
+                    <small>Paid: {{ st.paid_orders or 0 }} | Pending: {{ st.pending_orders or 0 }} | Batal: {{ st.cancelled_orders or 0 }}</small><br>
+                    <small>Belanja: Rp {{ "{:,.0f}".format(st.total_spend or 0).replace(',', '.') }}</small>
+                </td>
+                <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else '-' }}</td>
+                <td>
+                    {% if is_super_admin %}
+                        <a class="btn small" href="{{ url_for('admin.user_detail', id=user.id) }}">Detail</a>
+                    {% else %}
+                        <small>Detail khusus Super Admin</small>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Belum ada user.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

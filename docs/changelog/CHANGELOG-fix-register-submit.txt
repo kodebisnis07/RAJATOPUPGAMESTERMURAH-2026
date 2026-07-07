@@ -1,0 +1,4 @@
+Fix register submit:
+- Form daftar sekarang memakai action eksplisit ke auth.register.
+- /register dan /daftar menerima GET/POST dan menjalankan handler register yang sama.
+- Submit daftar tidak lagi mental ke beranda.

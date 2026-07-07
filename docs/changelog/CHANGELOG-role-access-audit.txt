@@ -1,0 +1,10 @@
+RAJA TOPUP - Role Access & Audit Log
+
+Perubahan:
+- Super Admin bisa login melalui /admin/login dan /super-admin/login.
+- Admin/operator tetap tidak bisa membuka menu khusus Super Admin.
+- Menu khusus Super Admin: Manajemen Admin, Metode Pembayaran, Auto Order, Section Katalog, Pengaturan, Audit Log.
+- Admin: kelola produk/kategori/banner/promo/testimoni/FAQ serta pesanan.
+- Operator: fokus melihat pesanan/user/pembayaran dan update status pesanan.
+- Semua aktivitas penting admin/operator dicatat di Audit Log khusus Super Admin.
+- Audit Log mendukung filter berdasarkan username/IP/keterangan, role, dan aksi.

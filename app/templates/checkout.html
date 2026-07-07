@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="invoice-page">
+    <div class="invoice-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="invoice-messages">
+                    {% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="invoice-head">
+            <div>
+                <span class="eyebrow">INVOICE</span>
+                <h1>{{ order.invoice }}</h1>
+                {% if order.payment_status == 'pending' and order.order_status == 'pending' and order.payment and order.payment.expired_at %}
+                    <p>Pesanan berhasil dibuat. Selesaikan pembayaran sebelum waktu habis.</p>
+                    <div class="order-countdown" data-expired-at="{{ order.payment.expired_at.isoformat() }}Z">
+                        <span>Sisa waktu pembayaran</span>
+                        <strong id="orderCountdown">10:00</strong>
+                    </div>
+                {% elif order.order_status == 'cancelled' or order.payment_status in ['expired','cancelled'] %}
+                    <p>Pesanan ini sudah dibatalkan/kedaluwarsa.</p>
+                {% else %}
+                    <p>Pesanan berhasil dibuat. Selesaikan pembayaran agar transaksi dapat diproses.</p>
+                {% endif %}
+            </div>
+            <span class="status-pill {{ order.payment_status }}">{{ order.payment_status|upper }}</span>
+        </div>
+
+        <div class="invoice-grid">
+            <div class="invoice-box">
+                <h2>Detail Pesanan</h2>
+                <div class="summary-row"><span>Produk</span><b>{{ order.product.name }}</b></div>
+                <div class="summary-row"><span>Game</span><b>{{ order.product.category.name if order.product.category else '-' }}</b></div>
+                <div class="summary-row"><span>User ID</span><b>{{ order.game_user_id }}</b></div>
+                <div class="summary-row"><span>Server ID</span><b>{{ order.game_server_id or '-' }}</b></div>
+                <div class="summary-row"><span>Nama</span><b>{{ order.customer_name or '-' }}</b></div>
+                <div class="summary-row total"><span>Total</span><b>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</b></div>
+            </div>
+
+            <div class="invoice-box payment-instruction">
+                <h2>Pembayaran</h2>
+                <div class="summary-row"><span>Metode</span><b>{{ order.payment_method or '-' }}</b></div>
+                {% if payment_method %}
+                    <div class="manual-pay-detail">
+                        {% if payment_method.logo %}<img class="pay-logo big" src="{{ url_for('static', filename='img/payment_methods/' + payment_method.logo) }}" alt="{{ payment_method.name }}">{% endif %}
+                        <div class="summary-row"><span>Jenis</span><b>{{ payment_method.type|replace('_',' ')|title }}</b></div>
+                        {% if payment_method.account_number %}
+                            <div class="summary-row"><span>Nomor</span><b id="payNumber">{{ payment_method.account_number }}</b></div>
+                            <button type="button" class="btn-small outline" onclick="copyPayNumber()">Salin Nomor</button>
+                        {% endif %}
+                        {% if payment_method.account_name %}<div class="summary-row"><span>Atas Nama</span><b>{{ payment_method.account_name }}</b></div>{% endif %}
+                        {% if payment_method.admin_fee %}<div class="summary-row"><span>Biaya Admin</span><b>Rp {{ "{:,}".format(payment_method.admin_fee).replace(",", ".") }}</b></div>{% endif %}
+                        {% if payment_method.qr_image %}<img class="qr-img" src="{{ url_for('static', filename='img/payment_methods/' + payment_method.qr_image) }}" alt="QR {{ payment_method.name }}">{% endif %}
+                        {% if payment_method.instruction %}<div class="manual-note">{{ payment_method.instruction }}</div>{% endif %}
+                    </div>
+                {% endif %}
+                <div class="summary-row"><span>Status Order</span><b>{{ order.order_status }}</b></div>
+                {% if order.payment %}
+                    <div class="summary-row"><span>Provider</span><b>{{ order.payment.provider or 'Manual' }}</b></div>
+                    <div class="summary-row"><span>Reference</span><b>{{ order.payment.reference or order.invoice }}</b></div>
+                    {% if order.payment.expired_at %}<div class="summary-row"><span>Batas Bayar</span><b>{{ order.payment.expired_at.strftime('%d/%m/%Y %H:%M') }}</b></div>{% endif %}
+                    {% if order.payment.payment_code %}<div class="summary-row"><span>Kode Bayar</span><b>{{ order.payment.payment_code }}</b></div>{% endif %}
+                    {% if order.payment.qr_url %}<img class="qr-img" src="{{ order.payment.qr_url }}" alt="QRIS">{% endif %}
+                    {% if order.payment.checkout_url and order.payment_status == 'pending' and order.order_status == 'pending' %}
+                        <a class="btn-checkout" href="{{ order.payment.checkout_url }}" target="_blank">Bayar Sekarang</a>
+                    {% elif order.payment.provider == 'wallet' or order.payment.payment_name == 'Saldo RajaTopup' %}
+                        <div class="manual-note success">Pembayaran sudah memakai Saldo RajaTopup. Tidak perlu transfer ulang.</div>
+                    {% elif order.payment_status == 'paid' %}
+                        <div class="manual-note success">Pembayaran sudah diterima. Pesanan sedang diproses.</div>
+                    {% elif payment_method %}
+                        <div class="manual-note">Silakan transfer sesuai detail metode pembayaran di atas. Admin akan memproses setelah pembayaran diterima.</div>
+                    {% else %}
+                        <div class="manual-note">Payment gateway belum aktif atau credential belum lengkap. Atur di Admin → Pengaturan.</div>
+                    {% endif %}
+                {% else %}
+                    <div class="manual-note">Data pembayaran belum tersedia. Silakan hubungi admin.</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="invoice-actions">
+            <a class="btn-small outline" href="{{ url_for('home.index') }}">Kembali ke Home</a>
+            <a class="btn-small" href="{{ url_for('home.checkout', invoice=order.invoice) }}">Refresh Status</a>
+            {% if session.get('user_id') == order.user_id and order.payment_status == 'pending' and order.order_status == 'pending' %}
+                <form method="POST" action="{{ url_for('home.cancel_order', invoice=order.invoice) }}" onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?');" class="cancel-order-form">
+                    <button class="btn-small danger" type="submit">Batalkan Pesanan</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<script>
+(function(){
+  var box = document.querySelector('.order-countdown');
+  var target = document.getElementById('orderCountdown');
+  if(!box || !target){ return; }
+  var expiredAt = new Date(box.getAttribute('data-expired-at')).getTime();
+  function tick(){
+    var left = Math.floor((expiredAt - Date.now()) / 1000);
+    if(left <= 0){
+      target.textContent = '00:00';
+      box.classList.add('expired');
+      setTimeout(function(){ window.location.reload(); }, 1000);
+      return;
+    }
+    var m = String(Math.floor(left / 60)).padStart(2, '0');
+    var s = String(left % 60).padStart(2, '0');
+    target.textContent = m + ':' + s;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+{% endblock %}

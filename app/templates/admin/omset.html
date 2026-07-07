@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="page-head">
+    <h1>📈 Riwayat Omset</h1>
+    <p>Omset dihitung dari pesanan berstatus <b>paid</b>. Omset Bulan Ini otomatis mulai dari 0 setiap masuk bulan baru, sedangkan riwayat bulan lama tetap tersimpan.</p>
+</div>
+
+<div class="cards">
+    <div class="card-admin"><h2>Rp {{ "{:,}".format(omset.today_income).replace(',', '.') }}</h2><p>Omset Hari Ini · {{ omset.today_count }} transaksi</p></div>
+    <div class="card-admin"><h2>Rp {{ "{:,}".format(omset.month_income).replace(',', '.') }}</h2><p>Omset Bulan Ini · {{ omset.month_count }} transaksi</p></div>
+    <div class="card-admin"><h2>Rp {{ "{:,}".format(omset.last_month_income).replace(',', '.') }}</h2><p>Omset Bulan Lalu · {{ omset.last_month_count }} transaksi</p></div>
+    <div class="card-admin"><h2>Rp {{ "{:,}".format(omset.total_income).replace(',', '.') }}</h2><p>Total Omset Paid · {{ omset.total_count }} transaksi</p></div>
+</div>
+
+<div class="admin-grid-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:22px;">
+    <section class="settings-form full-width-section">
+        <h2>Riwayat Omset Bulanan</h2>
+        <table class="admin-table">
+            <tr><th>Bulan</th><th>Jumlah Transaksi Paid</th><th>Total Omset</th></tr>
+            {% for row in monthly_history %}
+            <tr>
+                <td>{{ row.label }}</td>
+                <td>{{ row.count }}</td>
+                <td><strong>Rp {{ "{:,}".format(row.income).replace(',', '.') }}</strong></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">Belum ada data omset.</td></tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <section class="settings-form full-width-section">
+        <h2>Riwayat Omset Harian</h2>
+        <table class="admin-table">
+            <tr><th>Tanggal</th><th>Transaksi Paid</th><th>Omset</th></tr>
+            {% for row in daily_history %}
+            <tr>
+                <td>{{ row.label }}</td>
+                <td>{{ row.count }}</td>
+                <td>Rp {{ "{:,}".format(row.income).replace(',', '.') }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">Belum ada data omset harian.</td></tr>
+            {% endfor %}
+        </table>
+    </section>
+</div>
+{% endblock %}

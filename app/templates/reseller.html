@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-page">
+  <div class="auth-card">
+    <span class="eyebrow">PROGRAM RESELLER</span>
+    <h1>Daftar Reseller RajaTopup</h1>
+    <p class="auth-muted">Isi nama toko dan catatan singkat. Admin akan meninjau pendaftaran Anda.</p>
+    {% if profile %}
+      <div class="manual-note">Status saat ini: <b>{{ profile.status|title }}</b>{% if profile.level %} • Level: {{ profile.level }}{% endif %}</div>
+    {% endif %}
+    <form method="POST">
+      <label>Nama Toko / Brand<input name="store_name" value="{{ profile.store_name if profile else '' }}" placeholder="Contoh: RajaTopup Reseller"></label>
+      <label>Catatan<textarea name="note" placeholder="Ceritakan kebutuhan reseller Anda">{{ profile.note if profile else '' }}</textarea></label>
+      <button type="submit">Kirim Pendaftaran</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

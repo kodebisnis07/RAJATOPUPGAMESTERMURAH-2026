@@ -1,0 +1,9 @@
+Perbaikan revisi:
+- Top up sekarang wajib login sebagai user. Guest tidak bisa membuat order.
+- Invoice/checkout hanya bisa dilihat oleh pemilik order yang sedang login.
+- Login admin/operator/super admin tetap memakai /admin/login, tetapi akses fitur sensitif dibatasi role.
+- Menu Pengaturan sekarang khusus Super Admin.
+- Pembuatan admin/operator menggunakan hashing password yang benar dan validasi minimal 6 karakter.
+- Login admin lebih toleran untuk database lama yang pernah menyimpan password admin plaintext.
+- Form manajemen admin diberi tombol mata untuk melihat/sembunyikan password saat input.
+- requirements.txt ditambahkan gunicorn untuk Render.

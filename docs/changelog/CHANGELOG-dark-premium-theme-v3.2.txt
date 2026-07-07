@@ -1,0 +1,5 @@
+Tema Dark Premium v3.2
+- Background tidak hitam pekat (#111827/#1a2235).
+- Aksen emas untuk tombol, hover, dan badge.
+- User, Admin, Operator, dan Super Admin memakai tema sama.
+- Link Super Admin di login admin disembunyikan lewat CSS portal-switch.
