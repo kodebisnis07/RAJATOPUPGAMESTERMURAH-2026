@@ -1084,3 +1084,164 @@ img{max-width:100%}
   .market-logo,.market-search,.market-actions{grid-column:auto!important;grid-row:auto!important;}
   .market-actions{justify-content:flex-end!important;flex-wrap:nowrap!important;}
 }
+
+/* ==========================================================
+   NAVBAR FINAL RAPI — single source of truth (2026-07-10)
+   ========================================================== */
+.market-category-nav,
+.quick-pills,
+nav.market-category-nav,
+section.quick-pills{
+  display:none!important;
+}
+
+/* Ukuran halaman normal pada zoom browser 100%. */
+html{font-size:16px!important;}
+body.marketplace-home{font-size:16px!important;}
+
+.market-nav-top{
+  display:grid!important;
+  grid-template-columns:max-content minmax(300px,1fr) max-content!important;
+  align-items:center!important;
+  gap:14px!important;
+  width:min(1560px,100%)!important;
+  margin:0 auto!important;
+  padding:12px clamp(14px,2vw,28px)!important;
+}
+.market-logo{
+  grid-column:auto!important;
+  grid-row:auto!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  white-space:nowrap!important;
+}
+.market-logo span{flex:0 0 auto!important;}
+.market-logo b{
+  max-width:230px!important;
+  font-size:15px!important;
+  line-height:1.15!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.market-search{
+  grid-column:auto!important;
+  grid-row:auto!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:9px!important;
+  min-width:0!important;
+  width:100%!important;
+  min-height:44px!important;
+  margin:0!important;
+}
+.market-search input{
+  width:100%!important;
+  min-width:0!important;
+  height:42px!important;
+  font-size:13px!important;
+}
+.market-search button{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:static!important;
+  visibility:visible!important;
+  opacity:1!important;
+  min-width:62px!important;
+  height:42px!important;
+  padding:0 15px!important;
+  white-space:nowrap!important;
+}
+.market-actions{
+  grid-column:auto!important;
+  grid-row:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+  gap:8px!important;
+  min-width:max-content!important;
+  width:auto!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+.market-action,
+.market-wallet,
+.market-login,
+.market-register,
+.user-menu-btn{
+  flex:0 0 auto!important;
+  min-height:40px!important;
+  padding:8px 12px!important;
+  font-size:12px!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+}
+
+/* Laptop/tablet landscape: tetap satu baris, tetapi lebih ringkas. */
+@media (min-width:901px) and (max-width:1180px){
+  .market-nav-top{
+    grid-template-columns:max-content minmax(190px,1fr) max-content!important;
+    gap:8px!important;
+    padding:10px 12px!important;
+  }
+  .market-logo b{max-width:150px!important;font-size:13px!important;}
+  .market-logo span{width:34px!important;height:34px!important;}
+  .market-search{gap:6px!important;}
+  .market-search input{font-size:12px!important;}
+  .market-search button{min-width:52px!important;padding:0 10px!important;font-size:12px!important;}
+  .market-actions{gap:5px!important;}
+  .market-action,.market-wallet,.market-login,.market-register,.user-menu-btn{
+    min-height:36px!important;
+    padding:7px 8px!important;
+    font-size:10.5px!important;
+  }
+  .market-action-download span{display:none!important;}
+  .market-action-download{width:36px!important;min-width:36px!important;padding:7px!important;justify-content:center!important;}
+}
+
+/* Tablet portrait: logo dan akun di atas, pencarian penuh di bawah. */
+@media (min-width:761px) and (max-width:900px){
+  .market-nav-top{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px 10px!important;
+    padding:10px 12px!important;
+  }
+  .market-logo{grid-column:1!important;grid-row:1!important;}
+  .market-actions{grid-column:2!important;grid-row:1!important;max-width:58vw!important;overflow-x:auto!important;scrollbar-width:none!important;}
+  .market-actions::-webkit-scrollbar{display:none!important;}
+  .market-search{grid-column:1/-1!important;grid-row:2!important;}
+  .market-action-download{display:none!important;}
+}
+
+/* Ponsel: rapi, tidak menimbulkan scroll horizontal. */
+@media (max-width:760px){
+  .market-nav-top{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px!important;
+    padding:9px 10px!important;
+  }
+  .market-logo{grid-column:1!important;grid-row:1!important;justify-content:flex-start!important;}
+  .market-logo b{max-width:150px!important;font-size:13px!important;text-align:left!important;white-space:nowrap!important;}
+  .market-actions{
+    grid-column:2!important;
+    grid-row:1!important;
+    max-width:48vw!important;
+    overflow-x:auto!important;
+    scrollbar-width:none!important;
+    gap:5px!important;
+  }
+  .market-actions::-webkit-scrollbar{display:none!important;}
+  .market-search{grid-column:1/-1!important;grid-row:2!important;order:initial!important;}
+  .market-search input,.market-search button{height:40px!important;}
+  .market-action-download{display:none!important;}
+  .market-action,.market-wallet,.market-login,.market-register,.user-menu-btn{
+    min-height:35px!important;
+    padding:7px 9px!important;
+    font-size:10px!important;
+  }
+}
