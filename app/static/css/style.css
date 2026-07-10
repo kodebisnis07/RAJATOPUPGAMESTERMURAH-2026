@@ -883,3 +883,114 @@ img{max-width:100%;height:auto;}
   .market-action-download{display:none!important;}
   .market-search button{min-width:58px!important;padding:9px 12px!important;}
 }
+
+
+/* ==========================================================
+   FINAL RESPONSIVE MARKETPLACE + MENU SUNTIK SOSMED (2026-07-10)
+   Override paling akhir untuk mencegah konflik aturan lama.
+   ========================================================== */
+.market-action-sosmed{
+  border-color:rgba(251,191,36,.38)!important;
+  background:linear-gradient(135deg,rgba(251,191,36,.14),#0b1220)!important;
+}
+.market-action-sosmed:hover{
+  background:linear-gradient(135deg,#fde68a,#fbbf24)!important;
+  color:#111827!important;
+}
+#sosmed{scroll-margin-top:92px!important;}
+
+/* Kartu produk tidak boleh saling menimpa pada ukuran layar apa pun. */
+.market-product-grid{
+  grid-template-columns:repeat(6,minmax(150px,1fr))!important;
+  align-items:stretch!important;
+}
+.market-product-card{
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  min-height:190px!important;
+}
+.market-product-image{height:132px!important;}
+.market-product-info h3{overflow-wrap:anywhere!important;}
+
+@media (max-width:1399px){
+  .market-nav-top{grid-template-columns:auto minmax(260px,1fr)!important;}
+  .market-actions{grid-column:1/-1!important;justify-content:flex-end!important;overflow-x:auto!important;padding-bottom:2px!important;}
+  .market-product-grid{grid-template-columns:repeat(5,minmax(145px,1fr))!important;}
+}
+
+@media (max-width:1100px){
+  .market-nav-top{grid-template-columns:auto minmax(220px,1fr)!important;padding:11px 16px!important;}
+  .market-logo b{font-size:14px!important;}
+  .market-actions{justify-content:flex-start!important;flex-wrap:nowrap!important;}
+  .market-action,.market-wallet,.market-login,.market-register,.user-menu-btn{flex:0 0 auto!important;}
+  .market-section{padding-left:16px!important;padding-right:16px!important;}
+  .market-filter{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .market-filter input{grid-column:1/-1!important;}
+  .market-filter button,.market-filter a{width:100%!important;text-align:center!important;justify-self:stretch!important;}
+  .market-product-grid{grid-template-columns:repeat(4,minmax(135px,1fr))!important;gap:12px!important;}
+}
+
+@media (max-width:780px){
+  html,body{overflow-x:hidden!important;}
+  .market-nav-top{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+    padding:9px 10px!important;
+  }
+  .market-logo{justify-content:center!important;}
+  .market-logo b{white-space:normal!important;text-align:center!important;}
+  .market-search{order:2!important;width:100%!important;height:auto!important;}
+  .market-actions{
+    order:3!important;
+    width:100%!important;
+    display:flex!important;
+    justify-content:flex-start!important;
+    overflow-x:auto!important;
+    gap:7px!important;
+    scrollbar-width:none!important;
+  }
+  .market-actions::-webkit-scrollbar{display:none!important;}
+  .market-action,.market-wallet,.market-login,.market-register,.user-menu-btn{
+    width:auto!important;
+    min-width:max-content!important;
+    height:36px!important;
+    min-height:36px!important;
+    padding:7px 9px!important;
+    font-size:10.5px!important;
+  }
+  .market-action span{display:inline!important;font-size:9.5px!important;line-height:1.05!important;}
+  .market-action-download{display:none!important;}
+  .market-action-sosmed{display:inline-flex!important;}
+
+  .market-hero{padding:10px!important;}
+  .hero-stage{height:250px!important;}
+  .market-slide-content{padding:25px 18px!important;max-width:94%!important;}
+  .market-slide h1{font-size:28px!important;}
+
+  .market-section{padding:20px 10px!important;}
+  .market-section-head{flex-direction:column!important;align-items:flex-start!important;gap:8px!important;}
+  .market-section-head h2{font-size:21px!important;white-space:normal!important;}
+  .market-section-head a{width:100%!important;text-align:center!important;}
+  .market-filter{grid-template-columns:1fr!important;gap:8px!important;}
+  .market-filter input,.market-filter select,.market-filter button,.market-filter a{grid-column:auto!important;width:100%!important;}
+
+  .market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+  .market-product-card{min-height:172px!important;border-radius:15px!important;}
+  .market-product-image{height:112px!important;padding:12px!important;}
+  .market-product-image img{max-width:78%!important;max-height:78%!important;}
+  .market-product-info{left:9px!important;right:9px!important;bottom:9px!important;}
+  .market-product-info h3{font-size:12px!important;line-height:1.15!important;}
+  .market-product-info p{font-size:10px!important;}
+  .discount-badge{font-size:8.5px!important;padding:5px 6px!important;}
+  .sosmed-chip-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+}
+
+@media (max-width:380px){
+  .market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .market-product-card{min-height:162px!important;}
+  .market-product-image{height:104px!important;}
+  .market-product-info h3{font-size:11px!important;}
+  .market-product-info p{font-size:9px!important;}
+  .sosmed-chip-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+}

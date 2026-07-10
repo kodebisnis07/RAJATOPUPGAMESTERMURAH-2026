@@ -6,7 +6,7 @@
     <title>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#0b1220">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=popup-top-20260710">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=market-final-20260710">
     <style>
       /* Hapus total menu kecil kategori di bawah header (Home, Voucher, Pulsa, dll). */
       .market-category-nav, .quick-pills, nav.market-category-nav, section.quick-pills {
@@ -72,6 +72,7 @@
             <button type="submit">Cari</button>
         </form>
         <div class="market-actions">
+            <a class="market-action market-action-sosmed" href="{{ url_for('home.index') }}#sosmed" aria-label="Suntik Sosmed">🚀<span>Suntik<br>Sosmed</span></a>
             <a class="market-action market-action-download" href="{{ url_for('home.index') }}#games" aria-label="Download aplikasi">📥<span>Download<br>Aplikasi</span></a>
             {% if session.get('user_id') %}
                 <a class="market-action" href="{{ url_for('auth.orders') }}">📄<span>Invoice</span></a>
