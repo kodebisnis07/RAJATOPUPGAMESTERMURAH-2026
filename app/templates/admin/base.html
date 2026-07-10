@@ -8,6 +8,7 @@
 </head>
 <body>
 <button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>
+<div class="admin-backdrop" aria-hidden="true"></div>
 <div class="admin-layout">
     <aside class="sidebar" id="admin-sidebar">
         <div class="logo">👑 RAJA TOPUP GAMES<br><span>Admin Control Center</span></div>
@@ -66,11 +67,29 @@
 (function(){
   var btn = document.querySelector('.admin-menu-toggle');
   var sidebar = document.querySelector('.sidebar');
+  var backdrop = document.querySelector('.admin-backdrop');
   if(btn && sidebar){
     btn.addEventListener('click', function(){
       var open = sidebar.classList.toggle('open');
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       btn.textContent = open ? '✕ Tutup' : '☰ Menu';
+      document.body.classList.toggle('admin-menu-open', open);
+    });
+    if(backdrop){
+      backdrop.addEventListener('click', function(){
+        sidebar.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.textContent = '☰ Menu';
+        document.body.classList.remove('admin-menu-open');
+      });
+    }
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && sidebar.classList.contains('open')){
+        sidebar.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.textContent = '☰ Menu';
+        document.body.classList.remove('admin-menu-open');
+      }
     });
     sidebar.querySelectorAll('a').forEach(function(a){
       a.addEventListener('click', function(){
@@ -78,6 +97,7 @@
           sidebar.classList.remove('open');
           btn.setAttribute('aria-expanded', 'false');
           btn.textContent = '☰ Menu';
+          document.body.classList.remove('admin-menu-open');
         }
       });
     });

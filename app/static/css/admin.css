@@ -128,3 +128,131 @@ input,select,textarea,button{max-width:100%;}
   th,td{padding:9px 8px!important;white-space:nowrap!important;}
   .btn,.btn-small,button{min-height:40px!important;}
 }
+
+/* =========================================================
+   ADMIN MOBILE DESKTOP-LIKE FIX 2026-07-10
+   Keep the desktop visual hierarchy on phones:
+   - sidebar becomes an overlay drawer
+   - dashboard cards remain compact
+   - wide tables scroll horizontally without crushing columns
+   ========================================================= */
+@media (max-width:900px){
+  html,body{overflow-x:hidden!important}
+  body.admin-menu-open{overflow:hidden!important}
+
+  .admin-menu-toggle{
+    display:flex!important;
+    align-items:center;
+    justify-content:flex-start;
+    position:sticky!important;
+    top:0;
+    z-index:10003!important;
+    width:100%!important;
+    min-height:48px;
+    padding:12px 16px!important;
+  }
+
+  .admin-layout{
+    display:block!important;
+    min-height:calc(100vh - 48px);
+  }
+
+  .admin-sidebar,.sidebar{
+    position:fixed!important;
+    top:0!important;
+    bottom:0!important;
+    left:0!important;
+    width:min(82vw,270px)!important;
+    min-height:100vh!important;
+    padding:64px 18px 24px!important;
+    overflow-y:auto!important;
+    transform:translateX(-105%)!important;
+    transition:transform .22s ease!important;
+    z-index:10002!important;
+  }
+  .admin-sidebar.open,.sidebar.open{transform:translateX(0)!important}
+
+  .admin-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:10001;
+    background:rgba(2,6,23,.68);
+    backdrop-filter:blur(2px);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .2s ease,visibility .2s ease;
+  }
+  body.admin-menu-open .admin-backdrop{opacity:1;visibility:visible}
+
+  .admin-main,.admin-content,.content,.main-content{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    padding:18px!important;
+    overflow:visible!important;
+  }
+
+  .topbar{
+    display:flex!important;
+    flex-direction:row!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+  }
+  .topbar>div{width:auto!important;min-width:160px}
+
+  .page-head h1{font-size:30px!important}
+  .cards,.stats-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .card-admin{padding:16px!important}
+  .card-admin h2{font-size:24px!important}
+
+  .admin-form.grid-form,.grid-form,.form-grid,.banner-form,.settings-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  .admin-table{
+    display:table!important;
+    width:max-content!important;
+    min-width:100%!important;
+    max-width:none!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
+  .admin-table th,.admin-table td{white-space:nowrap!important}
+  .admin-table-wrap,.table-wrap,.table-responsive,
+  .main-content > .admin-table{
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  /* Tables used directly in templates still remain scrollable. */
+  .main-content{contain:inline-size}
+  .main-content > table.admin-table{
+    display:block!important;
+    width:100%!important;
+    overflow-x:auto!important;
+  }
+  .main-content > table.admin-table tbody,
+  .main-content > table.admin-table thead,
+  .main-content > table.admin-table tr{width:max-content;min-width:100%}
+
+  .mini-edit{min-width:240px!important}
+  .admin-form button,.btn,.settings-form button{width:auto!important}
+}
+
+@media (max-width:600px){
+  .admin-main,.admin-content,.content,.main-content{padding:14px!important}
+  .page-head h1{font-size:27px!important}
+  .cards,.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .admin-form.grid-form,.grid-form,.form-grid,.banner-form,.settings-grid{
+    grid-template-columns:1fr!important;
+  }
+  .card-admin h2{font-size:21px!important}
+  .card-admin p{font-size:13px!important}
+  .topbar>div{width:100%!important}
+}
+
+@media (max-width:380px){
+  .cards,.stats-grid{grid-template-columns:1fr!important}
+}

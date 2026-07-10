@@ -38,6 +38,7 @@
     <a class="logo" href="{{ url_for('home.index') }}">👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') if settings is defined else 'RAJA TOPUP GAMES' }}</a>
     <button class="mobile-nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false">☰</button>
 </header>
+var nav = document.querySelector('.navbar nav');
 {% block content %}{% endblock %}
 <footer class="footer">
     <h3>👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') if settings is defined else 'RAJA TOPUP GAMES' }}</h3>
