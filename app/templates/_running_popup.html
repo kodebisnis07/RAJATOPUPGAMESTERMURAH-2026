@@ -4,12 +4,26 @@
 {% set popup_bg = popup_settings.get('running_popup_bg_color', '#07101f') %}
 {% set popup_text_color = popup_settings.get('running_popup_text_color', '#fff3c4') %}
 {% set popup_border_color = popup_settings.get('running_popup_border_color', '#fbbf24') %}
-<div class="running-popup" id="runningPopup" role="status" aria-label="Pengumuman website"
+<div class="running-popup" id="runningPopup" role="status" aria-live="polite" aria-label="Pengumuman website"
      style="--running-popup-bg: {{ popup_bg }}; --running-popup-color: {{ popup_text_color }}; --running-popup-border: {{ popup_border_color }}; --running-popup-duration: {{ popup_settings.get('running_popup_speed', '18')|int }}s;">
-  <div class="running-popup-icon" aria-hidden="true">📢</div>
+  <span class="running-popup-icon" aria-hidden="true">📢</span>
   <div class="running-popup-viewport">
-    <div class="running-popup-text"><span>{{ popup_text }}</span></div>
+    <div class="running-popup-track">
+      <span class="running-popup-message">{{ popup_text }}</span>
+    </div>
   </div>
-  <button class="running-popup-close" type="button" aria-label="Tutup pengumuman" onclick="document.getElementById('runningPopup').remove()">×</button>
+  <button class="running-popup-close" type="button" aria-label="Tutup pengumuman" data-close-running-popup>×</button>
 </div>
+<script>
+(function () {
+  var popup = document.getElementById('runningPopup');
+  if (!popup) return;
+  var closeButton = popup.querySelector('[data-close-running-popup]');
+  if (closeButton) {
+    closeButton.addEventListener('click', function () {
+      popup.remove();
+    });
+  }
+})();
+</script>
 {% endif %}
