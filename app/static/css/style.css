@@ -861,3 +861,21 @@ img{max-width:100%;height:auto;}
 @media (prefers-reduced-motion:reduce){
   .running-popup-track{animation-duration:40s;}
 }
+
+/* === NAVBAR FINAL 2026-07-10: Cari tidak boleh tertutup tombol aksi === */
+.market-nav-top{grid-template-columns:max-content minmax(320px,1fr) max-content!important;gap:14px!important;}
+.market-search{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;align-items:center!important;min-width:0!important;width:100%!important;overflow:visible!important;}
+.market-search input{min-width:0!important;width:100%!important;}
+.market-search button{display:inline-flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;position:static!important;min-width:64px!important;width:auto!important;white-space:nowrap!important;}
+.market-actions{min-width:max-content!important;}
+@media(max-width:1180px){
+  .market-nav-top{grid-template-columns:minmax(0,1fr) auto!important;}
+  .market-logo{grid-column:1!important;grid-row:1!important;}
+  .market-actions{grid-column:2!important;grid-row:1!important;justify-content:flex-end!important;}
+  .market-search{grid-column:1/-1!important;grid-row:2!important;}
+}
+@media(max-width:760px){
+  .market-actions{display:flex!important;width:auto!important;gap:6px!important;}
+  .market-action-download{display:none!important;}
+  .market-search button{min-width:58px!important;padding:9px 12px!important;}
+}
