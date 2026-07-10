@@ -1,0 +1,14 @@
+PERBAIKAN NAMA WEBSITE DINAMIS
+
+Nama website yang disimpan melalui Panel Super Admin > Pengaturan sekarang otomatis digunakan pada:
+- Logo/header halaman utama
+- Judul tab halaman utama
+- Badge hero bawaan
+- Teks promo halaman utama
+- Footer halaman utama
+- Halaman detail/top up produk
+- Judul halaman akun pengguna
+- Halaman login/daftar/lupa password/reset password
+- Panel admin dan login admin (sudah dinamis sebelumnya)
+
+Setelah deploy, simpan ulang Nama Website dari menu Pengaturan lalu refresh paksa/incognito.

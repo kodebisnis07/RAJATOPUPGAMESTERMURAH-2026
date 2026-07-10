@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Live Chat - RAJA TOPUP GAMES{% endblock %}
+{% block title %}Live Chat - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endblock %}
 {% block content %}
 <section class="profile-page chat-page">
     <div class="profile-container">
@@ -8,7 +8,7 @@
             <div class="section-heading left">
                 <span>💬 Bantuan</span>
                 <h1>Live Chat Admin / Operator</h1>
-                <p>Kirim pesan kepada tim Raja Topup Games. Balasan admin akan muncul otomatis.</p>
+                <p>Kirim pesan kepada tim {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}. Balasan admin akan muncul otomatis.</p>
             </div>
 
             <div class="chat-box" id="user-chat-box">

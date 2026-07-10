@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Edit Profil - RAJA TOPUP GAMES{% endblock %}
+{% block title %}Edit Profil - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endblock %}
 {% block content %}
 <section class="profile-page">
     {% include 'auth/_account_nav.html' %}

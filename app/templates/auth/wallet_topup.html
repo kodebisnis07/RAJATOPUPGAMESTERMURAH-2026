@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Top Up Saldo - RAJA TOPUP GAMES{% endblock %}
+{% block title %}Top Up Saldo - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endblock %}
 {% block content %}
 <section class="profile-page wallet-page">
     {% include 'auth/_account_nav.html' %}
     <div class="profile-head">
         <span class="eyebrow">DOMPET USER</span>
         <h1>Top Up Saldo Akun</h1>
-        <p>Isi saldo akun Raja Topup Games dan dapatkan bonus koin sesuai nominal top up.</p>
+        <p>Isi saldo akun {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }} dan dapatkan bonus koin sesuai nominal top up.</p>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}

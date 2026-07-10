@@ -18,7 +18,7 @@
 <body class="site-body marketplace-home">
 <header class="market-nav">
     <div class="market-nav-top">
-        <a class="market-logo" href="{{ url_for('home.index') }}"><span>👑</span><b>RAJA TOPUP<br>GAMES</b></a>
+        <a class="market-logo" href="{{ url_for('home.index') }}"><span>👑</span><b>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</b></a>
         <form class="market-search" method="GET" action="{{ url_for('home.index') }}#games">
             <span>🔍</span>
             <input type="text" name="q" value="{{ q }}" placeholder="Cari game, voucher, atau produk...">
@@ -80,7 +80,7 @@
         {% for banner in banners %}
         <article class="market-slide {% if loop.first %}active{% endif %}" style="background-image:linear-gradient(90deg,rgba(5,8,15,.30),rgba(5,8,15,.10)),url('{% if banner.image %}{% if '/' in banner.image %}{{ url_for('static', filename=banner.image) }}{% else %}{{ url_for('static', filename='img/products/' + banner.image) }}{% endif %}{% else %}{{ url_for('static', filename='img/banner/rtg-banner-20260707.png') }}{% endif %}')">
             <div class="market-slide-content">
-                <span class="market-badge">{{ banner.tag|default('RAJA TOPUP GAMES', true) }}</span>
+                <span class="market-badge">{% if banner.tag and banner.tag != 'RAJA TOPUP GAMES' %}{{ banner.tag }}{% else %}{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endif %}</span>
                 <h1>{{ banner.title }}</h1>
                 <p>{{ banner.subtitle or settings.get('site_tagline', 'Top Up game cepat, murah, dan terpercaya.') }}</p>
                 <a class="market-cta" href="{{ banner.link or '#games' }}">{{ banner.button_text or 'Top Up Sekarang' }} →</a>
@@ -213,7 +213,7 @@
 </section>
 
 <section class="market-section" id="promo">
-    <div class="market-section-head"><div><h2>🎁 Promo & Benefit</h2><p>Promo terbaik dari Raja Topup Games</p></div></div>
+    <div class="market-section-head"><div><h2>🎁 Promo & Benefit</h2><p>Promo terbaik dari {{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</p></div></div>
     <div class="market-promo-grid">
         {% for promo in promos %}
         <a class="market-promo-card" href="{{ promo.link or '#games' }}"><span>{{ promo.badge }}</span><h3>{{ promo.title }}</h3><p>{{ promo.description }}</p></a>
@@ -234,8 +234,8 @@
 <button id="install-pwa-btn" class="install-pwa-btn market-install" type="button" hidden>📲 Pasang Aplikasi</button>
 
 <footer class="market-footer">
-    <div><b>👑 RAJA TOPUP GAMES</b><p>Platform top up game, voucher, e-wallet, dan aplikasi premium.</p></div>
-    <div><b>Metode Pembayaran</b><p>QRIS · Bank · E-Wallet · Saldo Raja Topup</p></div>
+    <div><b>👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</b><p>Platform top up game, voucher, e-wallet, dan aplikasi premium.</p></div>
+    <div><b>Metode Pembayaran</b><p>QRIS · Bank · E-Wallet · Saldo {{ settings.get('site_name', 'Website') }}</p></div>
     <div><b>Support</b><p>Live Chat Admin / Operator 24 Jam</p></div>
 </footer>
 

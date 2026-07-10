@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login User - Raja Topup Games</title>
+    <title>Login User - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=fix-sosmed-20260701">
 </head>
 <body class="site-body auth-page auth-login-page">
 <div class="auth-shell">
-    <section class="auth-banner" aria-label="Banner Raja Topup Games">
+    <section class="auth-banner" aria-label="Banner {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">
         <div class="auth-banner-overlay"></div>
         <div class="auth-brand-badge">
             <div class="auth-crown">♛</div>
             <div>
-                <span>RAJA TOPUP</span>
+                <span>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</span>
                 <strong>GAMES</strong>
             </div>
         </div>
         <div class="auth-banner-content">
             <p class="auth-kicker">Top Up Cepat • Aman • Terpercaya</p>
-            <h1>RAJA TOPUP<br><span>GAMES</span></h1>
+            <h1>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h1>
             <p class="auth-banner-text">Login untuk lanjut membeli diamond, voucher, dan kebutuhan game favorit Anda.</p>
             <div class="auth-benefits">
                 <div><b>⚡</b><span>Proses Cepat</span></div>
@@ -32,7 +32,7 @@
     <section class="auth-panel">
         <div class="auth-logo-mini">
             <span>♛</span>
-            <b>RAJA TOPUP GAMES</b>
+            <b>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</b>
         </div>
         <h1>Selamat Datang Kembali!</h1>
         <p class="auth-muted">Masuk menggunakan username Anda untuk melanjutkan.</p>

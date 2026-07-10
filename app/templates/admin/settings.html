@@ -3,7 +3,7 @@
 <div class="page-head"><h1>Pengaturan Website & Payment</h1><p>Ubah nama website, brand, kontak, SEO, dan payment gateway dari satu halaman.</p></div>
 <form method="POST" class="settings-form">
     <h2>Brand Website</h2>
-    <label>Nama Website</label><input type="text" name="site_name" value="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}" maxlength="80" required placeholder="Contoh: RAJA TOPUP GAMES"><small class="field-help">Nama ini akan tampil di header, footer, halaman login, dan panel admin.</small>
+    <label>Nama Website</label><input type="text" name="site_name" value="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}" maxlength="80" required placeholder="Contoh: RAJA TOPUP GAMES"><small class="field-help">Nama ini otomatis tampil di header website, footer, halaman produk, halaman akun, login, dan panel admin setelah disimpan.</small>
     <label>Tagline</label><input type="text" name="site_tagline" value="{{ settings.get('site_tagline', '') }}">
     <label>WhatsApp</label><input type="text" name="whatsapp" value="{{ settings.get('whatsapp', '') }}">
     <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">

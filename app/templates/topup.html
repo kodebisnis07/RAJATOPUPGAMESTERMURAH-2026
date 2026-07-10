@@ -2,7 +2,7 @@
 {% block content %}
 <section class="topup-hero">
     <div>
-        <span class="eyebrow">RAJA TOPUP GAMES</span>
+        <span class="eyebrow">{{ settings.get('site_name', global_settings.get('site_name', 'RAJA TOPUP GAMES')) }}</span>
         <h1>Top Up {{ category.name }}</h1>
         <p>{{ input_config.help if input_config else 'Pilih paket, pilih pembayaran, lalu selesaikan transaksi dengan aman.' }}</p>
     </div>

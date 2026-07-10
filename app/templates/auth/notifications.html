@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Notifikasi - RAJA TOPUP GAMES{% endblock %}
+{% block title %}Notifikasi - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endblock %}
 {% block content %}
 <section class="profile-page notifications-page">
     {% include 'auth/_account_nav.html' %}
