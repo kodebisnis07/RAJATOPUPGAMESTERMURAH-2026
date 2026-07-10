@@ -377,3 +377,124 @@ input,select,textarea,button{max-width:100%;}
     -webkit-overflow-scrolling: touch !important;
   }
 }
+
+/* =========================================================
+   ADMIN MOBILE LAYOUT RESET 2026-07-10
+   Final source-of-truth rules. Keep admin content in normal
+   document flow and remove the tall empty area on phones.
+   ========================================================= */
+@media (max-width: 900px) {
+  html,
+  body,
+  body.login-page {
+    width: 100% !important;
+    min-height: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  body:not(.login-page) {
+    display: block !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+  }
+
+  body:not(.login-page) > .admin-menu-toggle {
+    display: flex !important;
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10003 !important;
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+    transform: none !important;
+  }
+
+  body:not(.login-page) > .admin-layout {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  body:not(.login-page) .main-content {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    float: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 14px !important;
+    transform: none !important;
+    translate: none !important;
+    overflow: visible !important;
+  }
+
+  body:not(.login-page) .topbar,
+  body:not(.login-page) .page-head,
+  body:not(.login-page) .alert,
+  body:not(.login-page) .cards,
+  body:not(.login-page) .settings-form,
+  body:not(.login-page) .admin-form {
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    translate: none !important;
+  }
+
+  body:not(.login-page) .topbar {
+    display: flex !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+    justify-content: stretch !important;
+  }
+
+  body:not(.login-page) .topbar > div {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.login-page {
+    display: block !important;
+  }
+
+  body.login-page .login-wrap {
+    display: flex !important;
+    position: static !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 20px 14px !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    transform: none !important;
+  }
+
+  body.login-page .login-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 430px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+}

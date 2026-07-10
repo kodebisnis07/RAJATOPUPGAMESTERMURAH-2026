@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% set is_super_portal = portal == 'super_admin' %}
     <title>{{ 'Login Super Admin' if is_super_portal else 'Login Admin / Operator' }} - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260710-mobile-reset-3">
 </head>
 <body class="login-page {{ 'super-admin-login' if is_super_portal else 'admin-operator-login' }}">
 <div class="login-wrap">
