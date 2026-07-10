@@ -6,7 +6,7 @@
     <title>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#0b1220">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=market-final-20260710">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=final-polish-20260710">
     <style>
       /* Hapus total menu kecil kategori di bawah header (Home, Voucher, Pulsa, dll). */
       .market-category-nav, .quick-pills, nav.market-category-nav, section.quick-pills {
@@ -100,25 +100,7 @@
 </header>
 {% include '_running_popup.html' %}
 
-<script>
-/* Guard tambahan: hapus menu kecil kategori jika masih muncul dari cache/template lama. */
-(function(){
-  function removeSmallCategoryMenu(){
-    var badWords = ['Home','Voucher','Pulsa','Dolar','Sosial Media','Aplikasi Premium','Top Up Games','Reseller'];
-    document.querySelectorAll('.market-category-nav,.quick-pills,nav,section,div').forEach(function(el){
-      var txt = (el.textContent || '').replace(/\s+/g,' ').trim();
-      var hit = badWords.filter(function(w){ return txt.indexOf(w) !== -1; }).length;
-      if(hit >= 4 && el.closest('header.market-nav') === null && el.id !== 'games'){ el.remove(); }
-    });
-    document.querySelectorAll('body > a').forEach(function(a){
-      var txt = (a.textContent || '').trim();
-      if(badWords.some(function(w){ return txt.indexOf(w) !== -1; })){ a.remove(); }
-    });
-  }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', removeSmallCategoryMenu); }
-  else { removeSmallCategoryMenu(); }
-})();
-</script>
+
 
 <section class="market-hero">
     <button class="hero-arrow left" type="button">‹</button>
@@ -191,7 +173,7 @@
         <a href="{{ url_for('home.topup', category_id=game.id) }}" class="market-product-card">
             {% if game.badge %}<span class="discount-badge">{{ game.badge }}</span>{% else %}<span class="discount-badge">-5%</span>{% endif %}
             <div class="market-product-image">
-                {% if game.icon %}{% if game.icon.startswith('http') %}<img src="{{ game.icon }}" alt="{{ game.name }}">{% else %}<img src="{{ url_for('static', filename='img/games/' + game.icon) }}" alt="{{ game.name }}">{% endif %}{% else %}<span>{{ game.name[:2] }}</span>{% endif %}
+                {% if game.icon %}{% if game.icon.startswith('http') %}<img src="{{ game.icon }}" alt="{{ game.name }}" loading="lazy" decoding="async">{% else %}<img src="{{ url_for('static', filename='img/games/' + game.icon) }}" alt="{{ game.name }}" loading="lazy" decoding="async">{% endif %}{% else %}<span>{{ game.name[:2] }}</span>{% endif %}
             </div>
             <div class="market-product-info">
                 <h3>{{ game.name }}</h3>
@@ -218,7 +200,7 @@
             {% if item.badge %}<span class="discount-badge">{{ item.badge }}</span>{% endif %}
             <div class="market-product-image">
                 {% if item.icon %}
-                    {% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}">{% endif %}
+                    {% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% endif %}
                 {% else %}<span>{{ item.name[:2] }}</span>{% endif %}
             </div>
             <div class="market-product-info">
@@ -249,7 +231,7 @@
         {% for item in social_categories %}
         <a href="{{ url_for('home.topup', category_id=item.id) }}" class="sosmed-chip">
             <span class="sosmed-chip-icon">
-                {% if item.icon %}{% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}">{% endif %}{% else %}{{ item.name[:1] }}{% endif %}
+                {% if item.icon %}{% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% endif %}{% else %}{{ item.name[:1] }}{% endif %}
             </span>
             <b>{{ item.name.replace(' Sosmed','') }}</b>
         </a>

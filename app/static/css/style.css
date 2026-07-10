@@ -994,3 +994,80 @@ img{max-width:100%;height:auto;}
   .market-product-info p{font-size:9px!important;}
   .sosmed-chip-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
 }
+
+
+/* ==========================================================
+   FINAL QUALITY PASS 2026-07-10
+   Stabilizes layout across desktop, tablet, and phones.
+   ========================================================== */
+html{box-sizing:border-box;max-width:100%;overflow-x:hidden}
+*,*::before,*::after{box-sizing:inherit}
+body.marketplace-home{width:100%;max-width:100%;margin:0;overflow-x:hidden}
+.market-nav{position:sticky;top:0;z-index:1200;width:100%;background:rgba(7,13,24,.96);backdrop-filter:blur(14px)}
+.market-nav-top{width:min(1560px,100%);margin-inline:auto;padding:12px clamp(14px,2.2vw,34px)!important}
+.market-logo{min-width:0;white-space:nowrap}
+.market-logo b{overflow:hidden;text-overflow:ellipsis}
+.market-search{min-height:44px}
+.market-search input{height:44px;line-height:1.2}
+.market-search button{height:44px}
+.market-actions{max-width:100%}
+.running-popup{position:relative!important;top:auto!important;bottom:auto!important;z-index:1100!important}
+.market-hero,.market-section,.website-banner-block,.market-footer{width:min(1560px,100%);margin-inline:auto}
+.hero-stage{min-width:0}
+.market-slide{background-repeat:no-repeat}
+.website-banner-grid{align-items:stretch}
+.website-promo-card{min-width:0;overflow:hidden}
+.market-filter{display:grid!important;grid-template-columns:minmax(220px,1.5fr) minmax(170px,1fr) minmax(170px,1fr) auto auto!important;align-items:center!important;width:100%!important}
+.market-filter input,.market-filter select{width:100%!important;min-width:0!important;margin:0!important}
+.market-filter button,.market-filter a{white-space:nowrap}
+.market-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important}
+.market-product-card{min-width:0;isolation:isolate}
+.market-product-image img{display:block;width:100%;height:100%;object-fit:cover}
+.market-product-info h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.market-product-info p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.market-action,.market-wallet,.market-login,.market-register,.user-menu-btn{flex:0 0 auto}
+img{max-width:100%}
+
+@media (min-width:1400px){
+  .market-product-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
+@media (max-width:1100px){
+  .market-nav-top{grid-template-columns:minmax(0,1fr) auto!important}
+  .market-logo{grid-column:1;grid-row:1}
+  .market-actions{grid-column:2;grid-row:1;overflow-x:auto;scrollbar-width:none}
+  .market-actions::-webkit-scrollbar{display:none}
+  .market-search{grid-column:1/-1;grid-row:2}
+  .market-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .market-filter{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .market-filter input{grid-column:1/-1!important}
+}
+@media (max-width:760px){
+  .market-nav{position:relative}
+  .market-nav-top{padding:10px 12px!important;gap:8px!important}
+  .market-logo b{font-size:14px!important}
+  .market-actions{gap:6px!important}
+  .market-action,.market-wallet,.market-login,.market-register,.user-menu-btn{min-height:36px!important;padding:7px 9px!important;font-size:10px!important}
+  .market-search{grid-template-columns:auto minmax(0,1fr) auto!important}
+  .market-search input,.market-search button{height:40px!important}
+  .market-search button{min-width:56px!important;padding-inline:11px!important}
+  .market-hero{padding:10px 10px 6px!important}
+  .hero-stage{height:clamp(220px,58vw,300px)!important}
+  .market-slide-content{padding:24px 18px!important}
+  .market-slide h1{font-size:clamp(26px,8vw,34px)!important}
+  .market-section,.website-banner-block{padding-left:10px!important;padding-right:10px!important}
+  .market-filter{grid-template-columns:1fr!important;gap:8px!important}
+  .market-filter input,.market-filter select,.market-filter button,.market-filter a{grid-column:auto!important;width:100%!important;text-align:center}
+  .market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .market-product-card{min-height:172px!important}
+  .market-product-image{height:112px!important}
+  .market-product-info{left:10px!important;right:10px!important;bottom:10px!important}
+  .market-product-info h3{font-size:12px!important}
+  .market-product-info p{font-size:10px!important}
+  .website-banner-grid{grid-template-columns:1fr!important}
+  .floating-chat{right:14px!important;bottom:16px!important}
+}
+@media (max-width:360px){
+  .market-product-grid{gap:8px!important}
+  .market-product-card{min-height:160px!important}
+  .market-product-image{height:102px!important}
+}
