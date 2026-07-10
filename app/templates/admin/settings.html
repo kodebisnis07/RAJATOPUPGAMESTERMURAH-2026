@@ -25,6 +25,22 @@
         <option value="26" {% if popup_speed == '26' %}selected{% endif %}>Lambat</option>
     </select>
 
+    <div class="popup-color-grid">
+        <div>
+            <label for="running_popup_bg_color">Warna Latar Pop-up</label>
+            <input id="running_popup_bg_color" type="color" name="running_popup_bg_color" value="{{ settings.get('running_popup_bg_color', '#07101f') }}">
+        </div>
+        <div>
+            <label for="running_popup_text_color">Warna Tulisan</label>
+            <input id="running_popup_text_color" type="color" name="running_popup_text_color" value="{{ settings.get('running_popup_text_color', '#fff3c4') }}">
+        </div>
+        <div>
+            <label for="running_popup_border_color">Warna Garis</label>
+            <input id="running_popup_border_color" type="color" name="running_popup_border_color" value="{{ settings.get('running_popup_border_color', '#fbbf24') }}">
+        </div>
+    </div>
+    <small class="field-help">Warna akan langsung digunakan pada pop-up setelah pengaturan disimpan dan halaman website dimuat ulang.</small>
+
     <h2>SEO & Google</h2>
     <label>Meta Title</label><input type="text" name="meta_title" value="{{ settings.get('meta_title', 'Raja Topup Games | Top Up Game Murah, Cepat & Terpercaya') }}">
     <label>Meta Description</label><textarea name="meta_description" rows="3">{{ settings.get('meta_description', 'Top up game murah, cepat, aman, dan terpercaya 24 jam di Raja Topup Games.') }}</textarea>

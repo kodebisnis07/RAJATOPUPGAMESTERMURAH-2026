@@ -1528,6 +1528,7 @@ def settings():
             "meta_title", "meta_description", "meta_keywords", "google_site_verification",
             "google_analytics_id", "facebook_pixel_id",
             "running_popup_enabled", "running_popup_text", "running_popup_speed",
+            "running_popup_bg_color", "running_popup_text_color", "running_popup_border_color",
             "payment_gateway", "tripay_mode", "tripay_api_key", "tripay_private_key",
             "tripay_merchant_code", "duitku_merchant_code", "duitku_api_key", "xendit_secret_key"
         ]
@@ -1539,10 +1540,18 @@ def settings():
             flash("Nama website maksimal 80 karakter.", "error")
             return redirect(url_for("admin.settings"))
 
+        import re
+        color_defaults = {
+            "running_popup_bg_color": "#07101f",
+            "running_popup_text_color": "#fff3c4",
+            "running_popup_border_color": "#fbbf24",
+        }
         for key in keys:
             value = request.form.get(key, "")
             if key == "site_name":
                 value = site_name
+            if key in color_defaults and not re.fullmatch(r"#[0-9A-Fa-f]{6}", value or ""):
+                value = color_defaults[key]
             set_setting(key, value)
         db.session.commit()
         log_admin_activity("ubah_pengaturan", f"Memperbarui pengaturan website/payment gateway; nama website: {site_name}")

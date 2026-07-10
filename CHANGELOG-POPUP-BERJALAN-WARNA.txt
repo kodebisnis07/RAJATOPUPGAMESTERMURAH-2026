@@ -1,0 +1,14 @@
+PERBAIKAN POP-UP BERJALAN + PENGATURAN WARNA
+
+Perubahan:
+- Pop-up hanya menampilkan satu teks, tidak lagi terlihat dobel/menyambung.
+- Animasi bergerak dari kanan ke kiri.
+- Warna latar, tulisan, dan garis dapat dipilih dari Panel Super Admin > Pengaturan.
+- Validasi warna hex di sisi server.
+- Tampilan responsif untuk HP dan PC.
+
+File utama yang diubah:
+- app/templates/_running_popup.html
+- app/templates/admin/settings.html
+- app/routes/admin.py
+- app/static/css/style.css
