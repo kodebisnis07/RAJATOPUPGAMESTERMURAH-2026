@@ -6,7 +6,7 @@
     <title>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#0b1220">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=final-polish-20260710">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=navbar-sejajar-20260710">
     <style>
       /* Hapus total menu kecil kategori di bawah header (Home, Voucher, Pulsa, dll). */
       .market-category-nav, .quick-pills, nav.market-category-nav, section.quick-pills {
@@ -43,15 +43,32 @@
       .market-actions{min-width:max-content!important;}
       .market-action-download{order:0!important;}
 
-      @media (max-width:1180px){
+      /* Tablet/desktop sempit: semua elemen navbar tetap satu baris. */
+      @media (min-width:761px) and (max-width:1180px){
         .market-nav-top{
-          grid-template-columns:minmax(0,1fr) auto!important;
-          gap:10px!important;
+          grid-template-columns:max-content minmax(180px,1fr) max-content!important;
+          gap:8px!important;
+          padding:10px 12px!important;
         }
-        .market-logo{grid-column:1!important;grid-row:1!important;}
-        .market-actions{grid-column:2!important;grid-row:1!important;justify-content:flex-end!important;}
-        .market-search{grid-column:1/-1!important;grid-row:2!important;}
+        .market-logo,.market-search,.market-actions{
+          grid-column:auto!important;
+          grid-row:auto!important;
+        }
+        .market-logo{gap:7px!important;}
+        .market-logo span{width:34px!important;height:34px!important;border-radius:10px!important;}
+        .market-logo b{font-size:13px!important;max-width:145px!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+        .market-search{padding:6px 8px!important;gap:7px!important;border-radius:13px!important;}
+        .market-search input{font-size:12px!important;}
+        .market-search button{min-width:52px!important;padding:8px 11px!important;font-size:12px!important;}
+        .market-actions{gap:6px!important;justify-content:flex-end!important;}
+        .market-action,.market-login,.market-register,.market-wallet,.user-menu-btn{
+          min-height:36px!important;padding:7px 9px!important;font-size:11px!important;border-radius:11px!important;
+        }
         .market-action-download span{display:inline!important;}
+      }
+      @media (min-width:761px) and (max-width:930px){
+        .market-action-download span{display:none!important;}
+        .market-action-download{width:38px!important;min-width:38px!important;padding:7px!important;}
       }
       @media (max-width:760px){
         .market-nav-top{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;}

@@ -1071,3 +1071,16 @@ img{max-width:100%}
   .market-product-card{min-height:160px!important}
   .market-product-image{height:102px!important}
 }
+
+/* === FINAL NAVBAR SEJAJAR: desktop dan tablet tetap satu baris === */
+@media (min-width:761px) and (max-width:1180px){
+  .market-nav-top{
+    display:grid!important;
+    grid-template-columns:max-content minmax(180px,1fr) max-content!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:10px 12px!important;
+  }
+  .market-logo,.market-search,.market-actions{grid-column:auto!important;grid-row:auto!important;}
+  .market-actions{justify-content:flex-end!important;flex-wrap:nowrap!important;}
+}

@@ -1,0 +1,5 @@
+Perbaikan navbar sejajar
+- Logo, pencarian, tombol Cari, Download Aplikasi, Masuk, dan Daftar tetap satu baris pada PC/tablet.
+- Ukuran elemen diperkecil secara proporsional pada layar sempit tanpa memindahkan tombol ke baris kedua.
+- Pada lebar 761–930 px, teks Download Aplikasi disembunyikan tetapi ikonnya tetap tampil agar navbar tetap muat.
+- Tampilan ponsel di bawah 760 px tetap responsif.
