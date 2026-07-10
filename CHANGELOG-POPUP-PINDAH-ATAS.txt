@@ -1,0 +1,6 @@
+POPUP DIPINDAHKAN KE ATAS
+
+- Pop-up tidak lagi fixed di bawah layar.
+- Pop-up sekarang tampil sebagai bar penuh tepat di bawah navbar dan di atas banner hero.
+- Tampilan desktop dan mobile sudah disesuaikan.
+- Warna latar, teks, garis, kecepatan, dan tombol tutup tetap berfungsi dari panel admin.
