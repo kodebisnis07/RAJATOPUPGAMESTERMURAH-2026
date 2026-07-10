@@ -1,0 +1,66 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<h1>🔌 API Management / Mitra API / White Label</h1>
+<p>Kelola cabang dan website pihak ketiga yang wajib membeli produk melalui saldo serta API Raja Topup Games.</p>
+
+{% if generated %}
+<div class="card" style="border:2px solid #f4c542;padding:16px;margin-bottom:18px">
+  <h2>Kredensial Baru — {{ generated.name }}</h2>
+  <p><strong>Simpan sekarang. API Secret tidak dapat ditampilkan kembali.</strong></p>
+  <label>API Key</label><textarea readonly style="width:100%">{{ generated.api_key }}</textarea>
+  <label>API Secret</label><textarea readonly style="width:100%">{{ generated.api_secret }}</textarea>
+</div>
+{% endif %}
+
+<div class="card" style="padding:16px;margin-bottom:18px">
+<h2>Tambah Mitra API</h2>
+<form method="post" class="form-grid">
+  <label>Nama Mitra<input name="name" required></label>
+  <label>Domain<input name="domain" placeholder="https://mitra.id"></label>
+  <label>Nama Kontak<input name="contact_name"></label>
+  <label>Email Kontak<input name="contact_email" type="email"></label>
+  <label>Saldo Awal<input name="balance" type="number" min="0" value="0"></label>
+  <label>Markup Harga API (%)<input name="price_markup_percent" type="number" min="0" value="0"></label>
+  <label>Allowed IP<textarea name="allowed_ips" placeholder="Kosong = semua IP. Pisahkan dengan koma."></textarea></label>
+  <label>Callback URL<input name="callback_url" placeholder="https://mitra.id/callback"></label>
+  <label>Status<select name="status"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></label>
+  <label><input type="checkbox" name="white_label_enabled"> Aktifkan White Label</label>
+  <label>Nama Brand<input name="brand_name"></label>
+  <label>URL Logo<input name="brand_logo"></label>
+  <label>Warna Utama<input name="brand_primary_color" placeholder="#f5b82e"></label>
+  <button type="submit">+ Buat Mitra & Generate API Key</button>
+</form>
+</div>
+
+<h2>Daftar Mitra API</h2>
+{% for item in clients %}
+<details class="card" style="padding:14px;margin-bottom:10px">
+ <summary><strong>{{ item.name }}</strong> — {{ item.domain or '-' }} — Saldo Rp{{ '{:,.0f}'.format(item.balance or 0) }} — {{ item.status }}</summary>
+ <form method="post" action="{{ url_for('admin.update_api_client', id=item.id) }}" class="form-grid" style="margin-top:12px">
+  <label>Nama<input name="name" value="{{ item.name }}" required></label>
+  <label>Domain<input name="domain" value="{{ item.domain or '' }}"></label>
+  <label>Kontak<input name="contact_name" value="{{ item.contact_name or '' }}"></label>
+  <label>Email<input name="contact_email" value="{{ item.contact_email or '' }}"></label>
+  <label>Saldo<input name="balance" type="number" min="0" value="{{ item.balance or 0 }}"></label>
+  <label>Markup (%)<input name="price_markup_percent" type="number" min="0" value="{{ item.price_markup_percent or 0 }}"></label>
+  <label>Allowed IP<textarea name="allowed_ips">{{ item.allowed_ips or '' }}</textarea></label>
+  <label>Callback URL<input name="callback_url" value="{{ item.callback_url or '' }}"></label>
+  <label>Status<select name="status"><option value="active" {% if item.status=='active' %}selected{% endif %}>Aktif</option><option value="inactive" {% if item.status!='active' %}selected{% endif %}>Nonaktif</option></select></label>
+  <label><input type="checkbox" name="white_label_enabled" {% if item.white_label_enabled %}checked{% endif %}> White Label</label>
+  <label>Nama Brand<input name="brand_name" value="{{ item.brand_name or '' }}"></label>
+  <label>URL Logo<input name="brand_logo" value="{{ item.brand_logo or '' }}"></label>
+  <label>Warna<input name="brand_primary_color" value="{{ item.brand_primary_color or '' }}"></label>
+  <button type="submit">Simpan Perubahan</button>
+ </form>
+ <form method="post" action="{{ url_for('admin.rotate_api_client', id=item.id) }}" onsubmit="return confirm('Kredensial lama akan langsung tidak berlaku. Lanjutkan?')" style="margin-top:8px">
+   <button type="submit">🔄 Rotate API Key & Secret</button>
+ </form>
+ <p>Key prefix: <code>{{ item.key_prefix }}</code> · Order API: {{ item.api_orders|length }} · Dibuat: {{ item.created_at }}</p>
+</details>
+{% else %}<p>Belum ada mitra API.</p>{% endfor %}
+
+<h2>Log API Terbaru</h2>
+<div style="overflow:auto"><table><thead><tr><th>Waktu</th><th>Mitra</th><th>Method</th><th>Endpoint</th><th>Status</th><th>IP</th><th>Pesan</th></tr></thead><tbody>
+{% for log in recent_logs %}<tr><td>{{ log.created_at }}</td><td>{{ log.client.name if log.client else '-' }}</td><td>{{ log.method }}</td><td><code>{{ log.endpoint }}</code></td><td>{{ log.status_code }}</td><td>{{ log.ip_address or '-' }}</td><td>{{ log.response_message or '-' }}</td></tr>{% else %}<tr><td colspan="7">Belum ada log.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

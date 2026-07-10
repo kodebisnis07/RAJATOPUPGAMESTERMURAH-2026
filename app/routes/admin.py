@@ -1,10 +1,11 @@
 import os
 import json
+import secrets
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify, abort
 from app.extensions import db
-from app.models import Admin, Category, CatalogSection, Product, Order, User, Payment, PaymentMethod, Setting, Banner, Promo, Testimonial, FAQ, FavoriteGame, AdminActivityLog, WalletTopup, UserNotification, ChatThread, ChatMessage, Voucher, ResellerProfile
+from app.models import Admin, Category, CatalogSection, Product, Order, User, Payment, PaymentMethod, Setting, Banner, Promo, Testimonial, FAQ, FavoriteGame, AdminActivityLog, WalletTopup, UserNotification, ChatThread, ChatMessage, Voucher, ResellerProfile, ApiClient, ApiOrder, ApiRequestLog
 from app.utils import unique_slug, save_uploaded_image, set_setting, get_setting, refund_wallet_order
 
 def _clean_prefix(value, fallback):
@@ -1421,6 +1422,84 @@ def auto_order():
     recent_orders = Order.query.order_by(Order.id.desc()).limit(10).all()
     return render_template("admin/auto_order.html", settings=settings, status_summary=status_summary, recent_orders=recent_orders)
 
+
+
+@admin_bp.route("/api-management", methods=["GET", "POST"])
+@super_admin_required
+def api_management():
+    generated = session.pop("generated_api_credentials", None)
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        if not name:
+            flash("Nama mitra wajib diisi.", "error")
+            return redirect(url_for("admin.api_management"))
+        token = secrets.token_urlsafe(24).replace("-", "").replace("_", "")
+        prefix = "rtg_" + secrets.token_hex(4)
+        raw_key = prefix + "_" + token
+        raw_secret = secrets.token_urlsafe(32)
+        client = ApiClient(
+            name=name, domain=request.form.get("domain", "").strip() or None,
+            contact_name=request.form.get("contact_name", "").strip() or None,
+            contact_email=request.form.get("contact_email", "").strip() or None,
+            key_prefix=prefix, balance=int(request.form.get("balance") or 0),
+            price_markup_percent=int(request.form.get("price_markup_percent") or 0),
+            allowed_ips=request.form.get("allowed_ips", "").strip() or None,
+            callback_url=request.form.get("callback_url", "").strip() or None,
+            status=request.form.get("status", "active"),
+            white_label_enabled=bool(request.form.get("white_label_enabled")),
+            brand_name=request.form.get("brand_name", "").strip() or None,
+            brand_logo=request.form.get("brand_logo", "").strip() or None,
+            brand_primary_color=request.form.get("brand_primary_color", "").strip() or None,
+        )
+        client.set_api_key(raw_key); client.set_api_secret(raw_secret)
+        db.session.add(client); db.session.commit()
+        session["generated_api_credentials"] = {"name": name, "api_key": raw_key, "api_secret": raw_secret}
+        log_admin_activity("buat_mitra_api", f"Membuat Mitra API: {name}")
+        flash("Mitra API berhasil dibuat. Simpan kredensial yang tampil karena secret tidak dapat dilihat lagi.", "success")
+        return redirect(url_for("admin.api_management"))
+    clients = ApiClient.query.order_by(ApiClient.id.desc()).all()
+    recent_logs = ApiRequestLog.query.order_by(ApiRequestLog.id.desc()).limit(100).all()
+    return render_template("admin/api_management.html", clients=clients, recent_logs=recent_logs, generated=generated)
+
+@admin_bp.route("/api-management/<int:id>/update", methods=["POST"])
+@super_admin_required
+def update_api_client(id):
+    client = ApiClient.query.get_or_404(id)
+    client.name = request.form.get("name", client.name).strip() or client.name
+    client.domain = request.form.get("domain", "").strip() or None
+    client.contact_name = request.form.get("contact_name", "").strip() or None
+    client.contact_email = request.form.get("contact_email", "").strip() or None
+    client.balance = max(0, int(request.form.get("balance") or 0))
+    client.price_markup_percent = max(0, int(request.form.get("price_markup_percent") or 0))
+    client.allowed_ips = request.form.get("allowed_ips", "").strip() or None
+    client.callback_url = request.form.get("callback_url", "").strip() or None
+    client.status = request.form.get("status", client.status)
+    client.white_label_enabled = bool(request.form.get("white_label_enabled"))
+    client.brand_name = request.form.get("brand_name", "").strip() or None
+    client.brand_logo = request.form.get("brand_logo", "").strip() or None
+    client.brand_primary_color = request.form.get("brand_primary_color", "").strip() or None
+    db.session.commit()
+    flash("Data Mitra API berhasil diperbarui.", "success")
+    return redirect(url_for("admin.api_management"))
+
+@admin_bp.route("/api-management/<int:id>/rotate", methods=["POST"])
+@super_admin_required
+def rotate_api_client(id):
+    client = ApiClient.query.get_or_404(id)
+    token = secrets.token_urlsafe(24).replace("-", "").replace("_", "")
+    prefix = "rtg_" + secrets.token_hex(4)
+    raw_key = prefix + "_" + token
+    raw_secret = secrets.token_urlsafe(32)
+    client.key_prefix = prefix; client.set_api_key(raw_key); client.set_api_secret(raw_secret)
+    db.session.commit()
+    session["generated_api_credentials"] = {"name": client.name, "api_key": raw_key, "api_secret": raw_secret}
+    flash("API key dan secret berhasil dirotasi. Kredensial lama langsung tidak berlaku.", "success")
+    return redirect(url_for("admin.api_management"))
+
+@admin_bp.route("/api-documentation")
+@super_admin_required
+def api_documentation():
+    return render_template("admin/api_documentation.html")
 
 @admin_bp.route("/audit-log")
 @super_admin_required

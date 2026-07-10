@@ -119,11 +119,13 @@ def create_app():
     from app.routes.home import home_bp
     from app.routes.admin import admin_bp, super_admin_bp, register_legacy_admin_blockers
     from app.routes.auth import auth_bp
+    from app.routes.api_v1 import api_v1_bp
 
     app.register_blueprint(home_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(super_admin_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(api_v1_bp)
     register_legacy_admin_blockers(app)
 
 

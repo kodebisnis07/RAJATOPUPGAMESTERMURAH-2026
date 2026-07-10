@@ -394,3 +394,69 @@ class ResellerProfile(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = db.relationship("User", backref=db.backref("reseller_profile", uselist=False))
+
+
+class ApiClient(db.Model):
+    __tablename__ = "api_clients"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(160), nullable=False)
+    domain = db.Column(db.String(255), nullable=True)
+    contact_name = db.Column(db.String(120), nullable=True)
+    contact_email = db.Column(db.String(120), nullable=True)
+    key_prefix = db.Column(db.String(24), unique=True, nullable=False, index=True)
+    api_key_hash = db.Column(db.String(255), nullable=False)
+    api_secret_hash = db.Column(db.String(255), nullable=False)
+    balance = db.Column(db.Integer, default=0)
+    price_markup_percent = db.Column(db.Integer, default=0)
+    allowed_ips = db.Column(db.Text, nullable=True)
+    callback_url = db.Column(db.String(500), nullable=True)
+    status = db.Column(db.String(30), default="active")
+    white_label_enabled = db.Column(db.Boolean, default=False)
+    brand_name = db.Column(db.String(160), nullable=True)
+    brand_logo = db.Column(db.String(255), nullable=True)
+    brand_primary_color = db.Column(db.String(20), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def set_api_key(self, raw_key):
+        self.api_key_hash = generate_password_hash(raw_key)
+
+    def check_api_key(self, raw_key):
+        return check_password_hash(self.api_key_hash, raw_key)
+
+    def set_api_secret(self, raw_secret):
+        self.api_secret_hash = generate_password_hash(raw_secret)
+
+    def check_api_secret(self, raw_secret):
+        return check_password_hash(self.api_secret_hash, raw_secret)
+
+
+class ApiOrder(db.Model):
+    __tablename__ = "api_orders"
+
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey("api_clients.id"), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
+    external_ref = db.Column(db.String(120), nullable=False)
+    charged_amount = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    client = db.relationship("ApiClient", backref="api_orders")
+    order = db.relationship("Order", backref=db.backref("api_order", uselist=False))
+    __table_args__ = (db.UniqueConstraint("client_id", "external_ref", name="uq_api_client_external_ref"),)
+
+
+class ApiRequestLog(db.Model):
+    __tablename__ = "api_request_logs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey("api_clients.id"), nullable=True)
+    method = db.Column(db.String(10), nullable=False)
+    endpoint = db.Column(db.String(255), nullable=False)
+    status_code = db.Column(db.Integer, nullable=False)
+    ip_address = db.Column(db.String(80), nullable=True)
+    response_message = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    client = db.relationship("ApiClient", backref="request_logs")

@@ -1,0 +1,34 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<h1>📘 Developer / Dokumentasi API Reseller</h1>
+<p>Base URL: <code>{{ request.url_root.rstrip('/') }}/api/v1</code></p>
+<h2>Autentikasi</h2>
+<pre>Authorization: Bearer RTG_API_KEY
+X-API-Secret: RTG_API_SECRET
+Content-Type: application/json</pre>
+<p>Jangan menaruh API Secret di JavaScript frontend. Panggil API dari server/backend milik mitra.</p>
+
+<h2>1. Tes API</h2><pre>GET /api/v1/ping</pre>
+<h2>2. Cek Saldo</h2><pre>GET /api/v1/balance</pre>
+<h2>3. Daftar Produk</h2><pre>GET /api/v1/products</pre>
+<h2>4. Buat Order</h2>
+<pre>POST /api/v1/order
+{
+  "product_id": 1,
+  "external_ref": "INV-MITRA-0001",
+  "user_id": "123456789",
+  "server_id": "1234"
+}</pre>
+<p><code>external_ref</code> harus unik per mitra. Pengiriman ulang dengan referensi sama tidak akan memotong saldo dua kali.</p>
+<h2>5. Cek Status</h2><pre>GET /api/v1/order/INV-MITRA-0001</pre>
+
+<h2>Contoh cURL</h2>
+<pre>curl -X POST "{{ request.url_root.rstrip('/') }}/api/v1/order" \
+  -H "Authorization: Bearer RTG_API_KEY" \
+  -H "X-API-Secret: RTG_API_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"product_id":1,"external_ref":"INV-MITRA-0001","user_id":"123456789","server_id":"1234"}'</pre>
+
+<h2>Alur</h2><p>Website mitra → API Raja Topup Games → saldo mitra dipotong → pesanan masuk sebagai <strong>paid / processing</strong> → sistem Auto Order/provider memproses produk.</p>
+<p><strong>Catatan:</strong> modul ini sudah membuat API reseller, saldo, order, status, log, dan white-label metadata. Pengiriman otomatis ke Digiflazz tetap bergantung pada integrasi provider nyata di menu Auto Order.</p>
+{% endblock %}

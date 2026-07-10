@@ -36,6 +36,8 @@
             <a href="{{ url_for('admin.live_chat') }}">💬 Live Chat</a>
             {% if is_super_admin %}<a href="{{ url_for('admin.payment_methods') }}">🏦 Metode Pembayaran</a>{% endif %}
             {% if is_super_admin %}<a href="{{ url_for('admin.auto_order') }}">🤖 Auto Order</a>{% endif %}
+            {% if is_super_admin %}<a href="{{ url_for('admin.api_management') }}">🔌 API Management</a>{% endif %}
+            {% if is_super_admin %}<a href="{{ url_for('admin.api_documentation') }}">📘 Developer / Dokumentasi API</a>{% endif %}
             {% if is_super_admin %}<a href="{{ url_for('admin.admins') }}">👑 Manajemen Admin</a>{% endif %}
             {% if is_super_admin %}<a href="{{ url_for('admin.role_permissions') }}">🛡️ Izin Role</a>{% endif %}
             {% if is_super_admin %}<a href="{{ url_for('admin.audit_log') }}">🕵️ Audit Log</a>{% endif %}
