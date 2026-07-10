@@ -256,3 +256,124 @@ input,select,textarea,button{max-width:100%;}
 @media (max-width:380px){
   .cards,.stats-grid{grid-template-columns:1fr!important}
 }
+
+/* =========================================================
+   ADMIN MOBILE HOTFIX 2026-07-10 FINAL
+   Mencegah konten terdorong ke bawah/ruang kosong pada HP.
+   ========================================================= */
+@media (max-width: 900px) {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  body {
+    display: block !important;
+  }
+
+  .admin-menu-toggle {
+    display: flex !important;
+    position: sticky !important;
+    inset: auto !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .admin-layout {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+  }
+
+  .sidebar,
+  .admin-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    right: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(82vw, 270px) !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 64px 18px 24px !important;
+    transform: translate3d(-105%, 0, 0) !important;
+  }
+
+  .sidebar.open,
+  .admin-sidebar.open {
+    transform: translate3d(0, 0, 0) !important;
+  }
+
+  .main-content,
+  .admin-main,
+  .admin-content,
+  .content {
+    display: block !important;
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 14px !important;
+    transform: none !important;
+    translate: none !important;
+    contain: none !important;
+    overflow: visible !important;
+    align-self: start !important;
+  }
+
+  .topbar {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 0 14px !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .topbar > div {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .admin-page,
+  .page-head {
+    position: relative !important;
+    inset: auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin-top: 0 !important;
+    transform: none !important;
+  }
+
+  .admin-table {
+    display: block !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}

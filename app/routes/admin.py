@@ -1527,14 +1527,26 @@ def settings():
             "site_name", "site_tagline", "whatsapp", "telegram", "instagram",
             "meta_title", "meta_description", "meta_keywords", "google_site_verification",
             "google_analytics_id", "facebook_pixel_id",
+            "running_popup_enabled", "running_popup_text", "running_popup_speed",
             "payment_gateway", "tripay_mode", "tripay_api_key", "tripay_private_key",
             "tripay_merchant_code", "duitku_merchant_code", "duitku_api_key", "xendit_secret_key"
         ]
+        site_name = (request.form.get("site_name") or "").strip()
+        if not site_name:
+            flash("Nama website tidak boleh kosong.", "error")
+            return redirect(url_for("admin.settings"))
+        if len(site_name) > 80:
+            flash("Nama website maksimal 80 karakter.", "error")
+            return redirect(url_for("admin.settings"))
+
         for key in keys:
-            set_setting(key, request.form.get(key, ""))
+            value = request.form.get(key, "")
+            if key == "site_name":
+                value = site_name
+            set_setting(key, value)
         db.session.commit()
-        log_admin_activity("ubah_pengaturan", "Memperbarui pengaturan website/payment gateway")
-        flash("Pengaturan berhasil disimpan.", "success")
+        log_admin_activity("ubah_pengaturan", f"Memperbarui pengaturan website/payment gateway; nama website: {site_name}")
+        flash(f"Pengaturan berhasil disimpan. Nama website sekarang: {site_name}", "success")
         return redirect(url_for("admin.settings"))
     settings = {item.key: item.value for item in Setting.query.all()}
     return render_template("admin/settings.html", settings=settings)

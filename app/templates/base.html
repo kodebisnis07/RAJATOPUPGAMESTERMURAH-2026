@@ -35,15 +35,16 @@
 </head>
 <body class="site-body">
 <header class="navbar">
-    <a class="logo" href="{{ url_for('home.index') }}">👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') if settings is defined else 'RAJA TOPUP GAMES' }}</a>
+    <a class="logo" href="{{ url_for('home.index') }}">👑 {{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}</a>
     <button class="mobile-nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false">☰</button>
 </header>
+{% include '_running_popup.html' %}
 var nav = document.querySelector('.navbar nav');
 {% block content %}{% endblock %}
 <footer class="footer">
-    <h3>👑 {{ settings.get('site_name', 'RAJA TOPUP GAMES') if settings is defined else 'RAJA TOPUP GAMES' }}</h3>
-    <p>{{ settings.get('site_tagline', 'Top Up Game Termurah, Cepat, Aman, dan Terpercaya') if settings is defined else 'Top Up Game Termurah, Cepat, Aman, dan Terpercaya' }}</p>
-    <small>© 2026 RAJA TOPUP GAMES. All Rights Reserved.</small>
+    <h3>👑 {{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h3>
+    <p>{{ seo_settings.get('site_tagline', 'Top Up Game Termurah, Cepat, Aman, dan Terpercaya') }}</p>
+    <small>© 2026 {{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}. All Rights Reserved.</small>
 </footer>
 <button id="install-pwa-btn" class="install-pwa-btn" type="button" hidden>📲 Install Aplikasi</button>
 

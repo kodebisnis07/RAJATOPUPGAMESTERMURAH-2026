@@ -1,13 +1,29 @@
 {% extends 'admin/base.html' %}
 {% block content %}
-<div class="page-head"><h1>Pengaturan Website & Payment</h1><p>Atur brand, kontak, dan payment gateway.</p></div>
+<div class="page-head"><h1>Pengaturan Website & Payment</h1><p>Ubah nama website, brand, kontak, SEO, dan payment gateway dari satu halaman.</p></div>
 <form method="POST" class="settings-form">
     <h2>Brand Website</h2>
-    <label>Nama Website</label><input type="text" name="site_name" value="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}">
+    <label>Nama Website</label><input type="text" name="site_name" value="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}" maxlength="80" required placeholder="Contoh: RAJA TOPUP GAMES"><small class="field-help">Nama ini akan tampil di header, footer, halaman login, dan panel admin.</small>
     <label>Tagline</label><input type="text" name="site_tagline" value="{{ settings.get('site_tagline', '') }}">
     <label>WhatsApp</label><input type="text" name="whatsapp" value="{{ settings.get('whatsapp', '') }}">
     <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">
     <label>Instagram</label><input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">
+
+    <h2>Pop-up Tulisan Berjalan</h2>
+    <label class="settings-check" style="display:flex;align-items:center;gap:10px;margin:8px 0 14px;">
+        <input type="checkbox" name="running_popup_enabled" value="1" {% if settings.get('running_popup_enabled', '0') == '1' %}checked{% endif %} style="width:auto;">
+        Aktifkan pop-up berjalan di website
+    </label>
+    <label>Isi Tulisan</label>
+    <textarea name="running_popup_text" rows="3" maxlength="300" placeholder="Contoh: Promo hari ini! Top up cepat, murah, dan aman.">{{ settings.get('running_popup_text', '') }}</textarea>
+    <small class="field-help">Teks akan bergerak dari kanan ke kiri dan tampil di bagian bawah layar pengunjung.</small>
+    <label>Kecepatan</label>
+    {% set popup_speed = settings.get('running_popup_speed', '18') %}
+    <select name="running_popup_speed">
+        <option value="12" {% if popup_speed == '12' %}selected{% endif %}>Cepat</option>
+        <option value="18" {% if popup_speed == '18' %}selected{% endif %}>Normal</option>
+        <option value="26" {% if popup_speed == '26' %}selected{% endif %}>Lambat</option>
+    </select>
 
     <h2>SEO & Google</h2>
     <label>Meta Title</label><input type="text" name="meta_title" value="{{ settings.get('meta_title', 'Raja Topup Games | Top Up Game Murah, Cepat & Terpercaya') }}">
