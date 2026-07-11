@@ -9,6 +9,24 @@
     <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">
     <label>Instagram</label><input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">
 
+    <h2>Keamanan Link Panel</h2>
+    <div class="alert warning" style="margin-bottom:14px;">
+        Hanya Super Admin yang dapat mengubah alamat ini. Setelah disimpan, link lama langsung tidak dapat dibuka.
+    </div>
+    <label>Link Admin / Operator</label>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>/</span>
+        <input type="text" name="admin_panel_path" value="{{ settings.get('admin_panel_path', 'panel-rtg-2026-X7q9K')|trim('/') }}" minlength="8" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9-]{7,63}" required style="flex:1;min-width:220px;">
+    </div>
+    <small class="field-help">Contoh: panel-raja-X7q9K. Gunakan alamat yang sulit ditebak.</small>
+
+    <label>Link Super Admin</label>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>/</span>
+        <input type="text" name="super_admin_panel_path" value="{{ settings.get('super_admin_panel_path', 'super-panel-rtg-2026-S9kL2')|trim('/') }}" minlength="8" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9-]{7,63}" required style="flex:1;min-width:220px;">
+    </div>
+    <small class="field-help">Jangan samakan dengan Link Admin. Simpan kedua link di tempat aman.</small>
+
     <h2>Pop-up Tulisan Berjalan</h2>
     <label class="settings-check" style="display:flex;align-items:center;gap:10px;margin:8px 0 14px;">
         <input type="checkbox" name="running_popup_enabled" value="1" {% if settings.get('running_popup_enabled', '0') == '1' %}checked{% endif %} style="width:auto;">

@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, request, redirect, session, url_fo
 from app.extensions import db
 from app.models import Admin, Category, CatalogSection, Product, Order, User, Payment, PaymentMethod, Setting, Banner, Promo, Testimonial, FAQ, FavoriteGame, AdminActivityLog, WalletTopup, UserNotification, ChatThread, ChatMessage, Voucher, ResellerProfile, ApiClient, ApiOrder, ApiRequestLog
 from app.utils import unique_slug, save_uploaded_image, set_setting, get_setting, refund_wallet_order
+from app.admin_path import validate_panel_slug, DEFAULT_ADMIN_PATH, DEFAULT_SUPER_ADMIN_PATH
 
 def _clean_prefix(value, fallback):
     value = (value or fallback).strip()
@@ -1604,6 +1605,7 @@ def settings():
     if request.method == "POST":
         keys = [
             "site_name", "site_tagline", "whatsapp", "telegram", "instagram",
+            "admin_panel_path", "super_admin_panel_path",
             "meta_title", "meta_description", "meta_keywords", "google_site_verification",
             "google_analytics_id", "facebook_pixel_id",
             "running_popup_enabled", "running_popup_text", "running_popup_speed",
@@ -1619,6 +1621,18 @@ def settings():
             flash("Nama website maksimal 80 karakter.", "error")
             return redirect(url_for("admin.settings"))
 
+        admin_slug, admin_error = validate_panel_slug(request.form.get("admin_panel_path", ""))
+        super_slug, super_error = validate_panel_slug(request.form.get("super_admin_panel_path", ""))
+        if admin_error:
+            flash("Link Admin: " + admin_error, "error")
+            return redirect(url_for("admin.settings"))
+        if super_error:
+            flash("Link Super Admin: " + super_error, "error")
+            return redirect(url_for("admin.settings"))
+        if admin_slug.lower() == super_slug.lower():
+            flash("Link Admin dan Link Super Admin tidak boleh sama.", "error")
+            return redirect(url_for("admin.settings"))
+
         import re
         color_defaults = {
             "running_popup_bg_color": "#07101f",
@@ -1629,12 +1643,19 @@ def settings():
             value = request.form.get(key, "")
             if key == "site_name":
                 value = site_name
+            elif key == "admin_panel_path":
+                value = admin_slug
+            elif key == "super_admin_panel_path":
+                value = super_slug
             if key in color_defaults and not re.fullmatch(r"#[0-9A-Fa-f]{6}", value or ""):
                 value = color_defaults[key]
             set_setting(key, value)
         db.session.commit()
         log_admin_activity("ubah_pengaturan", f"Memperbarui pengaturan website/payment gateway; nama website: {site_name}")
-        flash(f"Pengaturan berhasil disimpan. Nama website sekarang: {site_name}", "success")
+        flash(
+            f"Pengaturan berhasil disimpan. Link Admin sekarang /{admin_slug} dan Link Super Admin /{super_slug}.",
+            "success",
+        )
         return redirect(url_for("admin.settings"))
     settings = {item.key: item.value for item in Setting.query.all()}
     return render_template("admin/settings.html", settings=settings)

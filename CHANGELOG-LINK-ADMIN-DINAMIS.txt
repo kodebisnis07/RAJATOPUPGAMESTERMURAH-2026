@@ -1,0 +1,24 @@
+FITUR LINK ADMIN DINAMIS DARI SUPER ADMIN
+
+Lokasi pengaturan:
+Super Admin > Pengaturan > Keamanan Link Panel
+
+Fitur:
+- Link Admin / Operator dapat diganti tanpa mengubah source code atau Environment Render.
+- Link Super Admin dapat diganti secara terpisah.
+- Link lama otomatis menjadi 404 setelah perubahan tersimpan.
+- Semua menu, form, dan redirect otomatis memakai link baru.
+- Validasi 8-64 karakter; hanya huruf, angka, dan tanda minus.
+- Link Admin dan Super Admin tidak boleh sama.
+
+Default:
+- /panel-rtg-2026-X7q9K
+- /super-panel-rtg-2026-S9kL2
+
+Contoh:
+- /panel-raja-X7q9K
+- /super-raja-S9kL2
+
+PENTING:
+Simpan link baru sebelum logout. Bila lupa, nilai tersimpan di tabel settings dengan key:
+admin_panel_path dan super_admin_panel_path.

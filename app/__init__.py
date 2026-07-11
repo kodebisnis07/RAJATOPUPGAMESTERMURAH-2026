@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, send_from_directory, render_template, request, abort
 from config import Config
 from app.extensions import db, migrate
 from sqlalchemy import inspect, text
@@ -127,6 +127,45 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_v1_bp)
     register_legacy_admin_blockers(app)
+
+    from app.admin_path import (
+        DynamicAdminPathMiddleware,
+        INTERNAL_ADMIN_PATH,
+        INTERNAL_SUPER_ADMIN_PATH,
+        DEFAULT_ADMIN_PATH,
+        DEFAULT_SUPER_ADMIN_PATH,
+        normalize_panel_path,
+    )
+    app.wsgi_app = DynamicAdminPathMiddleware(app, app.wsgi_app)
+
+    @app.before_request
+    def block_inactive_internal_admin_paths():
+        if request.environ.get("RTG_BLOCK_INTERNAL_ADMIN_PATH") == "1":
+            abort(404)
+
+    @app.after_request
+    def expose_dynamic_admin_urls(response):
+        admin_public = request.environ.get("RTG_ADMIN_PUBLIC_PATH", DEFAULT_ADMIN_PATH)
+        super_public = request.environ.get("RTG_SUPER_ADMIN_PUBLIC_PATH", DEFAULT_SUPER_ADMIN_PATH)
+
+        location = response.headers.get("Location")
+        if location:
+            location = location.replace(INTERNAL_SUPER_ADMIN_PATH, super_public)
+            location = location.replace(INTERNAL_ADMIN_PATH, admin_public)
+            response.headers["Location"] = location
+
+        content_type = response.headers.get("Content-Type", "")
+        if "text/html" in content_type and not response.direct_passthrough:
+            try:
+                html = response.get_data(as_text=True)
+                changed = html.replace(INTERNAL_SUPER_ADMIN_PATH, super_public)
+                changed = changed.replace(INTERNAL_ADMIN_PATH, admin_public)
+                if changed != html:
+                    response.set_data(changed)
+                    response.headers["Content-Length"] = str(len(response.get_data()))
+            except Exception:
+                pass
+        return response
 
 
     @app.route("/manifest.webmanifest")
