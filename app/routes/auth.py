@@ -1,11 +1,13 @@
 import os
 import secrets
+import hashlib
 from datetime import datetime
 from urllib.parse import urlencode
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify
 from app.extensions import db
 from app.models import User, Order, FavoriteGame, Category, UserNotification, PaymentMethod, WalletTopup, ChatThread, ChatMessage
 from app.utils import save_uploaded_image
+from app.email_service import send_password_reset_email
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 
@@ -13,11 +15,21 @@ def _password_reset_serializer():
     return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="user-password-reset")
 
 
+def _password_fingerprint(user):
+    # Membuat token lama otomatis tidak berlaku setelah password diganti.
+    return hashlib.sha256((user.password_hash or "").encode("utf-8")).hexdigest()[:20]
+
+
 def _make_reset_token(user):
-    return _password_reset_serializer().dumps({"user_id": user.id, "email": user.email})
+    return _password_reset_serializer().dumps({
+        "user_id": user.id,
+        "email": user.email,
+        "password_fingerprint": _password_fingerprint(user),
+    })
 
 
-def _load_user_from_token(token, max_age=3600):
+def _load_user_from_token(token, max_age=None):
+    max_age = max_age or current_app.config.get("PASSWORD_RESET_MAX_AGE", 3600)
     try:
         data = _password_reset_serializer().loads(token, max_age=max_age)
     except SignatureExpired:
@@ -26,7 +38,8 @@ def _load_user_from_token(token, max_age=3600):
         return None, "invalid"
 
     user = User.query.get(data.get("user_id"))
-    if not user or user.email != data.get("email") or not user.is_active:
+    if (not user or user.email != data.get("email") or not user.is_active
+            or data.get("password_fingerprint") != _password_fingerprint(user)):
         return None, "invalid"
     return user, None
 
@@ -209,10 +222,20 @@ def forgot_password():
         if user:
             token = _make_reset_token(user)
             reset_url = url_for("auth.reset_password", token=token, _external=True)
-            current_app.logger.info("Password reset link untuk %s: %s", email, reset_url)
-            flash("Link reset password sudah dibuat. Karena mode lokal, klik tombol di bawah untuk reset password.", "success")
-            return render_template("auth/forgot_password.html", reset_url=reset_url, email=email)
-        flash("Jika email terdaftar, link reset password akan dibuat.", "success")
+            sent, error = send_password_reset_email(
+                user,
+                reset_url,
+                expires_minutes=max(1, int(current_app.config.get("PASSWORD_RESET_MAX_AGE", 3600)) // 60),
+            )
+            if not sent:
+                current_app.logger.error("Gagal mengirim email reset password ke %s: %s", email, error)
+                # Link tidak ditampilkan ke pengunjung agar akun tetap aman.
+            else:
+                current_app.logger.info("Email reset password berhasil dikirim ke %s", email)
+
+        # Respons selalu sama untuk mencegah orang menebak email yang terdaftar.
+        flash("Jika email tersebut terdaftar, kami sudah mengirim link untuk membuat password baru. Periksa folder Inbox atau Spam.", "success")
+        return redirect(url_for("auth.forgot_password"))
     return render_template("auth/forgot_password.html")
 
 
