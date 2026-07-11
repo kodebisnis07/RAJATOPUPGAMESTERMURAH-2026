@@ -17,7 +17,7 @@ def _password_reset_serializer():
 
 def _password_fingerprint(user):
     # Membuat token lama otomatis tidak berlaku setelah password diganti.
-    return hashlib.sha256((user.password_hash or "").encode("utf-8")).hexdigest()[:20]
+    return hashlib.sha256((user.password or "").encode("utf-8")).hexdigest()[:20]
 
 
 def _make_reset_token(user):
