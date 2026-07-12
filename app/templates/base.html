@@ -9,9 +9,12 @@
     {% set default_keywords = seo_settings.get('meta_keywords') or 'top up game murah, top up mobile legends, top up free fire, diamond murah, raja topup games' %}
     {% set site_logo = seo_settings.get('site_logo') %}
     {% set favicon_logo = seo_settings.get('favicon_logo') or site_logo %}
+    {% set social_image = image_url(site_logo, 'img/site') if site_logo else url_for('static', filename='img/pwa/icon-512.png', _external=True) %}
     <title>{% block title %}{{ default_title }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{{ default_description }}{% endblock %}">
     <meta name="keywords" content="{{ default_keywords }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     {% if seo_settings.get('google_site_verification') %}<meta name="google-site-verification" content="{{ seo_settings.get('google_site_verification') }}">{% endif %}
     <link rel="canonical" href="{{ canonical_url if canonical_url is defined else request.url }}">
     <meta property="og:type" content="website">
@@ -19,9 +22,13 @@
     <meta property="og:description" content="{{ default_description }}">
     <meta property="og:url" content="{{ canonical_url if canonical_url is defined else request.url }}">
     <meta property="og:site_name" content="{{ seo_settings.get('site_name', 'Raja Topup Games') }}">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:image" content="{{ social_image }}">
+    <meta property="og:image:alt" content="Logo {{ seo_settings.get('site_name', 'Raja Topup Games') }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ default_title }}">
     <meta name="twitter:description" content="{{ default_description }}">
+    <meta name="twitter:image" content="{{ social_image }}">
     {% if seo_settings.get('google_analytics_id') %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ seo_settings.get('google_analytics_id') }}"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ seo_settings.get('google_analytics_id') }}');</script>
@@ -29,7 +36,14 @@
     {% if seo_settings.get('facebook_pixel_id') %}
     <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','{{ seo_settings.get('facebook_pixel_id') }}');fbq('track','PageView');</script>
     {% endif %}
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"{{ seo_settings.get('site_name', 'Raja Topup Games') }}","url":"{{ site_url if site_url is defined else request.url_root.rstrip('/') }}"}</script>
+    <script type="application/ld+json">{{ {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      'name': seo_settings.get('site_name', 'Raja Topup Games'),
+      'url': site_url if site_url is defined else request.url_root.rstrip('/'),
+      'description': default_description,
+      'inLanguage': 'id-ID'
+    }|tojson }}</script>
     <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#ffc83d">
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">

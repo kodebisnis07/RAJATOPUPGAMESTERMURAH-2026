@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from xml.sax.saxutils import escape
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, flash, Response, current_app
 from app.models import Category, CatalogSection, Product, Order, Banner, Promo, Testimonial, FAQ, Setting, PaymentMethod, Payment, UserNotification, User, Voucher, ResellerProfile
 from app.extensions import db
@@ -83,17 +84,24 @@ def _login_required_redirect(next_endpoint=None, **values):
 
 
 
+def _public_base_url():
+    """Return an absolute canonical origin without a trailing slash."""
+    configured = (current_app.config.get("SITE_URL") or "").strip()
+    if configured and not configured.startswith(("http://", "https://")):
+        configured = "https://" + configured
+    return (configured or request.url_root).rstrip("/")
+
+
 @home_bp.route("/robots.txt")
 def robots_txt():
     # Izinkan Google meng-crawl halaman publik. Blokir area admin/login saja.
-    base_url = current_app.config.get("SITE_URL", request.url_root.rstrip("/"))
+    base_url = _public_base_url()
     body = (
         "User-agent: *\n"
         "Allow: /\n"
         "Disallow: /admin\n"
         "Disallow: /super-admin\n"
-        "Disallow: /auth\n"
-        "Disallow: /login\n"
+        "Disallow: /staff-gateway\n"
         "\n"
         f"Sitemap: {base_url}/sitemap.xml\n"
     )
@@ -102,12 +110,10 @@ def robots_txt():
 
 @home_bp.route("/sitemap.xml")
 def sitemap_xml():
-    base_url = current_app.config.get("SITE_URL", request.url_root.rstrip("/"))
+    base_url = _public_base_url()
     urls = [
         ("/", "1.0"),
-        ("/daftar", "0.6"),
-        ("/login", "0.6"),
-        ("/reseller", "0.5"),
+        ("/reseller", "0.6"),
     ]
     try:
         categories = Category.query.filter_by(status="active").order_by(Category.id.asc()).all()
@@ -118,7 +124,7 @@ def sitemap_xml():
     today = datetime.utcnow().date().isoformat()
     for path, priority in urls:
         loc = path if path.startswith("http") else f"{base_url}{path}"
-        xml.append(f"  <url><loc>{loc}</loc><lastmod>{today}</lastmod><priority>{priority}</priority></url>")
+        xml.append(f"  <url><loc>{escape(loc)}</loc><lastmod>{today}</lastmod><changefreq>{'daily' if path == '/' else 'weekly'}</changefreq><priority>{priority}</priority></url>")
     xml.append("</urlset>")
     return Response("\n".join(xml), mimetype="application/xml")
 

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive">
     {% set is_super_portal = portal == 'super_admin' %}
     {% set site_logo = global_settings.get('site_logo') %}
     <title>{{ 'Login Super Admin' if is_super_portal else 'Login Admin / Operator' }} - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>

@@ -265,7 +265,10 @@ def create_app():
             settings = {item.key: item.value for item in Setting.query.all()}
         except Exception:
             settings = {}
-        base_url = app.config.get("SITE_URL", request.url_root.rstrip("/"))
+        base_url = (app.config.get("SITE_URL") or request.url_root).strip()
+        if base_url and not base_url.startswith(("http://", "https://")):
+            base_url = "https://" + base_url
+        base_url = base_url.rstrip("/")
         return {
             "global_settings": settings,
             "site_url": base_url,
