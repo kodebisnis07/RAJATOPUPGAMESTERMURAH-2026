@@ -1,4 +1,4 @@
-const CACHE_NAME = 'raja-topup-cache-v10-banner-20260707';
+const CACHE_NAME = 'raja-topup-cache-v11-cloudinary-20260712';
 const STATIC_ASSETS = [
   '/static/css/style.css?v=fix-sosmed-20260701',
   '/static/img/pwa/icon-192.png',

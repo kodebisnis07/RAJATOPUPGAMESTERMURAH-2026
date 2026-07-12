@@ -6,7 +6,7 @@ from functools import wraps
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify, abort
 from app.extensions import db
 from app.models import Admin, Category, CatalogSection, Product, Order, User, Payment, PaymentMethod, Setting, Banner, Promo, Testimonial, FAQ, FavoriteGame, AdminActivityLog, WalletTopup, UserNotification, ChatThread, ChatMessage, Voucher, ResellerProfile, ApiClient, ApiOrder, ApiRequestLog
-from app.utils import unique_slug, save_uploaded_image, set_setting, get_setting, refund_wallet_order
+from app.utils import unique_slug, save_uploaded_image, delete_uploaded_image, set_setting, get_setting, refund_wallet_order, delete_uploaded_image_file
 from app.admin_path import validate_panel_slug, DEFAULT_ADMIN_PATH, DEFAULT_SUPER_ADMIN_PATH
 
 def _clean_prefix(value, fallback):
@@ -214,14 +214,7 @@ def _game_upload_folder():
 
 
 def _delete_game_image(filename):
-    if not filename:
-        return
-    path = os.path.join(_game_upload_folder(), filename)
-    if os.path.exists(path):
-        try:
-            os.remove(path)
-        except OSError:
-            pass
+    delete_uploaded_image(filename, _game_upload_folder())
 
 
 def _payment_upload_folder():
@@ -231,14 +224,7 @@ def _payment_upload_folder():
 
 
 def _delete_payment_image(filename):
-    if not filename:
-        return
-    path = os.path.join(_payment_upload_folder(), filename)
-    if os.path.exists(path):
-        try:
-            os.remove(path)
-        except OSError:
-            pass
+    delete_uploaded_image(filename, _payment_upload_folder())
 
 
 @admin_bp.app_context_processor
@@ -531,12 +517,7 @@ def _save_product_from_form(product=None):
     product.provider_code = provider_code
     if image_name:
         if product.image:
-            old_path = os.path.join(current_app.config["UPLOAD_FOLDER"], product.image)
-            if os.path.exists(old_path):
-                try:
-                    os.remove(old_path)
-                except OSError:
-                    pass
+            delete_uploaded_image(product.image, current_app.config["UPLOAD_FOLDER"])
         product.image = image_name
     return product
 
@@ -602,10 +583,7 @@ def edit_product(id):
 @role_required("super_admin", "admin")
 def delete_product(id):
     product = Product.query.get_or_404(id)
-    if product.image:
-        path = os.path.join(current_app.config["UPLOAD_FOLDER"], product.image)
-        if os.path.exists(path):
-            os.remove(path)
+    delete_uploaded_image(product.image, current_app.config["UPLOAD_FOLDER"])
     deleted_name = product.name
     db.session.delete(product)
     db.session.commit()
@@ -767,6 +745,7 @@ def update_banner(id):
         flash(str(exc), "error")
         return redirect(url_for("admin.slide_banners"))
     if new_image:
+        delete_uploaded_image(banner.image, current_app.config["UPLOAD_FOLDER"])
         banner.image = new_image
     db.session.commit()
     flash("Banner berhasil diperbarui.", "success")
@@ -776,7 +755,9 @@ def update_banner(id):
 @admin_bp.route("/banners/<int:id>/delete", methods=["POST"])
 @role_required("super_admin", "admin")
 def delete_banner(id):
-    db.session.delete(Banner.query.get_or_404(id))
+    banner = Banner.query.get_or_404(id)
+    delete_uploaded_image(banner.image, current_app.config["UPLOAD_FOLDER"])
+    db.session.delete(banner)
     db.session.commit()
     flash("Banner berhasil dihapus.", "success")
     return redirect(url_for("admin.slide_banners"))
@@ -802,6 +783,7 @@ def update_website_banner(banner_id):
                 flash(str(exc), "error")
                 return redirect(url_for("admin.website_banners"))
             if new_image:
+                delete_uploaded_image(item.get("image"), current_app.config["UPLOAD_FOLDER"])
                 item["image"] = new_image
             _save_website_banners(items)
             flash("Banner website berhasil diperbarui.", "success")
@@ -813,7 +795,12 @@ def update_website_banner(banner_id):
 @super_admin_bp.route("/website-banners/<banner_id>/delete", methods=["POST"])
 @role_required("super_admin", "admin")
 def delete_website_banner(banner_id):
-    items = [item for item in _load_website_banners() if str(item.get("id")) != str(banner_id)]
+    items = _load_website_banners()
+    for item in items:
+        if str(item.get("id")) == str(banner_id):
+            delete_uploaded_image(item.get("image"), current_app.config["UPLOAD_FOLDER"])
+            break
+    items = [item for item in items if str(item.get("id")) != str(banner_id)]
     _save_website_banners(items)
     flash("Banner website berhasil dihapus.", "success")
     return redirect(url_for("admin.website_banners"))
@@ -1650,6 +1637,33 @@ def settings():
             if key in color_defaults and not re.fullmatch(r"#[0-9A-Fa-f]{6}", value or ""):
                 value = color_defaults[key]
             set_setting(key, value)
+
+        site_asset_folder = current_app.config.get("SITE_ASSET_UPLOAD_FOLDER")
+
+        logo_file = request.files.get("site_logo_file")
+        remove_logo = request.form.get("remove_site_logo") == "1"
+        old_logo = get_setting("site_logo", "") or ""
+        if remove_logo:
+            delete_uploaded_image_file(old_logo, site_asset_folder)
+            set_setting("site_logo", "")
+        elif logo_file and logo_file.filename:
+            new_logo = save_uploaded_image(logo_file, site_asset_folder)
+            if old_logo and old_logo != new_logo:
+                delete_uploaded_image_file(old_logo, site_asset_folder)
+            set_setting("site_logo", new_logo)
+
+        favicon_file = request.files.get("favicon_logo_file")
+        remove_favicon = request.form.get("remove_favicon_logo") == "1"
+        old_favicon = get_setting("favicon_logo", "") or ""
+        if remove_favicon:
+            delete_uploaded_image_file(old_favicon, site_asset_folder)
+            set_setting("favicon_logo", "")
+        elif favicon_file and favicon_file.filename:
+            new_favicon = save_uploaded_image(favicon_file, site_asset_folder)
+            if old_favicon and old_favicon != new_favicon:
+                delete_uploaded_image_file(old_favicon, site_asset_folder)
+            set_setting("favicon_logo", new_favicon)
+
         db.session.commit()
         log_admin_activity("ubah_pengaturan", f"Memperbarui pengaturan website/payment gateway; nama website: {site_name}")
         flash(

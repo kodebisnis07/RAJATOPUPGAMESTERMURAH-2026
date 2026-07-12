@@ -27,7 +27,7 @@
     <tbody>
     {% for b in banners %}
     <tr>
-        <td>{% if b.image %}<img class="admin-thumb wide" src="{{ url_for('static', filename='img/products/' + b.image) }}">{% else %}<span class="badge">No Image</span>{% endif %}</td>
+        <td>{% if b.image %}<img class="admin-thumb wide" src="{{ media_url(b.image, 'products') }}">{% else %}<span class="badge">No Image</span>{% endif %}</td>
         <td><strong>{{ b.title }}</strong><br><small>{{ b.subtitle }}</small><br><small>{{ b.badge }} · {{ b.button_text }} · {{ b.link }}</small></td>
         <td>{{ 'Aktif / tampil di homepage' if b.is_active else 'Nonaktif' }}<br><small>Urutan: {{ b.sort_order }}</small></td>
         <td>

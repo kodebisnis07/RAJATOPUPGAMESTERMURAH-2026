@@ -11,6 +11,11 @@ def _database_uri():
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
         return database_url
+    if os.environ.get("RENDER", "").lower() == "true":
+        raise RuntimeError(
+            "DATABASE_URL PostgreSQL wajib diisi pada Environment Render. "
+            "Aplikasi production tidak boleh memakai SQLite sementara."
+        )
     return "sqlite:///" + os.path.join(base_dir, "rajatopup.db")
 
 
@@ -27,7 +32,19 @@ class Config:
 
     # Upload
     MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 5 * 1024 * 1024))
-    ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
+    ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "ico", "svg"}
+
+    # Permanent media storage. Render must use Cloudinary so uploads survive
+    # service restarts and redeploys. Local development can still use static folders.
+    MEDIA_STORAGE_BACKEND = os.environ.get(
+        "MEDIA_STORAGE_BACKEND",
+        "cloudinary" if os.environ.get("RENDER", "").lower() == "true" else "auto",
+    )
+    CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL", "")
+    CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME", "")
+    CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY", "")
+    CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET", "")
+    CLOUDINARY_FOLDER = os.environ.get("CLOUDINARY_FOLDER", "rajatopupgames")
 
     # Session production
     SESSION_COOKIE_HTTPONLY = True

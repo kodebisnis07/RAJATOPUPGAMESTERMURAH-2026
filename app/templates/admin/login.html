@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% set is_super_portal = portal == 'super_admin' %}
+    {% set site_logo = global_settings.get('site_logo') %}
     <title>{{ 'Login Super Admin' if is_super_portal else 'Login Admin / Operator' }} - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
+    {% set favicon_logo = global_settings.get('favicon_logo') or global_settings.get('site_logo') %}
+    <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260710-mobile-reset-3">
 </head>
 <body class="login-page {{ 'super-admin-login' if is_super_portal else 'admin-operator-login' }}">
 <div class="login-wrap">
     <form class="login-card" method="POST">
-        <h1>👑 {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h1>
+        <h1>{% if site_logo %}<img class="login-site-brand-logo" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}👑 {% endif %}{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h1>
         {% if is_super_portal %}
             <p><strong>Portal Khusus Super Admin</strong><br>Full control seluruh website.</p>
         {% else %}

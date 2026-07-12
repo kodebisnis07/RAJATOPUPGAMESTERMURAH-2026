@@ -53,14 +53,14 @@
     <tbody>
     {% for m in methods %}
         <tr>
-            <td>{% if m.logo %}<img class="admin-thumb" src="{{ url_for('static', filename='img/payment_methods/' + m.logo) }}" alt="{{ m.name }}">{% else %}<div class="admin-thumb placeholder">{{ m.name[:2]|upper }}</div>{% endif %}</td>
+            <td>{% if m.logo %}<img class="admin-thumb" src="{{ media_url(m.logo, 'payment_methods') }}" alt="{{ m.name }}">{% else %}<div class="admin-thumb placeholder">{{ m.name[:2]|upper }}</div>{% endif %}</td>
             <td><strong>{{ m.name }}</strong><br><span class="badge">{{ m.type }}</span>{% if m.admin_fee %}<br><small>Fee: Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}</small>{% endif %}</td>
             <td>{{ m.account_number or '-' }}<br><small>{{ m.account_name or '-' }}</small></td>
             <td>
                 {% if m.is_active and not m.is_offline %}<span class="badge success-badge">ONLINE</span>{% elif m.is_offline %}<span class="badge offline-badge">OFFLINE</span>{% else %}<span class="badge inactive-badge">NONAKTIF</span>{% endif %}
                 <br><small>Urutan: {{ m.sort_order }}</small>
             </td>
-            <td>{% if m.qr_image %}<img class="admin-thumb" src="{{ url_for('static', filename='img/payment_methods/' + m.qr_image) }}" alt="QR {{ m.name }}">{% else %}-{% endif %}</td>
+            <td>{% if m.qr_image %}<img class="admin-thumb" src="{{ media_url(m.qr_image, 'payment_methods') }}" alt="QR {{ m.name }}">{% else %}-{% endif %}</td>
             <td>
                 <form method="POST" action="{{ url_for('admin.toggle_payment_method', id=m.id) }}" class="inline-form">
                     {% if m.is_offline or not m.is_active %}<button class="btn small" name="action" value="online">Online</button>{% else %}<button class="btn small" name="action" value="offline">Offline</button>{% endif %}

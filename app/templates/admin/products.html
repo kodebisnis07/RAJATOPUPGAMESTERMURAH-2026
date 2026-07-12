@@ -28,7 +28,7 @@
             {% for product in products %}
             <tr>
                 <td>{{ product.id }}</td>
-                <td>{% if product.image %}<img class="admin-thumb" src="{{ url_for('static', filename='img/products/' + product.image) }}" alt="{{ product.name }}">{% else %}<div class="admin-thumb placeholder">🎮</div>{% endif %}</td>
+                <td>{% if product.image %}<img class="admin-thumb" src="{{ media_url(product.image, 'products') }}" alt="{{ product.name }}">{% else %}<div class="admin-thumb placeholder">🎮</div>{% endif %}</td>
                 <td><strong>{{ product.name }}</strong><br><small>{{ product.description or '' }}</small></td>
                 <td>{{ product.category.name if product.category else '-' }}</td>
                 <td>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</td>

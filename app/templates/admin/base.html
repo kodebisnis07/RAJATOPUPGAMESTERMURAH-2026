@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
+    {% set site_logo = global_settings.get('site_logo') %}
+    {% set favicon_logo = global_settings.get('favicon_logo') or site_logo %}
+    <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260710-compact-desktop-mobile-1">
 </head>
 <body>
@@ -11,7 +14,7 @@
 <div class="admin-backdrop" aria-hidden="true"></div>
 <div class="admin-layout">
     <aside class="sidebar" id="admin-sidebar">
-        <div class="logo">👑 {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}<br><span>Admin Control Center</span></div>
+        <div class="logo admin-brand-logo">{% if site_logo %}<img class="site-brand-logo admin-site-brand-logo" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}<span class="logo-mark">👑</span>{% endif %}<span>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}<br><span>Admin Control Center</span></span></div>
         <nav>
             <a href="{{ url_for('admin.dashboard') }}">📊 Dashboard</a>
             {% if is_super_admin %}<a href="{{ url_for('admin.omset') }}">📈 Riwayat Omset</a>{% endif %}

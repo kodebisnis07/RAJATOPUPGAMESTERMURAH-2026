@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify
 from app.extensions import db
 from app.models import User, Order, FavoriteGame, Category, UserNotification, PaymentMethod, WalletTopup, ChatThread, ChatMessage
-from app.utils import save_uploaded_image
+from app.utils import save_uploaded_image, delete_uploaded_image, media_url
 from app.email_service import send_password_reset_email
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
@@ -74,9 +74,7 @@ def _require_user():
 
 
 def _avatar_url(user):
-    if user and user.avatar:
-        return url_for("static", filename=f"img/avatars/{user.avatar}")
-    return None
+    return media_url(user.avatar, "avatars") if user and user.avatar else None
 
 
 def _user_stats(user):
@@ -312,14 +310,10 @@ def edit_profile():
             return redirect(url_for("auth.edit_profile"))
         if avatar_name:
             if user.avatar:
-                old_path = os.path.join(current_app.config["AVATAR_UPLOAD_FOLDER"], user.avatar)
-                if os.path.exists(old_path):
-                    os.remove(old_path)
+                delete_uploaded_image(user.avatar, current_app.config["AVATAR_UPLOAD_FOLDER"])
             user.avatar = avatar_name
         if request.form.get("remove_avatar") == "1" and user.avatar:
-            old_path = os.path.join(current_app.config["AVATAR_UPLOAD_FOLDER"], user.avatar)
-            if os.path.exists(old_path):
-                os.remove(old_path)
+            delete_uploaded_image(user.avatar, current_app.config["AVATAR_UPLOAD_FOLDER"])
             user.avatar = None
         user.name = name
         user.email = email

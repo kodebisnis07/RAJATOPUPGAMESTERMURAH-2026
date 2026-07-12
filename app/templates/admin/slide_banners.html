@@ -28,7 +28,7 @@
     {% for b in banners %}
     <tr>
         <td>
-          {% if b.image %}<img class="admin-thumb wide" src="{% if '/' in b.image %}{{ url_for('static', filename=b.image) }}{% else %}{{ url_for('static', filename='img/products/' + b.image) }}{% endif %}">{% else %}<span class="badge">No Image</span>{% endif %}
+          {% if b.image %}<img class="admin-thumb wide" src="{{ media_url(b.image, 'products') }}">{% else %}<span class="badge">No Image</span>{% endif %}
         </td>
         <td><strong>{{ b.title }}</strong><br><small>{{ b.subtitle }}</small><br><small>{{ b.tag }} · {{ b.button_text }} · {{ b.link }}</small></td>
         <td>{{ 'Aktif' if b.is_active else 'Nonaktif' }}<br><small>Urutan: {{ b.sort_order }}</small></td>

@@ -1,10 +1,30 @@
 {% extends 'admin/base.html' %}
 {% block content %}
 <div class="page-head"><h1>Pengaturan Website & Payment</h1><p>Ubah nama website, brand, kontak, SEO, dan payment gateway dari satu halaman.</p></div>
-<form method="POST" class="settings-form">
+<form method="POST" class="settings-form" enctype="multipart/form-data">
     <h2>Brand Website</h2>
     <label>Nama Website</label><input type="text" name="site_name" value="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}" maxlength="80" required placeholder="Contoh: RAJA TOPUP GAMES"><small class="field-help">Nama ini otomatis tampil di header website, footer, halaman produk, halaman akun, login, dan panel admin setelah disimpan.</small>
     <label>Tagline</label><input type="text" name="site_tagline" value="{{ settings.get('site_tagline', '') }}">
+    <label>Logo Website</label>
+    {% if settings.get('site_logo') %}
+        <div class="brand-preview-row">
+            <img class="brand-preview" src="{{ image_url(settings.get('site_logo'), 'img/site') }}" alt="Logo website">
+            <label class="tiny-check"><input type="checkbox" name="remove_site_logo" value="1"> Hapus logo website</label>
+        </div>
+    {% endif %}
+    <input type="file" name="site_logo_file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml">
+    <small class="field-help">Logo ini tampil di header website, footer, halaman login, panel admin, dan dapat dipakai sebagai identitas brand.</small>
+
+    <label>Favicon / Logo Tab Browser</label>
+    {% if settings.get('favicon_logo') %}
+        <div class="brand-preview-row">
+            <img class="brand-preview favicon-preview" src="{{ image_url(settings.get('favicon_logo'), 'img/site') }}" alt="Favicon website">
+            <label class="tiny-check"><input type="checkbox" name="remove_favicon_logo" value="1"> Hapus favicon</label>
+        </div>
+    {% endif %}
+    <input type="file" name="favicon_logo_file" accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon,image/vnd.microsoft.icon,image/svg+xml">
+    <small class="field-help">Favicon adalah logo kecil yang muncul di tab browser seperti contoh yang Anda kirim.</small>
+
     <label>WhatsApp</label><input type="text" name="whatsapp" value="{{ settings.get('whatsapp', '') }}">
     <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">
     <label>Instagram</label><input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">

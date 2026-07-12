@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login User - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
+    {% set favicon_logo = global_settings.get('favicon_logo') or global_settings.get('site_logo') %}
+    <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=fix-sosmed-20260701">
 </head>
 <body class="site-body auth-page auth-login-page">
+{% set site_logo = global_settings.get('site_logo') %}
 <div class="auth-shell">
     <section class="auth-banner" aria-label="Banner {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">
         <div class="auth-banner-overlay"></div>
         <div class="auth-brand-badge">
-            <div class="auth-crown">♛</div>
+            <div class="auth-crown">{% if site_logo %}<img class="auth-brand-image" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}♛{% endif %}</div>
             <div>
                 <span>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</span>
                 <strong>GAMES</strong>
@@ -31,7 +34,7 @@
 
     <section class="auth-panel">
         <div class="auth-logo-mini">
-            <span>♛</span>
+            <span>{% if site_logo %}<img class="auth-mini-logo-image" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}♛{% endif %}</span>
             <b>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</b>
         </div>
         <h1>Selamat Datang Kembali!</h1>

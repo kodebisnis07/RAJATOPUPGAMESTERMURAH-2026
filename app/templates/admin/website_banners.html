@@ -28,7 +28,7 @@
   {% for b in banners %}
   <div class="wb-card">
     <div class="wb-preview">
-      {% if b.image %}<img src="{{ url_for('static', filename='img/products/' + b.image) }}" alt="{{ b.title }}">{% else %}<span class="wb-noimg">No Image</span>{% endif %}
+      {% if b.image %}<img src="{{ media_url(b.image, 'products') }}" alt="{{ b.title }}">{% else %}<span class="wb-noimg">No Image</span>{% endif %}
     </div>
     <div class="wb-body">
       <span class="wb-badge">{{ b.badge or 'PROMO WEBSITE' }}</span>

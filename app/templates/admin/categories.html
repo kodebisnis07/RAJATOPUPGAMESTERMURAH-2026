@@ -67,7 +67,7 @@
                 <td>{{ loop.index }}</td>
                 <td>
                     {% if category.icon %}
-                        <img class="admin-thumb" src="{{ category.icon if category.icon.startswith('http') else url_for('static', filename='img/games/' + category.icon) }}" alt="{{ category.name }}">
+                        <img class="admin-thumb" src="{{ media_url(category.icon, 'games') }}" alt="{{ category.name }}">
                     {% else %}
                         <div class="admin-thumb placeholder">{{ category.name[:2] }}</div>
                     {% endif %}

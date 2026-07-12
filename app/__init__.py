@@ -15,9 +15,9 @@ def ensure_sqlite_columns(app):
         return
     columns = {
         "admins": {"name": "VARCHAR(120)", "role": "VARCHAR(30) DEFAULT 'admin'", "is_active": "BOOLEAN DEFAULT 1"},
-        "categories": {"icon": "VARCHAR(255)", "catalog_section_id": "INTEGER", "badge": "VARCHAR(60)", "sort_order": "INTEGER DEFAULT 0", "is_featured": "BOOLEAN DEFAULT 1"},
-        "users": {"username": "VARCHAR(80)", "phone": "VARCHAR(30)", "avatar": "VARCHAR(255)", "member_level": "VARCHAR(30) DEFAULT 'Bronze'", "balance": "INTEGER DEFAULT 0", "bonus_coins": "INTEGER DEFAULT 0"},
-        "products": {"image": "VARCHAR(255)", "price_modal": "INTEGER DEFAULT 0", "provider": "VARCHAR(100)", "provider_code": "VARCHAR(100)", "stock": "INTEGER DEFAULT 0", "game_id": "INTEGER"},
+        "categories": {"icon": "VARCHAR(500)", "catalog_section_id": "INTEGER", "badge": "VARCHAR(60)", "sort_order": "INTEGER DEFAULT 0", "is_featured": "BOOLEAN DEFAULT 1"},
+        "users": {"username": "VARCHAR(80)", "phone": "VARCHAR(30)", "avatar": "VARCHAR(500)", "member_level": "VARCHAR(30) DEFAULT 'Bronze'", "balance": "INTEGER DEFAULT 0", "bonus_coins": "INTEGER DEFAULT 0"},
+        "products": {"image": "VARCHAR(500)", "price_modal": "INTEGER DEFAULT 0", "provider": "VARCHAR(100)", "provider_code": "VARCHAR(100)", "stock": "INTEGER DEFAULT 0", "game_id": "INTEGER"},
         "orders": {"payment_url": "VARCHAR(500)", "payment_reference": "VARCHAR(150)", "cancelled_at": "DATETIME", "voucher_code": "VARCHAR(60)", "discount_amount": "INTEGER DEFAULT 0"},
         "payments": {
             "provider": "VARCHAR(50)",
@@ -98,6 +98,28 @@ def ensure_runtime_columns(app):
             ddl_statements.append("ALTER TABLE users ADD COLUMN bonus_coins INTEGER DEFAULT 0")
         if "banners" in existing_tables and "tag" not in banner_columns:
             ddl_statements.append("ALTER TABLE banners ADD COLUMN tag VARCHAR(80) DEFAULT 'RAJA TOPUP GAMES'")
+
+        # Cloudinary URLs are longer than the old local filenames.
+        if dialect == "postgresql":
+            media_columns = {
+                "users": ["avatar"],
+                "categories": ["icon"],
+                "games": ["image"],
+                "products": ["image"],
+                "payment_methods": ["logo", "qr_image"],
+                "banners": ["image"],
+            }
+            for table, columns in media_columns.items():
+                if table not in existing_tables:
+                    continue
+                column_info = {col["name"]: col for col in inspector.get_columns(table)}
+                for column in columns:
+                    info = column_info.get(column)
+                    current_length = getattr(info.get("type"), "length", None) if info else None
+                    if info and current_length and current_length < 500:
+                        ddl_statements.append(
+                            f"ALTER TABLE {table} ALTER COLUMN {column} TYPE VARCHAR(500)"
+                        )
         with db.engine.begin() as conn:
             for ddl in ddl_statements:
                 conn.execute(text(ddl))
@@ -110,6 +132,7 @@ def create_app():
     app.config.from_object(Config)
     app.config.setdefault("UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "products"))
     app.config.setdefault("AVATAR_UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "avatars"))
+    app.config.setdefault("SITE_ASSET_UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "site"))
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -216,6 +239,8 @@ def create_app():
                 response.headers['Expires'] = '0'
             if request.path == '/service-worker.js':
                 response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            if request.path.startswith(('/static/img/products/', '/static/img/games/', '/static/img/avatars/', '/static/img/payment_methods/', '/static/img/site/')):
+                response.headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
         except Exception:
             pass
 
@@ -225,6 +250,11 @@ def create_app():
         response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
         response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
         return response
+
+    @app.context_processor
+    def inject_media_helpers():
+        from app.utils import media_url, build_image_url
+        return {"media_url": media_url, "image_url": build_image_url}
 
     @app.context_processor
     def inject_seo_context():
@@ -258,7 +288,10 @@ def create_app():
                 unread_notifications_count = UserNotification.query.filter_by(user_id=user_id, is_read=False).count()
             except Exception:
                 unread_notifications_count = 0
-        return {"unread_notifications_count": unread_notifications_count, "current_user": current_user}
+        return {
+            "unread_notifications_count": unread_notifications_count,
+            "current_user": current_user,
+        }
 
     from app.cli import register_cli
     register_cli(app)

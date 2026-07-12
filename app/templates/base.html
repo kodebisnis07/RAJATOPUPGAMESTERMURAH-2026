@@ -7,6 +7,8 @@
     {% set default_title = seo_settings.get('meta_title') or seo_settings.get('site_name') or 'Raja Topup Games | Top Up Game Murah, Cepat & Terpercaya' %}
     {% set default_description = seo_settings.get('meta_description') or 'Top up game murah, cepat, aman, dan terpercaya 24 jam di Raja Topup Games.' %}
     {% set default_keywords = seo_settings.get('meta_keywords') or 'top up game murah, top up mobile legends, top up free fire, diamond murah, raja topup games' %}
+    {% set site_logo = seo_settings.get('site_logo') %}
+    {% set favicon_logo = seo_settings.get('favicon_logo') or site_logo %}
     <title>{% block title %}{{ default_title }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{{ default_description }}{% endblock %}">
     <meta name="keywords" content="{{ default_keywords }}">
@@ -30,18 +32,19 @@
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"{{ seo_settings.get('site_name', 'Raja Topup Games') }}","url":"{{ site_url if site_url is defined else request.url_root.rstrip('/') }}"}</script>
     <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#ffc83d">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/pwa/icon-192.png') }}">
+    <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=final-polish-20260710">
 </head>
 <body class="site-body">
 <header class="navbar">
-    <a class="logo" href="{{ url_for('home.index') }}">👑 {{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}</a>
+    <a class="logo brand-logo-link" href="{{ url_for('home.index') }}">{% if site_logo %}<img class="site-brand-logo" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}<span class="logo-mark">👑</span>{% endif %}<span class="logo-text">{{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}</span></a>
     <button class="mobile-nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false">☰</button>
 </header>
 {% include '_running_popup.html' %}
 {% block content %}{% endblock %}
 <footer class="footer">
-    <h3>👑 {{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h3>
+    <h3>{% if site_logo %}<img class="footer-brand-logo" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}👑 {% endif %}{{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h3>
     <p>{{ seo_settings.get('site_tagline', 'Top Up Game Termurah, Cepat, Aman, dan Terpercaya') }}</p>
     <small>© 2026 {{ seo_settings.get('site_name', 'RAJA TOPUP GAMES') }}. All Rights Reserved.</small>
 </footer>

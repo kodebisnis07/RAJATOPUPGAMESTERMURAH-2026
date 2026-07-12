@@ -27,7 +27,7 @@
                 <label class="nominal-card" data-name="{{ product.name }}" data-price="{{ product.price }}">
                     <input type="radio" name="product_id" value="{{ product.id }}" required>
                     <div class="nominal-icon">
-                        {% if product.image %}<img src="{{ url_for('static', filename='img/products/' + product.image) }}" alt="{{ product.name }}">{% else %}💎{% endif %}
+                        {% if product.image %}<img src="{{ media_url(product.image, 'products') }}" alt="{{ product.name }}">{% else %}💎{% endif %}
                     </div>
                     <div><strong>{{ product.name }}</strong><small>{{ product.description or 'Paket top-up instan' }}</small></div>
                     <b>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</b>
@@ -65,7 +65,7 @@
                 {% for m in payment_methods %}
                 <label class="pay-card pay-method-card" data-fee="{{ m.admin_fee or 0 }}">
                     <input type="radio" name="payment_method_id" value="{{ m.id }}" required>
-                    {% if m.logo %}<img class="pay-logo" src="{{ url_for('static', filename='img/payment_methods/' + m.logo) }}" alt="{{ m.name }}">{% endif %}
+                    {% if m.logo %}<img class="pay-logo" src="{{ media_url(m.logo, 'payment_methods') }}" alt="{{ m.name }}">{% endif %}
                     <span>{{ m.name }}</span>
                     <small>{{ m.type|replace('_',' ')|title }}{% if m.admin_fee %} • Fee Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}{% endif %}</small>
                 </label>

@@ -8,7 +8,7 @@
     <div class="favorite-grid">
         {% for category in categories %}
         <div class="favorite-card">
-            <div class="game-thumb small-thumb">{% if category.icon %}<img src="{{ category.icon if category.icon.startswith('http') else url_for('static', filename='img/games/' ~ category.icon) }}" alt="{{ category.name }}">{% else %}<span>{{ category.name[:2]|upper }}</span>{% endif %}</div>
+            <div class="game-thumb small-thumb">{% if category.icon %}<img src="{{ media_url(category.icon, 'games') }}" alt="{{ category.name }}">{% else %}<span>{{ category.name[:2]|upper }}</span>{% endif %}</div>
             <h3>{{ category.name }}</h3>
             <form method="POST" action="{{ url_for('auth.toggle_favorite', category_id=category.id) }}">
                 <button class="btn-small {{ 'outline' if category.id in favorite_ids else '' }}" type="submit">{{ 'Hapus Favorit' if category.id in favorite_ids else 'Tambah Favorit' }}</button>

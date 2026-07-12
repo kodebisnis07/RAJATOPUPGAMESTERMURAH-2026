@@ -707,3 +707,8 @@ input,select,textarea,button{max-width:100%;}
     padding: 10px 8px 20px !important;
   }
 }
+
+
+/* === Site logo support === */
+.admin-site-brand-logo{width:42px;height:42px;object-fit:cover;border-radius:12px;background:#fff;border:1px solid rgba(255,255,255,.12)}
+.login-site-brand-logo{width:36px;height:36px;object-fit:cover;border-radius:10px;background:#fff;vertical-align:middle;margin-right:10px}

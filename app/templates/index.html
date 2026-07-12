@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
+    {% set site_logo = settings.get('site_logo') %}
+    {% set favicon_logo = settings.get('favicon_logo') or site_logo %}
     <link rel="manifest" href="{{ url_for('manifest') }}">
     <meta name="theme-color" content="#0b1220">
+    <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=navbar-final-rapi-20260710">
 
 </head>
 <body class="site-body marketplace-home">
 <header class="market-nav">
     <div class="market-nav-top">
-        <a class="market-logo" href="{{ url_for('home.index') }}"><span>👑</span><b>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</b></a>
+        <a class="market-logo" href="{{ url_for('home.index') }}"><span class="market-logo-badge">{% if site_logo %}<img class="market-logo-image" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}👑{% endif %}</span><b>{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}</b></a>
         <form class="market-search" method="GET" action="{{ url_for('home.index') }}#games">
             <span>🔍</span>
             <input type="text" name="q" value="{{ q }}" placeholder="Cari game, voucher, atau produk...">
@@ -54,7 +57,7 @@
     <div class="hero-side hero-side-left"></div>
     <div class="hero-stage">
         {% for banner in banners %}
-        <article class="market-slide {% if loop.first %}active{% endif %}" style="background-image:linear-gradient(90deg,rgba(5,8,15,.30),rgba(5,8,15,.10)),url('{% if banner.image %}{% if '/' in banner.image %}{{ url_for('static', filename=banner.image) }}{% else %}{{ url_for('static', filename='img/products/' + banner.image) }}{% endif %}{% else %}{{ url_for('static', filename='img/banner/rtg-banner-20260707.png') }}{% endif %}')">
+        <article class="market-slide {% if loop.first %}active{% endif %}" style="background-image:linear-gradient(90deg,rgba(5,8,15,.30),rgba(5,8,15,.10)),url('{% if banner.image %}{{ media_url(banner.image, 'products') }}{% else %}{{ url_for('static', filename='img/banner/rtg-banner-20260707.png') }}{% endif %}')">
             <div class="market-slide-content">
                 <span class="market-badge">{% if banner.tag and banner.tag != 'RAJA TOPUP GAMES' %}{{ banner.tag }}{% else %}{{ settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endif %}</span>
                 <h1>{{ banner.title }}</h1>
@@ -84,7 +87,7 @@
 <section class="website-banner-block" id="promo-website">
   <div class="website-banner-grid">
     {% for wb in website_banners %}
-    <a class="website-promo-card" href="{{ wb.link or '#games' }}" {% if wb.image %}style="background-image:linear-gradient(90deg,rgba(6,10,20,.88),rgba(6,10,20,.28)),url('{{ url_for('static', filename='img/products/' + wb.image) }}')"{% endif %}>
+    <a class="website-promo-card" href="{{ wb.link or '#games' }}" {% if wb.image %}style="background-image:linear-gradient(90deg,rgba(6,10,20,.88),rgba(6,10,20,.28)),url('{{ media_url(wb.image, 'products') }}')"{% endif %}>
       <span>{{ wb.badge or 'PROMO WEBSITE' }}</span>
       <h2>{{ wb.title }}</h2>
       <p>{{ wb.subtitle }}</p>
@@ -120,7 +123,7 @@
         <a href="{{ url_for('home.topup', category_id=game.id) }}" class="market-product-card">
             {% if game.badge %}<span class="discount-badge">{{ game.badge }}</span>{% else %}<span class="discount-badge">-5%</span>{% endif %}
             <div class="market-product-image">
-                {% if game.icon %}{% if game.icon.startswith('http') %}<img src="{{ game.icon }}" alt="{{ game.name }}" loading="lazy" decoding="async">{% else %}<img src="{{ url_for('static', filename='img/games/' + game.icon) }}" alt="{{ game.name }}" loading="lazy" decoding="async">{% endif %}{% else %}<span>{{ game.name[:2] }}</span>{% endif %}
+                {% if game.icon %}<img src="{{ media_url(game.icon, 'games') }}" alt="{{ game.name }}" loading="lazy" decoding="async">{% else %}<span>{{ game.name[:2] }}</span>{% endif %}
             </div>
             <div class="market-product-info">
                 <h3>{{ game.name }}</h3>
@@ -147,7 +150,7 @@
             {% if item.badge %}<span class="discount-badge">{{ item.badge }}</span>{% endif %}
             <div class="market-product-image">
                 {% if item.icon %}
-                    {% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% endif %}
+                    <img src="{{ media_url(item.icon, 'games') }}" alt="{{ item.name }}" loading="lazy" decoding="async">
                 {% else %}<span>{{ item.name[:2] }}</span>{% endif %}
             </div>
             <div class="market-product-info">
@@ -178,7 +181,7 @@
         {% for item in social_categories %}
         <a href="{{ url_for('home.topup', category_id=item.id) }}" class="sosmed-chip">
             <span class="sosmed-chip-icon">
-                {% if item.icon %}{% if item.icon.startswith('http') %}<img src="{{ item.icon }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% else %}<img src="{{ url_for('static', filename='img/games/' + item.icon) }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% endif %}{% else %}{{ item.name[:1] }}{% endif %}
+                {% if item.icon %}<img src="{{ media_url(item.icon, 'games') }}" alt="{{ item.name }}" loading="lazy" decoding="async">{% else %}{{ item.name[:1] }}{% endif %}
             </span>
             <b>{{ item.name.replace(' Sosmed','') }}</b>
         </a>

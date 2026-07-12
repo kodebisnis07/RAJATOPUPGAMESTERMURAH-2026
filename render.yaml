@@ -15,6 +15,12 @@ services:
         fromDatabase:
           name: raja-topup-games-db
           property: connectionString
+      - key: MEDIA_STORAGE_BACKEND
+        value: cloudinary
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: CLOUDINARY_FOLDER
+        value: rajatopupgames
 
 databases:
   - name: raja-topup-games-db

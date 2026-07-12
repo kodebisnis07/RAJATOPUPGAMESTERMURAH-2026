@@ -45,7 +45,7 @@
                 <div class="summary-row"><span>Metode</span><b>{{ order.payment_method or '-' }}</b></div>
                 {% if payment_method %}
                     <div class="manual-pay-detail">
-                        {% if payment_method.logo %}<img class="pay-logo big" src="{{ url_for('static', filename='img/payment_methods/' + payment_method.logo) }}" alt="{{ payment_method.name }}">{% endif %}
+                        {% if payment_method.logo %}<img class="pay-logo big" src="{{ media_url(payment_method.logo, 'payment_methods') }}" alt="{{ payment_method.name }}">{% endif %}
                         <div class="summary-row"><span>Jenis</span><b>{{ payment_method.type|replace('_',' ')|title }}</b></div>
                         {% if payment_method.account_number %}
                             <div class="summary-row"><span>Nomor</span><b id="payNumber">{{ payment_method.account_number }}</b></div>
@@ -53,7 +53,7 @@
                         {% endif %}
                         {% if payment_method.account_name %}<div class="summary-row"><span>Atas Nama</span><b>{{ payment_method.account_name }}</b></div>{% endif %}
                         {% if payment_method.admin_fee %}<div class="summary-row"><span>Biaya Admin</span><b>Rp {{ "{:,}".format(payment_method.admin_fee).replace(",", ".") }}</b></div>{% endif %}
-                        {% if payment_method.qr_image %}<img class="qr-img" src="{{ url_for('static', filename='img/payment_methods/' + payment_method.qr_image) }}" alt="QR {{ payment_method.name }}">{% endif %}
+                        {% if payment_method.qr_image %}<img class="qr-img" src="{{ media_url(payment_method.qr_image, 'payment_methods') }}" alt="QR {{ payment_method.name }}">{% endif %}
                         {% if payment_method.instruction %}<div class="manual-note">{{ payment_method.instruction }}</div>{% endif %}
                     </div>
                 {% endif %}
