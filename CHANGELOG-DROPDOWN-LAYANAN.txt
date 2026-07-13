@@ -1,0 +1,13 @@
+PERUBAHAN HALAMAN TOP UP
+
+1. Menambahkan dropdown Kategori pada halaman top up.
+2. Menambahkan dropdown Layanan yang menampilkan nama dan harga.
+3. Menambahkan kotak Deskripsi yang muncul otomatis setelah layanan dipilih.
+4. Ringkasan pesanan dan total harga berubah otomatis.
+5. Tampilan responsif untuk desktop dan HP.
+6. Validasi backend memastikan layanan berasal dari kategori yang sedang dibuka.
+
+FILE YANG DIUBAH:
+- app/routes/home.py
+- app/templates/topup.html
+- app/static/css/style.css

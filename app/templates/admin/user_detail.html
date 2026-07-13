@@ -106,7 +106,7 @@
         {% for order in orders %}
             <tr>
                 <td>{{ order.invoice }}</td>
-                <td>{{ order.product.name if order.product else '-' }}<br><small>ID Game: {{ order.game_user_id or '-' }} | Server: {{ order.game_server_id or '-' }}</small></td>
+                <td>{{ order.product.name if order.product else '-' }}<br><small>Target / ID Game: {{ order.game_user_id or '-' }} | Server: {{ order.game_server_id or '-' }}</small></td>
                 <td>Rp {{ "{:,.0f}".format(order.price or 0).replace(',', '.') }}</td>
                 <td>{{ order.payment_method or '-' }}<br><span class="badge">{{ order.payment_status }}</span></td>
                 <td><span class="badge">{{ order.order_status }}</span></td>

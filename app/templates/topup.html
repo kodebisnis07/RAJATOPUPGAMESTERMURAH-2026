@@ -4,37 +4,61 @@
     <div>
         <span class="eyebrow">{{ settings.get('site_name', global_settings.get('site_name', 'RAJA TOPUP GAMES')) }}</span>
         <h1>Top Up {{ category.name }}</h1>
-        <p>{{ input_config.help if input_config else 'Pilih paket, pilih pembayaran, lalu selesaikan transaksi dengan aman.' }}</p>
+        <p>{{ input_config.help if input_config else 'Pilih layanan, masukkan target, lalu selesaikan transaksi dengan aman.' }}</p>
     </div>
 </section>
 
 <form method="POST" class="topup-layout" id="topupForm">
     <div class="topup-main">
-        <div class="step-card">
-            <div class="step-title"><span>1</span><div><h2>{{ input_config.title if input_config else 'Data Target' }}</h2><p>{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
-            <div class="form-grid compact-game-fields">
-                <label>{{ input_config.label if input_config else 'Data Target' }}<input type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" required></label>
-                {% if input_config and input_config.needs_server %}
-                <label>{{ input_config.server_label }}<input type="text" name="game_server_id" placeholder="{{ input_config.server_placeholder }}"></label>
-                {% endif %}
+        <div class="step-card service-selector-card">
+            <div class="step-title"><span>1</span><div><h2>Pilih Kategori & Layanan</h2><p>Pilih kategori dan layanan yang ingin dipesan.</p></div></div>
+            <div class="service-select-grid">
+                <label>
+                    Kategori <em>*</em>
+                    <select id="categorySelect" aria-label="Pilih kategori">
+                        {% for item in service_categories %}
+                        <option value="{{ url_for('home.topup', category_id=item.id) }}" {% if item.id == category.id %}selected{% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    Layanan <em>*</em>
+                    <select id="serviceSelect" name="product_id" required aria-label="Pilih layanan">
+                        <option value="" selected disabled>-- Pilih layanan --</option>
+                        {% for product in products %}
+                        {% set pc = product_configs.get(product.id, input_config) %}
+                        <option value="{{ product.id }}"
+                                data-name="{{ product.name|e }}"
+                                data-price="{{ product.price }}"
+                                data-description="{{ (product.description or 'Layanan diproses sesuai ketentuan. Pastikan data target sudah benar.')|e }}"
+                                data-target-title="{{ pc.title|e }}"
+                                data-target-help="{{ pc.help|e }}"
+                                data-target-label="{{ pc.label|e }}"
+                                data-target-placeholder="{{ pc.placeholder|e }}"
+                                data-needs-server="{{ '1' if pc.needs_server else '0' }}"
+                                data-server-label="{{ (pc.server_label or 'Zone / Server ID')|e }}"
+                                data-server-placeholder="{{ (pc.server_placeholder or 'Contoh: 1234')|e }}">
+                            {{ product.name }} — Rp {{ "{:,}".format(product.price).replace(",", ".") }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
             </div>
+            <div class="service-description" id="serviceDescription" hidden>
+                <div class="service-description-head">
+                    <strong>❕ Deskripsi</strong>
+                    <button type="button" id="closeDescription" aria-label="Tutup deskripsi">×</button>
+                </div>
+                <div id="serviceDescriptionText"></div>
+            </div>
+            {% if not products %}<div class="empty-state">Belum ada layanan aktif untuk kategori ini.</div>{% endif %}
         </div>
 
         <div class="step-card">
-            <div class="step-title"><span>2</span><div><h2>Pilih Nominal</h2><p>Pilih paket yang tersedia untuk {{ category.name }}.</p></div></div>
-            <div class="nominal-grid">
-                {% for product in products %}
-                <label class="nominal-card" data-name="{{ product.name }}" data-price="{{ product.price }}">
-                    <input type="radio" name="product_id" value="{{ product.id }}" required>
-                    <div class="nominal-icon">
-                        {% if product.image %}<img src="{{ media_url(product.image, 'products') }}" alt="{{ product.name }}">{% else %}💎{% endif %}
-                    </div>
-                    <div><strong>{{ product.name }}</strong><small>{{ product.description or 'Paket top-up instan' }}</small></div>
-                    <b>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</b>
-                </label>
-                {% else %}
-                <div class="empty-state">Belum ada nominal aktif untuk game ini.</div>
-                {% endfor %}
+            <div class="step-title"><span>2</span><div><h2 id="targetTitle">{{ input_config.title if input_config else 'Data Target' }}</h2><p id="targetHelp">{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
+            <div class="form-grid compact-game-fields">
+                <label><span id="targetLabel">{{ input_config.label if input_config else 'Data Target' }}</span><input id="targetInput" type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" required></label>
+                <label id="serverField" {% if not input_config or not input_config.needs_server %}hidden{% endif %}><span id="serverLabel">{{ input_config.server_label if input_config and input_config.server_label else 'Zone / Server ID' }}</span><input id="serverInput" type="text" name="game_server_id" placeholder="{{ input_config.server_placeholder if input_config and input_config.server_placeholder else 'Contoh: 1234' }}" {% if input_config and input_config.needs_server %}required{% endif %}></label>
             </div>
         </div>
 
@@ -79,7 +103,7 @@
     <aside class="order-summary">
         <h2>Ringkasan</h2>
         <div class="summary-row"><span>Produk</span><b>{{ category.name }}</b></div>
-        <div class="summary-row"><span>Nominal</span><b id="summaryProduct">Belum dipilih</b></div>
+        <div class="summary-row"><span>Layanan</span><b id="summaryProduct">Belum dipilih</b></div>
         <div class="summary-row"><span>Total</span><b id="summaryPrice">Rp 0</b></div>
         <button type="submit" class="btn-checkout">Bayar Sekarang</button>
         <a class="summary-back" href="{{ url_for('home.index') }}">← Kembali ke Home</a>
@@ -89,14 +113,51 @@
 function rupiah(value){ return 'Rp ' + Number(value || 0).toLocaleString('id-ID'); }
 window.selectedPrice = 0; window.selectedFee = 0;
 function updateSummaryTotal(){ document.getElementById('summaryPrice').textContent = rupiah((window.selectedPrice||0) + (window.selectedFee||0)); }
-document.querySelectorAll('.nominal-card input').forEach(function(input){
-    input.addEventListener('change', function(){
-        const card = this.closest('.nominal-card');
-        document.getElementById('summaryProduct').textContent = card.dataset.name;
-        window.selectedPrice = Number(card.dataset.price || 0);
-        updateSummaryTotal();
+
+const categorySelect = document.getElementById('categorySelect');
+if (categorySelect) {
+    categorySelect.addEventListener('change', function(){
+        if (this.value) window.location.href = this.value;
     });
-});
+}
+
+const serviceSelect = document.getElementById('serviceSelect');
+const descriptionBox = document.getElementById('serviceDescription');
+const descriptionText = document.getElementById('serviceDescriptionText');
+if (serviceSelect) {
+    serviceSelect.addEventListener('change', function(){
+        const option = this.options[this.selectedIndex];
+        document.getElementById('summaryProduct').textContent = option.dataset.name || option.textContent.trim();
+        window.selectedPrice = Number(option.dataset.price || 0);
+        updateSummaryTotal();
+        if (option.dataset.description) {
+            descriptionText.textContent = option.dataset.description;
+            descriptionBox.hidden = false;
+        }
+        const targetTitle = document.getElementById('targetTitle');
+        const targetHelp = document.getElementById('targetHelp');
+        const targetLabel = document.getElementById('targetLabel');
+        const targetInput = document.getElementById('targetInput');
+        const serverField = document.getElementById('serverField');
+        const serverLabel = document.getElementById('serverLabel');
+        const serverInput = document.getElementById('serverInput');
+        if (targetTitle) targetTitle.textContent = option.dataset.targetTitle || 'Data Target';
+        if (targetHelp) targetHelp.textContent = option.dataset.targetHelp || 'Masukkan data target pesanan.';
+        if (targetLabel) targetLabel.textContent = option.dataset.targetLabel || 'Data Target';
+        if (targetInput) targetInput.placeholder = option.dataset.targetPlaceholder || 'Masukkan data target';
+        const needsServer = option.dataset.needsServer === '1';
+        if (serverField) serverField.hidden = !needsServer;
+        if (serverLabel) serverLabel.textContent = option.dataset.serverLabel || 'Zone / Server ID';
+        if (serverInput) {
+            serverInput.placeholder = option.dataset.serverPlaceholder || 'Contoh: 1234';
+            serverInput.required = needsServer;
+            if (!needsServer) serverInput.value = '';
+        }
+    });
+}
+const closeDescription = document.getElementById('closeDescription');
+if (closeDescription) closeDescription.addEventListener('click', function(){ descriptionBox.hidden = true; });
+
 document.querySelectorAll('.pay-method-card input').forEach(function(input){
     input.addEventListener('change', function(){
         const card = this.closest('.pay-method-card');

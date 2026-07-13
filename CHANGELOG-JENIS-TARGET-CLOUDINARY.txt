@@ -1,0 +1,39 @@
+PERUBAHAN VERSI JENIS TARGET + CLOUDINARY
+=========================================
+
+1. PANEL ADMIN PRODUK/NOMINAL
+- Ditambahkan pilihan Jenis Target:
+  * Otomatis dari kategori
+  * Username
+  * Username / Link
+  * ID Game
+  * ID Game + Server/Zone
+  * Nomor HP
+  * Email
+  * Email / Username
+  * Data Target / Catatan
+- Pilihan tersimpan pada kolom products.target_type.
+- Produk lama otomatis memakai nilai "auto".
+
+2. HALAMAN PEMBELIAN
+- Kolom target berubah mengikuti produk yang dipilih.
+- ID Game dan Server/Zone ditampilkan sebagai dua kolom terpisah.
+- Validasi backend mengikuti jenis target, bukan hanya tampilan browser.
+
+3. DATABASE
+- Aplikasi otomatis menambahkan kolom target_type pada tabel products apabila belum ada.
+- Tidak perlu menghapus database lama.
+
+4. CLOUDINARY
+- Upload produk, ikon kategori/game, banner, logo, favicon, QR pembayaran, dan avatar memakai fungsi upload bersama.
+- Saat MEDIA_STORAGE_BACKEND=cloudinary, hasil upload disimpan sebagai URL HTTPS Cloudinary di database.
+- Gambar lama yang masih berupa file lokal tetap dapat ditampilkan.
+- Penghapusan gambar mendukung URL Cloudinary.
+
+5. RENDER FREE
+Isi Environment Variables berikut:
+MEDIA_STORAGE_BACKEND=cloudinary
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+CLOUDINARY_FOLDER=rajatopupgames
+
+Setelah mengubah Environment Variables, lakukan Manual Deploy / Deploy latest commit.

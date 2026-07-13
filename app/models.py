@@ -128,6 +128,9 @@ class Product(db.Model):
 
     provider = db.Column(db.String(100), nullable=True)
     provider_code = db.Column(db.String(100), nullable=True)
+    # Menentukan kolom target yang tampil pada halaman pelanggan.
+    # Nilai "auto" mempertahankan deteksi otomatis berdasarkan kategori.
+    target_type = db.Column(db.String(40), default="auto")
     image = db.Column(db.String(500), nullable=True)
 
     status = db.Column(db.String(20), default="active")

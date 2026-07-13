@@ -17,7 +17,7 @@ def ensure_sqlite_columns(app):
         "admins": {"name": "VARCHAR(120)", "role": "VARCHAR(30) DEFAULT 'admin'", "is_active": "BOOLEAN DEFAULT 1"},
         "categories": {"icon": "VARCHAR(500)", "catalog_section_id": "INTEGER", "badge": "VARCHAR(60)", "sort_order": "INTEGER DEFAULT 0", "is_featured": "BOOLEAN DEFAULT 1"},
         "users": {"username": "VARCHAR(80)", "phone": "VARCHAR(30)", "avatar": "VARCHAR(500)", "member_level": "VARCHAR(30) DEFAULT 'Bronze'", "balance": "INTEGER DEFAULT 0", "bonus_coins": "INTEGER DEFAULT 0"},
-        "products": {"image": "VARCHAR(500)", "price_modal": "INTEGER DEFAULT 0", "provider": "VARCHAR(100)", "provider_code": "VARCHAR(100)", "stock": "INTEGER DEFAULT 0", "game_id": "INTEGER"},
+        "products": {"image": "VARCHAR(500)", "price_modal": "INTEGER DEFAULT 0", "provider": "VARCHAR(100)", "provider_code": "VARCHAR(100)", "stock": "INTEGER DEFAULT 0", "game_id": "INTEGER", "target_type": "VARCHAR(40) DEFAULT 'auto'"},
         "orders": {"payment_url": "VARCHAR(500)", "payment_reference": "VARCHAR(150)", "cancelled_at": "DATETIME", "voucher_code": "VARCHAR(60)", "discount_amount": "INTEGER DEFAULT 0"},
         "payments": {
             "provider": "VARCHAR(50)",
@@ -82,6 +82,7 @@ def ensure_runtime_columns(app):
         order_columns = {col["name"] for col in inspector.get_columns("orders")}
         user_columns = {col["name"] for col in inspector.get_columns("users")} if "users" in existing_tables else set()
         banner_columns = {col["name"] for col in inspector.get_columns("banners")} if "banners" in existing_tables else set()
+        product_columns = {col["name"] for col in inspector.get_columns("products")} if "products" in existing_tables else set()
         ddl_statements = []
         if "cancelled_at" not in order_columns:
             if dialect == "postgresql":
@@ -98,6 +99,8 @@ def ensure_runtime_columns(app):
             ddl_statements.append("ALTER TABLE users ADD COLUMN bonus_coins INTEGER DEFAULT 0")
         if "banners" in existing_tables and "tag" not in banner_columns:
             ddl_statements.append("ALTER TABLE banners ADD COLUMN tag VARCHAR(80) DEFAULT 'RAJA TOPUP GAMES'")
+        if "products" in existing_tables and "target_type" not in product_columns:
+            ddl_statements.append("ALTER TABLE products ADD COLUMN target_type VARCHAR(40) DEFAULT 'auto'")
 
         # Cloudinary URLs are longer than the old local filenames.
         if dialect == "postgresql":

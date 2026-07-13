@@ -156,9 +156,9 @@ def _category_input_config(category):
     if any(k in text for k in ["sosmed", "followers", "likes", "instagram", "tiktok", "facebook"]):
         return {
             "type": "social",
-            "title": "Data Target Sosmed",
-            "help": "Masukkan username atau link target sesuai layanan yang dipilih.",
-            "label": "Username / Link Target",
+            "title": "Username / Link Sosial Media",
+            "help": "Masukkan username akun atau link postingan sesuai layanan yang dipilih. Jangan isi ID game di bagian ini.",
+            "label": "Username atau Link Target",
             "placeholder": "Contoh: @username atau https://link-postingan",
             "needs_server": False,
             "required": True,
@@ -215,9 +215,9 @@ def _category_input_config(category):
         }
     return {
         "type": "game",
-        "title": "Data Akun Game",
-        "help": "Cukup isi User ID dan Zone/Server ID. Data pembeli otomatis memakai akun login Anda.",
-        "label": "User ID",
+        "title": "ID Akun Game",
+        "help": "Masukkan ID game dan Zone/Server ID. Jangan isi username sosial media di bagian ini.",
+        "label": "ID Game",
         "placeholder": "Contoh: 123456789",
         "server_label": "Zone / Server ID",
         "server_placeholder": "Contoh: 1234",
@@ -225,6 +225,22 @@ def _category_input_config(category):
         "required": True,
     }
 
+
+
+def _product_input_config(product, category):
+    """Prioritaskan Jenis Target dari produk; nilai auto memakai deteksi kategori lama."""
+    target_type = (getattr(product, "target_type", None) or "auto").strip().lower()
+    configs = {
+        "username": {"type": "username", "title": "Data Username", "help": "Masukkan username akun tujuan.", "label": "Username", "placeholder": "Contoh: @username", "needs_server": False, "required": True},
+        "username_link": {"type": "username_link", "title": "Data Target Sosial Media", "help": "Masukkan username akun atau link postingan sesuai layanan.", "label": "Username / Link Target", "placeholder": "Contoh: @username atau https://link-postingan", "needs_server": False, "required": True},
+        "game_id": {"type": "game_id", "title": "ID Akun Game", "help": "Masukkan ID game tujuan dengan benar.", "label": "ID Game", "placeholder": "Contoh: 123456789", "needs_server": False, "required": True},
+        "game_id_server": {"type": "game", "title": "ID Akun Game", "help": "Masukkan ID game dan Zone/Server ID tujuan.", "label": "ID Game", "placeholder": "Contoh: 123456789", "server_label": "Zone / Server ID", "server_placeholder": "Contoh: 1234", "needs_server": True, "required": True},
+        "phone": {"type": "phone", "title": "Nomor Tujuan", "help": "Masukkan nomor HP tujuan.", "label": "Nomor HP", "placeholder": "Contoh: 081234567890", "needs_server": False, "required": True},
+        "email": {"type": "email", "title": "Email Tujuan", "help": "Masukkan alamat email tujuan.", "label": "Email", "placeholder": "Contoh: email@gmail.com", "needs_server": False, "required": True},
+        "email_username": {"type": "email_username", "title": "Data Akun", "help": "Masukkan email atau username akun tujuan.", "label": "Email / Username", "placeholder": "Contoh: email@gmail.com atau @username", "needs_server": False, "required": True},
+        "custom": {"type": "custom", "title": "Data Target", "help": "Masukkan data target atau catatan yang diperlukan untuk layanan ini.", "label": "Data Target / Catatan", "placeholder": "Masukkan data target", "needs_server": False, "required": True},
+    }
+    return configs.get(target_type) or _category_input_config(category)
 
 def _category_requires_game_account(category):
     return _category_input_config(category).get("type") == "game"
@@ -284,6 +300,11 @@ def topup(category_id):
 
     category = Category.query.get_or_404(category_id)
     products = Product.query.filter_by(category_id=category_id, status="active").order_by(Product.price.asc()).all()
+    # Daftar kategori pada bagian katalog yang sama untuk dropdown kategori.
+    service_categories_query = Category.query.filter_by(status="active")
+    if category.catalog_section_id:
+        service_categories_query = service_categories_query.filter_by(catalog_section_id=category.catalog_section_id)
+    service_categories = service_categories_query.order_by(Category.sort_order.asc(), Category.name.asc()).all()
     settings = {item.key: item.value for item in Setting.query.all()}
     payment_methods = PaymentMethod.query.filter_by(is_active=True, is_offline=False).order_by(PaymentMethod.sort_order.asc(), PaymentMethod.name.asc()).all()
 
@@ -293,10 +314,18 @@ def topup(category_id):
 
     if request.method == "POST":
         product_id = request.form.get("product_id")
+        product = Product.query.filter_by(id=product_id, category_id=category.id, status="active").first()
+        if not product:
+            flash("Layanan tidak tersedia pada kategori ini. Silakan pilih ulang.", "error")
+            return redirect(url_for("home.topup", category_id=category.id))
+        input_config = _product_input_config(product, category)
         game_user_id = (request.form.get("game_user_id") or "").strip()
         game_server_id = (request.form.get("game_server_id") or "").strip() if input_config.get("needs_server") else None
         if input_config.get("required") and not game_user_id:
             flash(f"{input_config.get('label', 'Data target')} wajib diisi.", "error")
+            return redirect(url_for("home.topup", category_id=category.id))
+        if input_config.get("needs_server") and not game_server_id:
+            flash(f"{input_config.get('server_label', 'Server/Zone ID')} wajib diisi.", "error")
             return redirect(url_for("home.topup", category_id=category.id))
         customer_name = (current_user.name if current_user else None) or session.get("user_name")
         customer_email = (current_user.email if current_user else None) or session.get("user_email")
@@ -312,7 +341,6 @@ def topup(category_id):
                 flash("Metode pembayaran tidak tersedia atau sedang offline. Silakan pilih metode lain.", "error")
                 return redirect(url_for("home.topup", category_id=category.id))
 
-        product = Product.query.get_or_404(product_id)
         invoice = "INV" + datetime.now().strftime("%Y%m%d%H%M%S%f")
         discount_amount = voucher.calculate_discount(product.price) if voucher else 0
         subtotal = max(0, product.price - discount_amount)
@@ -391,7 +419,8 @@ def topup(category_id):
         db.session.commit()
         return redirect(url_for("home.checkout", invoice=invoice))
 
-    return render_template("topup.html", category=category, products=products, settings=settings, payment_methods=payment_methods, requires_game_account=requires_game_account, input_config=input_config, current_user=current_user)
+    product_configs = {product.id: _product_input_config(product, category) for product in products}
+    return render_template("topup.html", category=category, products=products, service_categories=service_categories, settings=settings, payment_methods=payment_methods, requires_game_account=requires_game_account, input_config=input_config, product_configs=product_configs, current_user=current_user)
 
 
 @home_bp.route("/checkout/<invoice>")

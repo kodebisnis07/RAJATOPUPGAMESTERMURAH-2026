@@ -495,6 +495,10 @@ def _save_product_from_form(product=None):
     description = request.form.get("description") or ""
     provider = request.form.get("provider") or ""
     provider_code = request.form.get("provider_code") or ""
+    target_type = (request.form.get("target_type") or "auto").strip()
+    allowed_target_types = {"auto", "username", "username_link", "game_id", "game_id_server", "phone", "email", "email_username", "custom"}
+    if target_type not in allowed_target_types:
+        target_type = "auto"
     if not name or not price or not category_id:
         raise ValueError("Nama, harga, dan kategori/game wajib diisi.")
     try:
@@ -515,6 +519,7 @@ def _save_product_from_form(product=None):
     product.description = description
     product.provider = provider
     product.provider_code = provider_code
+    product.target_type = target_type
     if image_name:
         if product.image:
             delete_uploaded_image(product.image, current_app.config["UPLOAD_FOLDER"])

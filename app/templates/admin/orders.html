@@ -8,7 +8,7 @@
             <th>Invoice</th>
             <th>Produk</th>
             <th>Customer</th>
-            <th>ID Game</th>
+            <th>Username / ID Game</th>
             <th>Total</th>
             <th>Metode</th>
             <th>Status Bayar</th>
@@ -22,7 +22,9 @@
             <td><strong>{{ order.invoice }}</strong><br><small>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</small></td>
             <td>{{ order.product.name if order.product else '-' }}</td>
             <td>{{ order.customer_name or '-' }}<br><small>{{ order.customer_phone or order.customer_email or '-' }}</small></td>
-            <td>{{ order.game_user_id or '-' }}{% if order.game_server_id %} / {{ order.game_server_id }}{% endif %}<br><small>{{ order.game_nickname or '' }}</small></td>
+            {% set category_text = ((order.product.category.name if order.product and order.product.category else '') ~ ' ' ~ (order.product.category.slug if order.product and order.product.category else ''))|lower %}
+            {% set is_social = 'sosmed' in category_text or 'followers' in category_text or 'likes' in category_text or 'instagram' in category_text or 'tiktok' in category_text or 'facebook' in category_text %}
+            <td><small>{{ 'Username / Link' if is_social else 'ID Game' }}</small><br><strong>{{ order.game_user_id or '-' }}</strong>{% if order.game_server_id %}<br><small>Server: {{ order.game_server_id }}</small>{% endif %}</td>
             <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td>
             <td>{{ order.payment_method or '-' }}</td>
             <td><span class="badge">{{ order.payment_status }}</span></td>

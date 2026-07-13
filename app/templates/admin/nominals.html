@@ -18,6 +18,17 @@
         <input type="text" name="provider" placeholder="Provider, contoh: Digiflazz">
         <input type="text" name="provider_code" placeholder="Kode provider">
         <select name="status"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+        <select name="target_type" required>
+            <option value="auto">Jenis Target: Otomatis dari kategori</option>
+            <option value="username">Username</option>
+            <option value="username_link">Username / Link</option>
+            <option value="game_id">ID Game</option>
+            <option value="game_id_server">ID Game + Server/Zone</option>
+            <option value="phone">Nomor HP</option>
+            <option value="email">Email</option>
+            <option value="email_username">Email / Username</option>
+            <option value="custom">Data Target / Catatan</option>
+        </select>
         <input type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
         <textarea name="description" placeholder="Deskripsi singkat"></textarea>
         <button type="submit">Tambah Nominal</button>
@@ -58,6 +69,18 @@
                             <input type="text" name="provider" value="{{ product.provider or '' }}" placeholder="Provider">
                             <input type="text" name="provider_code" value="{{ product.provider_code or '' }}" placeholder="Kode provider">
                             <select name="status"><option value="active" {% if product.status == 'active' %}selected{% endif %}>Aktif</option><option value="inactive" {% if product.status == 'inactive' %}selected{% endif %}>Nonaktif</option></select>
+                            <select name="target_type" required>
+                                {% set target_type = product.target_type or 'auto' %}
+                                <option value="auto" {% if target_type == 'auto' %}selected{% endif %}>Target otomatis</option>
+                                <option value="username" {% if target_type == 'username' %}selected{% endif %}>Username</option>
+                                <option value="username_link" {% if target_type == 'username_link' %}selected{% endif %}>Username / Link</option>
+                                <option value="game_id" {% if target_type == 'game_id' %}selected{% endif %}>ID Game</option>
+                                <option value="game_id_server" {% if target_type == 'game_id_server' %}selected{% endif %}>ID Game + Server/Zone</option>
+                                <option value="phone" {% if target_type == 'phone' %}selected{% endif %}>Nomor HP</option>
+                                <option value="email" {% if target_type == 'email' %}selected{% endif %}>Email</option>
+                                <option value="email_username" {% if target_type == 'email_username' %}selected{% endif %}>Email / Username</option>
+                                <option value="custom" {% if target_type == 'custom' %}selected{% endif %}>Data Target / Catatan</option>
+                            </select>
                             <input type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
                             <textarea name="description">{{ product.description or '' }}</textarea>
                             <button type="submit">Simpan</button>

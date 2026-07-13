@@ -34,7 +34,9 @@
                 <h2>Detail Pesanan</h2>
                 <div class="summary-row"><span>Produk</span><b>{{ order.product.name }}</b></div>
                 <div class="summary-row"><span>Game</span><b>{{ order.product.category.name if order.product.category else '-' }}</b></div>
-                <div class="summary-row"><span>User ID</span><b>{{ order.game_user_id }}</b></div>
+                {% set category_text = ((order.product.category.name if order.product and order.product.category else '') ~ ' ' ~ (order.product.category.slug if order.product and order.product.category else ''))|lower %}
+                {% set is_social = 'sosmed' in category_text or 'followers' in category_text or 'likes' in category_text or 'instagram' in category_text or 'tiktok' in category_text or 'facebook' in category_text %}
+                <div class="summary-row"><span>{{ 'Username / Link Target' if is_social else 'ID Game' }}</span><b>{{ order.game_user_id }}</b></div>
                 <div class="summary-row"><span>Server ID</span><b>{{ order.game_server_id or '-' }}</b></div>
                 <div class="summary-row"><span>Nama</span><b>{{ order.customer_name or '-' }}</b></div>
                 <div class="summary-row total"><span>Total</span><b>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</b></div>
