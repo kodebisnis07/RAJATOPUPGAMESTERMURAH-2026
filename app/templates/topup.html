@@ -49,7 +49,7 @@
             <div class="step-title"><span>2</span><div><h2 id="targetTitle">{{ input_config.title if input_config else 'Isi Target' }}</h2><p id="targetHelp">{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
             <div class="form-grid compact-game-fields" id="targetGrid">
                 <label><span id="targetLabel">{{ input_config.label if input_config else 'Data Target' }}</span><input id="targetInput" type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" autocomplete="off" required></label>
-                <label id="serverField" {% if not input_config or not input_config.needs_server %}hidden{% endif %}><span id="serverLabel">{{ input_config.server_label if input_config and input_config.server_label else 'Zone / Server ID' }}</span><input id="serverInput" type="text" name="game_server_id" placeholder="{{ input_config.server_placeholder if input_config and input_config.server_placeholder else 'Contoh: 1234' }}" autocomplete="off" {% if input_config and input_config.needs_server %}required{% endif %}></label>
+                <label id="serverField" hidden><span id="serverLabel">Zone / Server ID</span><input id="serverInput" type="text" name="game_server_id" placeholder="Contoh: 1234" autocomplete="off"></label>
             </div>
             <div class="target-feedback" id="targetFeedback" aria-live="polite"></div>
             <div class="order-warning compact-warning">⚠️ Pastikan target benar. Pesanan yang sudah diproses tidak dapat dibatalkan karena kesalahan target.</div>
@@ -71,18 +71,19 @@
                 {% else %}<div class="empty-state">Belum ada metode pembayaran aktif.</div>{% endfor %}
             </div>
 
-            <details class="voucher-box-clean">
-                <summary><span>🎁 Punya kode voucher?</span><small>Tampilkan</small></summary>
-                <div class="voucher-input-row">
-                    <input type="text" name="voucher_code" placeholder="Masukkan kode voucher, contoh RAJA10" autocomplete="off">
-                    <span class="voucher-note">Voucher akan diperiksa saat pesanan dibuat.</span>
-                </div>
-            </details>
-
-            <label class="confirmation-check confirmation-check-clean">
-                <input type="checkbox" id="confirmTarget" required>
-                <span>Saya sudah memastikan layanan, target, dan metode pembayaran sudah benar.</span>
-            </label>
+            <div class="payment-voucher-wrap">
+                <details class="voucher-box-clean">
+                    <summary>
+                        <span><b>🎁 Gunakan Voucher</b><small>Punya kode promo? Masukkan di sini.</small></span>
+                        <strong>Buka</strong>
+                    </summary>
+                    <div class="voucher-input-row">
+                        <label for="voucherCode">Kode Voucher</label>
+                        <input id="voucherCode" type="text" name="voucher_code" placeholder="Contoh: RAJA10" autocomplete="off">
+                        <span class="voucher-note">Kode akan divalidasi saat Anda menekan Bayar Sekarang.</span>
+                    </div>
+                </details>
+            </div>
         </div>
     </div>
 
@@ -105,16 +106,15 @@
 <script>
 function rupiah(value){ return 'Rp ' + Number(value || 0).toLocaleString('id-ID'); }
 window.selectedPrice=0; window.selectedFee=0; window.selectedTargetType='';
-const form=document.getElementById('topupForm'), categorySelect=document.getElementById('categorySelect'), serviceSelect=document.getElementById('serviceSelect'), targetInput=document.getElementById('targetInput'), serverInput=document.getElementById('serverInput'), serverField=document.getElementById('serverField'), confirmTarget=document.getElementById('confirmTarget'), checkoutButton=document.getElementById('checkoutButton'), checkoutHint=document.getElementById('checkoutHint'), targetFeedback=document.getElementById('targetFeedback'), descriptionText=document.getElementById('serviceDescriptionText');
+const form=document.getElementById('topupForm'), categorySelect=document.getElementById('categorySelect'), serviceSelect=document.getElementById('serviceSelect'), targetInput=document.getElementById('targetInput'), serverInput=document.getElementById('serverInput'), serverField=document.getElementById('serverField'), checkoutButton=document.getElementById('checkoutButton'), checkoutHint=document.getElementById('checkoutHint'), targetFeedback=document.getElementById('targetFeedback'), descriptionText=document.getElementById('serviceDescriptionText');
 function currentTargetText(){const a=(targetInput.value||'').trim(),b=serverField&&!serverField.hidden?(serverInput.value||'').trim():'';return a?(b?a+' / '+b:a):'Belum diisi';}
 function updateSummaryTotal(){document.getElementById('summarySubtotal').textContent=rupiah(window.selectedPrice);document.getElementById('summaryFee').textContent=rupiah(window.selectedFee);document.getElementById('summaryPrice').textContent=rupiah(window.selectedPrice+window.selectedFee);}
 function validateTarget(show){const v=(targetInput.value||'').trim();let ok=v.length>0,msg='',t=window.selectedTargetType;if(ok&&['phone','wallet'].includes(t)){ok=/^(?:\+62|62|0)8[0-9]{7,13}$/.test(v.replace(/[\s-]/g,''));msg=ok?'✓ Format nomor benar.':'Gunakan nomor Indonesia yang valid.';}else if(ok&&t==='email'){ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);msg=ok?'✓ Format email benar.':'Masukkan alamat email yang valid.';}else if(ok&&['social','username','username_link'].includes(t)){ok=!/^[0-9]{5,}$/.test(v);msg=ok?'✓ Target siap digunakan.':'Jangan masukkan ID game pada layanan sosial media.';}if(ok&&serverField&&!serverField.hidden&&!(serverInput.value||'').trim()){ok=false;msg='Zone / Server ID wajib diisi.';}if(show||v){targetFeedback.textContent=msg;targetFeedback.className='target-feedback '+(ok?'valid':(msg?'invalid':''));}return ok;}
-function updateFormState(){document.getElementById('summaryTarget').textContent=currentTargetText();const ready=!!serviceSelect.value&&validateTarget(false)&&!!document.querySelector('input[name="payment_method_id"]:checked')&&confirmTarget.checked;checkoutButton.disabled=!ready;checkoutButton.textContent=ready?'Bayar Sekarang':'Lengkapi Pesanan';checkoutHint.textContent=ready?'Pesanan siap dilanjutkan.':'Pilih layanan, isi target, dan pilih pembayaran.';}
+function updateFormState(){document.getElementById('summaryTarget').textContent=currentTargetText();const ready=!!serviceSelect.value&&validateTarget(false)&&!!document.querySelector('input[name="payment_method_id"]:checked');checkoutButton.disabled=!ready;checkoutButton.textContent=ready?'Bayar Sekarang':'Lengkapi Pesanan';checkoutHint.textContent=ready?'Pesanan siap dilanjutkan.':'Pilih layanan, isi target, dan pilih pembayaran.';}
 categorySelect?.addEventListener('change',function(){if(this.value)location.href=this.value;});
-serviceSelect?.addEventListener('change',function(){const o=this.options[this.selectedIndex];document.getElementById('summaryProduct').textContent=o.dataset.name||o.textContent.trim();window.selectedPrice=Number(o.dataset.price||0);window.selectedTargetType=o.dataset.targetType||'';descriptionText.textContent=o.dataset.description||'Tidak ada deskripsi layanan.';document.getElementById('targetTitle').textContent=o.dataset.targetTitle||'Isi Target';document.getElementById('targetHelp').textContent=o.dataset.targetHelp||'Masukkan data target.';document.getElementById('targetLabel').textContent=o.dataset.targetLabel||'Data Target';targetInput.placeholder=o.dataset.targetPlaceholder||'Masukkan data target';const needs=o.dataset.needsServer==='1';serverField.hidden=!needs;document.getElementById('serverLabel').textContent=o.dataset.serverLabel||'Zone / Server ID';serverInput.placeholder=o.dataset.serverPlaceholder||'Contoh: 1234';serverInput.required=needs;if(!needs)serverInput.value='';targetInput.value='';confirmTarget.checked=false;updateSummaryTotal();updateFormState();});
+serviceSelect?.addEventListener('change',function(){const o=this.options[this.selectedIndex];document.getElementById('summaryProduct').textContent=o.dataset.name||o.textContent.trim();window.selectedPrice=Number(o.dataset.price||0);window.selectedTargetType=o.dataset.targetType||'';descriptionText.textContent=o.dataset.description||'Tidak ada deskripsi layanan.';document.getElementById('targetTitle').textContent=o.dataset.targetTitle||'Isi Target';document.getElementById('targetHelp').textContent=o.dataset.targetHelp||'Masukkan data target.';document.getElementById('targetLabel').textContent=o.dataset.targetLabel||'Data Target';targetInput.placeholder=o.dataset.targetPlaceholder||'Masukkan data target';const needs=o.dataset.needsServer==='1';serverField.hidden=!needs;document.getElementById('serverLabel').textContent=o.dataset.serverLabel||'Zone / Server ID';serverInput.placeholder=o.dataset.serverPlaceholder||'Contoh: 1234';serverInput.required=needs;if(!needs)serverInput.value='';targetInput.value='';updateSummaryTotal();updateFormState();});
 [targetInput,serverInput].forEach(i=>{i.addEventListener('input',updateFormState);i.addEventListener('blur',()=>{validateTarget(true);updateFormState();});});
 document.querySelectorAll('.pay-method-card input').forEach(i=>i.addEventListener('change',function(){window.selectedFee=Number(this.closest('.pay-method-card').dataset.fee||0);updateSummaryTotal();updateFormState();}));
-confirmTarget.addEventListener('change',updateFormState);
 form.addEventListener('submit',function(e){updateFormState();if(checkoutButton.disabled||!form.checkValidity()){e.preventDefault();validateTarget(true);form.reportValidity();}});
 updateSummaryTotal();updateFormState();
 </script>

@@ -1281,3 +1281,23 @@ body.marketplace-home{font-size:16px!important;}
 .checkout-stepper{max-width:1180px;margin:18px auto 22px;display:flex;align-items:center;justify-content:center;gap:14px;padding:0 18px}.checkout-step{display:flex;align-items:center;gap:9px;color:#aab2c1}.checkout-step span{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;border:1px solid #556078;font-weight:800}.checkout-step.active{color:#fff}.checkout-step.active span{background:#f7b928;color:#111827;border-color:#f7b928}.checkout-stepper i{height:1px;flex:1;max-width:90px;background:#39445a}.topup-layout-clean{align-items:start}.topup-layout-clean .topup-main{display:grid;gap:16px}.topup-layout-clean .step-card{padding:22px;border-radius:18px}.topup-hero-compact{padding-bottom:22px}.clean-description{margin-top:14px;border:1px solid rgba(148,163,184,.2);border-radius:12px;background:rgba(7,14,28,.35)}.clean-description summary{cursor:pointer;padding:12px 14px;color:#f8bf27;font-weight:800}.clean-description>div{padding:0 14px 14px;white-space:pre-line;color:#d4d9e3}.compact-warning{margin-top:10px;padding:10px 12px;font-size:12px}.payment-grid-clean{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.payment-grid-clean .pay-card{min-height:102px;padding:14px}.voucher-box-clean{margin-top:14px;border:1px solid rgba(148,163,184,.22);border-radius:14px;background:rgba(8,15,29,.45)}.voucher-box-clean summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:16px;font-weight:800}.voucher-box-clean summary small{color:#f8bf27}.voucher-input-row{padding:0 16px 16px}.voucher-input-row input{width:100%;min-height:46px}.voucher-note{display:block;margin-top:8px;color:#9da8ba;font-size:12px}.confirmation-check-clean{margin-top:14px;padding:12px 14px;border-radius:12px}.order-summary-clean{position:sticky;top:86px;border-radius:18px}.summary-divider{height:1px;background:rgba(148,163,184,.2);margin:8px 0}.checkout-trust-mini{margin-top:12px;padding:10px;border:1px solid rgba(59,130,246,.25);background:rgba(30,64,175,.1);border-radius:10px;color:#b8c8e9;font-size:12px;text-align:center}
 @media(max-width:900px){.auth-shell-pro{grid-template-columns:1fr;width:min(560px,94vw);margin:3vh auto}.auth-banner-pro{display:none}.auth-panel-pro{padding:38px 24px;min-height:94vh}.checkout-stepper{gap:7px}.checkout-step b{font-size:12px}.checkout-stepper i{max-width:30px}.order-summary-clean{position:static}.service-select-grid{grid-template-columns:1fr}.payment-grid-clean{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.checkout-step b{display:none}.checkout-stepper i{max-width:55px}.payment-grid-clean{grid-template-columns:1fr 1fr}.auth-panel-pro h1{font-size:31px}.auth-panel-pro{padding:30px 18px}}
+
+
+/* Checkout payment + voucher compact layout */
+.payment-step-card{overflow:hidden}
+.payment-voucher-wrap{margin-top:14px;padding-top:14px;border-top:1px solid rgba(148,163,184,.18)}
+.voucher-box-clean{margin-top:0!important;background:rgba(8,15,29,.38)!important;border:1px solid rgba(148,163,184,.18)!important;overflow:hidden}
+.voucher-box-clean summary{padding:14px 16px!important;gap:12px;list-style:none}
+.voucher-box-clean summary::-webkit-details-marker{display:none}
+.voucher-box-clean summary>span{display:flex;flex-direction:column;gap:3px}
+.voucher-box-clean summary b{color:#f8bf27;font-size:14px}
+.voucher-box-clean summary small{font-size:11px!important;color:#9da8ba!important;font-weight:600}
+.voucher-box-clean summary strong{margin-left:auto;color:#f8bf27;font-size:12px}
+.voucher-box-clean[open] summary strong{font-size:0}
+.voucher-box-clean[open] summary strong:after{content:'Tutup';font-size:12px}
+.voucher-input-row{display:grid;grid-template-columns:1fr;gap:7px;padding:0 16px 16px!important}
+.voucher-input-row label{font-size:12px;font-weight:800;color:#e5e7eb}
+.voucher-input-row input{min-height:42px!important;padding:10px 12px!important;border-radius:9px!important}
+.voucher-note{margin-top:0!important}
+#serverField[hidden]{display:none!important}
+@media(max-width:520px){.voucher-box-clean summary{padding:13px!important}.payment-grid-clean .pay-card{min-height:88px;padding:11px}}
