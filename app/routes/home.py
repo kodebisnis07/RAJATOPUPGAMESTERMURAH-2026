@@ -213,15 +213,15 @@ def _category_input_config(category):
             "needs_server": False,
             "required": True,
         }
+    # Default game cukup memakai ID Game. Zone/Server hanya ditampilkan bila
+    # produk secara eksplisit disetel ke target_type=game_id_server di admin.
     return {
-        "type": "game",
+        "type": "game_id",
         "title": "ID Akun Game",
-        "help": "Masukkan ID game dan Zone/Server ID. Jangan isi username sosial media di bagian ini.",
+        "help": "Masukkan ID game tujuan dengan benar.",
         "label": "ID Game",
         "placeholder": "Contoh: 123456789",
-        "server_label": "Zone / Server ID",
-        "server_placeholder": "Contoh: 1234",
-        "needs_server": True,
+        "needs_server": False,
         "required": True,
     }
 
@@ -262,19 +262,17 @@ def _product_input_config(product, category):
             "required": True,
         }
 
-    if category_type != "game" and target_type in {"auto", "game_id", "game_id_server"}:
-        return category_config
-
-    # Kategori non-game tidak pernah boleh menampilkan Zone/Server, meskipun
-    # target_type produk lama salah tersimpan sebagai game_id_server.
-    if category_type in {"social", "account", "telegram", "phone", "wallet", "voucher"}:
+    # Kategori non-game tidak pernah boleh memunculkan Zone/Server, walaupun
+    # data produk lama salah tersimpan sebagai game_id_server.
+    non_game_types = {"social", "account", "telegram", "phone", "wallet", "voucher"}
+    if category_type in non_game_types:
         return category_config
 
     configs = {
         "username": {"type": "username", "title": "Data Username", "help": "Masukkan username akun tujuan.", "label": "Username", "placeholder": "Contoh: @username", "needs_server": False, "required": True},
         "username_link": {"type": "username_link", "title": "Data Target Sosial Media", "help": "Masukkan username akun atau link postingan sesuai layanan.", "label": "Username / Link Target", "placeholder": "Contoh: @username atau https://link-postingan", "needs_server": False, "required": True},
         "game_id": {"type": "game_id", "title": "ID Akun Game", "help": "Masukkan ID game tujuan dengan benar.", "label": "ID Game", "placeholder": "Contoh: 123456789", "needs_server": False, "required": True},
-        "game_id_server": {"type": "game", "title": "ID Akun Game", "help": "Masukkan ID game dan Zone/Server ID tujuan.", "label": "ID Game", "placeholder": "Contoh: 123456789", "server_label": "Zone / Server ID", "server_placeholder": "Contoh: 1234", "needs_server": True, "required": True},
+        "game_id_server": {"type": "game_id_server", "title": "ID Akun Game", "help": "Masukkan ID game dan Zone/Server ID tujuan.", "label": "ID Game", "placeholder": "Contoh: 123456789", "server_label": "Zone / Server ID", "server_placeholder": "Contoh: 1234", "needs_server": True, "required": True},
         "phone": {"type": "phone", "title": "Nomor Tujuan", "help": "Masukkan nomor HP tujuan.", "label": "Nomor HP", "placeholder": "Contoh: 081234567890", "needs_server": False, "required": True},
         "email": {"type": "email", "title": "Email Tujuan", "help": "Masukkan alamat email tujuan.", "label": "Email", "placeholder": "Contoh: email@gmail.com", "needs_server": False, "required": True},
         "email_username": {"type": "email_username", "title": "Data Akun", "help": "Masukkan email atau username akun tujuan.", "label": "Email / Username", "placeholder": "Contoh: email@gmail.com atau @username", "needs_server": False, "required": True},
