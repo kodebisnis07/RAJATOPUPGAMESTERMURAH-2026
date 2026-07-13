@@ -5,10 +5,20 @@
     <p>Operator difokuskan untuk memantau pesanan dan memperbarui status pesanan.</p>
 </div>
 
+<form class="order-search-bar" method="get" action="{{ url_for('admin.orders') }}">
+    <div class="order-search-field">
+        <label for="orderSearch">Cari Nomor Order / Invoice / User / Target</label>
+        <input id="orderSearch" type="search" name="q" value="{{ search or '' }}" placeholder="Contoh: ORD-20260713, INV..., username, nomor HP">
+    </div>
+    <button class="btn" type="submit">🔎 Cari Pesanan</button>
+    {% if search %}<a class="btn secondary" href="{{ url_for('admin.orders') }}">Reset</a>{% endif %}
+</form>
+
 <div class="orders-table-scroll" role="region" aria-label="Daftar pesanan" tabindex="0">
 <table class="admin-table orders-table">
     <thead>
         <tr>
+            <th>Nomor Order</th>
             <th>Invoice</th>
             <th>Produk</th>
             <th>Deskripsi</th>
@@ -24,6 +34,7 @@
     <tbody>
     {% for order in orders %}
         <tr>
+            <td data-label="Nomor Order" class="order-number"><strong>{{ order.order_number or ('ORD-' ~ order.id) }}</strong></td>
             <td data-label="Invoice" class="order-invoice"><strong>{{ order.invoice }}</strong><br><small>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</small></td>
             <td data-label="Produk" class="order-product">{{ order.product.name if order.product else '-' }}</td>
             <td data-label="Deskripsi" class="order-description">
@@ -64,7 +75,7 @@
             </td>
         </tr>
     {% else %}
-        <tr class="empty-row"><td colspan="10">Belum ada pesanan.</td></tr>
+        <tr class="empty-row"><td colspan="11">Belum ada pesanan.</td></tr>
     {% endfor %}
     </tbody>
 </table>

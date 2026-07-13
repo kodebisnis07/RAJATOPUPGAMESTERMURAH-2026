@@ -7,7 +7,7 @@
     {% set site_logo = global_settings.get('site_logo') %}
     {% set favicon_logo = global_settings.get('favicon_logo') or site_logo %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260713-orders-responsive-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260713-sidebar-groups-1">
 </head>
 <body>
 <button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>
@@ -15,39 +15,79 @@
 <div class="admin-layout">
     <aside class="sidebar" id="admin-sidebar">
         <div class="logo admin-brand-logo">{% if site_logo %}<img class="site-brand-logo admin-site-brand-logo" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}<span class="logo-mark">👑</span>{% endif %}<span>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}<br><span>Admin Control Center</span></span></div>
-        <nav>
-            <a href="{{ url_for('admin.dashboard') }}">📊 Dashboard</a>
-            {% if is_super_admin %}<a href="{{ url_for('admin.omset') }}">📈 Riwayat Omset</a>{% endif %}
-            <a href="{{ url_for('admin.seo_settings') }}">🔎 SEO Website</a>
+        <nav class="admin-nav">
+            {% set ep = request.endpoint or '' %}
+
+            <a class="nav-dashboard{% if ep == 'admin.dashboard' %} active{% endif %}" href="{{ url_for('admin.dashboard') }}">📊 <span>Dashboard</span></a>
+
+            <div class="nav-quick-grid" aria-label="Menu penting">
+                <a class="{% if ep == 'admin.orders' %}active{% endif %}" href="{{ url_for('admin.orders') }}">🧾 <span>Pesanan</span></a>
+                <a class="{% if ep == 'admin.payments' %}active{% endif %}" href="{{ url_for('admin.payments') }}">💳 <span>Pembayaran</span></a>
+                <a class="{% if ep == 'admin.wallet_topups' %}active{% endif %}" href="{{ url_for('admin.wallet_topups') }}">💰 <span>Top Up Saldo</span></a>
+                <a class="{% if ep == 'admin.live_chat' %}active{% endif %}" href="{{ url_for('admin.live_chat') }}">💬 <span>Live Chat</span></a>
+            </div>
+
+            <details class="nav-group" {% if ep in ['admin.omset'] %}open{% endif %}>
+                <summary><span>📦 Transaksi</span><span class="nav-chevron">⌄</span></summary>
+                <div class="nav-group-links">
+                    {% if is_super_admin %}<a class="{% if ep == 'admin.omset' %}active{% endif %}" href="{{ url_for('admin.omset') }}">📈 Riwayat Omset</a>{% endif %}
+                </div>
+            </details>
+
             {% if is_admin_role %}
-                <a href="{{ url_for('admin.products') }}">🎮 Game / Produk</a>
-                <a href="{{ url_for('admin.nominals') }}">💎 Nominal</a>
-                <a href="{{ url_for('admin.categories') }}">📁 Kategori</a>
-                {% if is_super_admin %}<a href="{{ url_for('admin.catalog_sections') }}">🧩 Section Katalog</a>{% endif %}
-                {% if is_super_admin %}<a href="{{ url_for('admin.slide_banners') }}">🖼️ Slide Banner</a>{% endif %}
-                <a href="{{ url_for('admin.website_banners') }}">🎨 Banner Website</a>
-                <a href="{{ url_for('admin.promos') }}">🎁 Promo</a>
-                <a href="{{ url_for('admin.vouchers') }}">🎫 Voucher</a>
-                <a href="{{ url_for('admin.resellers') }}">🤝 Reseller</a>
-                <a href="{{ url_for('admin.testimonials') }}">⭐ Testimoni</a>
-                <a href="{{ url_for('admin.faqs') }}">❓ FAQ</a>
+            <details class="nav-group" {% if ep in ['admin.products','admin.nominals','admin.categories','admin.catalog_sections','admin.promos','admin.vouchers'] %}open{% endif %}>
+                <summary><span>🛍️ Produk</span><span class="nav-chevron">⌄</span></summary>
+                <div class="nav-group-links">
+                    <a class="{% if ep == 'admin.products' %}active{% endif %}" href="{{ url_for('admin.products') }}">🎮 Game / Produk</a>
+                    <a class="{% if ep == 'admin.nominals' %}active{% endif %}" href="{{ url_for('admin.nominals') }}">💎 Nominal</a>
+                    <a class="{% if ep == 'admin.categories' %}active{% endif %}" href="{{ url_for('admin.categories') }}">📁 Kategori</a>
+                    {% if is_super_admin %}<a class="{% if ep == 'admin.catalog_sections' %}active{% endif %}" href="{{ url_for('admin.catalog_sections') }}">🧩 Section Katalog</a>{% endif %}
+                    <a class="{% if ep == 'admin.promos' %}active{% endif %}" href="{{ url_for('admin.promos') }}">🎁 Promo</a>
+                    <a class="{% if ep == 'admin.vouchers' %}active{% endif %}" href="{{ url_for('admin.vouchers') }}">🎫 Voucher</a>
+                </div>
+            </details>
+
+            <details class="nav-group" {% if ep in ['admin.slide_banners','admin.website_banners','admin.testimonials','admin.faqs','admin.seo_settings'] %}open{% endif %}>
+                <summary><span>🎨 Website</span><span class="nav-chevron">⌄</span></summary>
+                <div class="nav-group-links">
+                    {% if is_super_admin %}<a class="{% if ep == 'admin.slide_banners' %}active{% endif %}" href="{{ url_for('admin.slide_banners') }}">🖼️ Slide Banner</a>{% endif %}
+                    <a class="{% if ep == 'admin.website_banners' %}active{% endif %}" href="{{ url_for('admin.website_banners') }}">🎨 Banner Website</a>
+                    <a class="{% if ep == 'admin.testimonials' %}active{% endif %}" href="{{ url_for('admin.testimonials') }}">⭐ Testimoni</a>
+                    <a class="{% if ep == 'admin.faqs' %}active{% endif %}" href="{{ url_for('admin.faqs') }}">❓ FAQ</a>
+                    <a class="{% if ep == 'admin.seo_settings' %}active{% endif %}" href="{{ url_for('admin.seo_settings') }}">🔎 SEO Website</a>
+                </div>
+            </details>
             {% endif %}
-            <a href="{{ url_for('admin.orders') }}">🧾 Pesanan</a>
-            <a href="{{ url_for('admin.users') }}">👥 User</a>
-            <a href="{{ url_for('admin.payments') }}">💳 Pembayaran</a>
-            <a href="{{ url_for('admin.wallet_topups') }}">💰 Top Up Saldo</a>
-            <a href="{{ url_for('admin.live_chat') }}">💬 Live Chat</a>
-            {% if is_super_admin %}<a href="{{ url_for('admin.payment_methods') }}">🏦 Metode Pembayaran</a>{% endif %}
-            {% if is_super_admin %}<a href="{{ url_for('admin.auto_order') }}">🤖 Auto Order</a>{% endif %}
-            {% if is_super_admin %}<a href="{{ url_for('admin.api_management') }}">🔌 API Management</a>{% endif %}
-            {% if is_super_admin %}<a href="{{ url_for('admin.api_documentation') }}">📘 Developer / Dokumentasi API</a>{% endif %}
-            {% if is_super_admin %}<a href="{{ url_for('admin.admins') }}">👑 Manajemen Admin</a>{% endif %}
-            {% if is_super_admin %}<a href="{{ url_for('admin.role_permissions') }}">🛡️ Izin Role</a>{% endif %}
-            {% if is_super_admin %}<a href="{{ url_for('admin.audit_log') }}">🕵️ Audit Log</a>{% endif %}
-            <a href="{{ url_for('admin.change_password') }}">🔐 Ganti Password</a>
-            {% if is_super_admin %}<a href="{{ url_for('admin.settings') }}">⚙️ Pengaturan</a>{% endif %}
-            <a href="{{ url_for('home.index') }}" target="_blank">🌐 Lihat Website</a>
-            <a href="{{ url_for('admin.logout') }}">🚪 Logout</a>
+
+            <details class="nav-group" {% if ep in ['admin.users','admin.resellers'] %}open{% endif %}>
+                <summary><span>👥 Pengguna</span><span class="nav-chevron">⌄</span></summary>
+                <div class="nav-group-links">
+                    <a class="{% if ep == 'admin.users' %}active{% endif %}" href="{{ url_for('admin.users') }}">👤 User</a>
+                    {% if is_admin_role %}<a class="{% if ep == 'admin.resellers' %}active{% endif %}" href="{{ url_for('admin.resellers') }}">🤝 Reseller</a>{% endif %}
+                </div>
+            </details>
+
+            {% if is_super_admin %}
+            <details class="nav-group" {% if ep in ['admin.payment_methods','admin.auto_order','admin.api_management','admin.api_documentation','admin.admins','admin.role_permissions','admin.audit_log','admin.settings'] %}open{% endif %}>
+                <summary><span>🔧 Sistem</span><span class="nav-chevron">⌄</span></summary>
+                <div class="nav-group-links">
+                    <a class="{% if ep == 'admin.payment_methods' %}active{% endif %}" href="{{ url_for('admin.payment_methods') }}">🏦 Metode Pembayaran</a>
+                    <a class="{% if ep == 'admin.auto_order' %}active{% endif %}" href="{{ url_for('admin.auto_order') }}">🤖 Auto Order</a>
+                    <a class="{% if ep == 'admin.api_management' %}active{% endif %}" href="{{ url_for('admin.api_management') }}">🔌 API Management</a>
+                    <a class="{% if ep == 'admin.api_documentation' %}active{% endif %}" href="{{ url_for('admin.api_documentation') }}">📘 Dokumentasi API</a>
+                    <a class="{% if ep == 'admin.admins' %}active{% endif %}" href="{{ url_for('admin.admins') }}">👑 Manajemen Admin</a>
+                    <a class="{% if ep == 'admin.role_permissions' %}active{% endif %}" href="{{ url_for('admin.role_permissions') }}">🛡️ Izin Role</a>
+                    <a class="{% if ep == 'admin.audit_log' %}active{% endif %}" href="{{ url_for('admin.audit_log') }}">🕵️ Audit Log</a>
+                    <a class="{% if ep == 'admin.settings' %}active{% endif %}" href="{{ url_for('admin.settings') }}">⚙️ Pengaturan</a>
+                </div>
+            </details>
+            {% endif %}
+
+            <div class="nav-footer-links">
+                <a class="{% if ep == 'admin.change_password' %}active{% endif %}" href="{{ url_for('admin.change_password') }}">🔐 Ganti Password</a>
+                <a href="{{ url_for('home.index') }}" target="_blank" rel="noopener">🌐 Lihat Website</a>
+                <a class="nav-logout" href="{{ url_for('admin.logout') }}">🚪 Logout</a>
+            </div>
         </nav>
     </aside>
     <main class="main-content">

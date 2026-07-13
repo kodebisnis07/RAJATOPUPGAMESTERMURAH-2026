@@ -18,7 +18,7 @@ def ensure_sqlite_columns(app):
         "categories": {"icon": "VARCHAR(500)", "catalog_section_id": "INTEGER", "badge": "VARCHAR(60)", "sort_order": "INTEGER DEFAULT 0", "is_featured": "BOOLEAN DEFAULT 1"},
         "users": {"username": "VARCHAR(80)", "phone": "VARCHAR(30)", "avatar": "VARCHAR(500)", "member_level": "VARCHAR(30) DEFAULT 'Bronze'", "balance": "INTEGER DEFAULT 0", "bonus_coins": "INTEGER DEFAULT 0"},
         "products": {"image": "VARCHAR(500)", "price_modal": "INTEGER DEFAULT 0", "provider": "VARCHAR(100)", "provider_code": "VARCHAR(100)", "stock": "INTEGER DEFAULT 0", "game_id": "INTEGER", "target_type": "VARCHAR(40) DEFAULT 'auto'"},
-        "orders": {"payment_url": "VARCHAR(500)", "payment_reference": "VARCHAR(150)", "cancelled_at": "DATETIME", "voucher_code": "VARCHAR(60)", "discount_amount": "INTEGER DEFAULT 0"},
+        "orders": {"payment_url": "VARCHAR(500)", "payment_reference": "VARCHAR(150)", "cancelled_at": "DATETIME", "voucher_code": "VARCHAR(60)", "discount_amount": "INTEGER DEFAULT 0", "order_number": "VARCHAR(40)"},
         "payments": {
             "provider": "VARCHAR(50)",
             "reference": "VARCHAR(150)",
@@ -93,6 +93,8 @@ def ensure_runtime_columns(app):
             ddl_statements.append("ALTER TABLE orders ADD COLUMN voucher_code VARCHAR(60)")
         if "discount_amount" not in order_columns:
             ddl_statements.append("ALTER TABLE orders ADD COLUMN discount_amount INTEGER DEFAULT 0")
+        if "order_number" not in order_columns:
+            ddl_statements.append("ALTER TABLE orders ADD COLUMN order_number VARCHAR(40)")
         if "balance" not in user_columns:
             ddl_statements.append("ALTER TABLE users ADD COLUMN balance INTEGER DEFAULT 0")
         if "bonus_coins" not in user_columns:
@@ -126,6 +128,19 @@ def ensure_runtime_columns(app):
         with db.engine.begin() as conn:
             for ddl in ddl_statements:
                 conn.execute(text(ddl))
+
+            # Isi nomor order untuk data lama. Nomor baru selanjutnya dibuat otomatis oleh model Order.
+            rows = conn.execute(text("SELECT id, created_at, order_number FROM orders WHERE order_number IS NULL OR order_number = ''")).fetchall()
+            for row in rows:
+                created = row[1]
+                stamp = created.strftime("%Y%m%d") if created else "LEGACY"
+                number = f"ORD-{stamp}-{int(row[0]):08d}"
+                conn.execute(text("UPDATE orders SET order_number = :number WHERE id = :id"), {"number": number, "id": row[0]})
+
+            if dialect == "postgresql":
+                conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_orders_order_number ON orders (order_number)"))
+            elif dialect == "sqlite":
+                conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_orders_order_number ON orders (order_number)"))
     except Exception:
         # Jangan hentikan aplikasi jika migrasi ringan gagal; tabel baru tetap dibuat oleh db.create_all().
         pass

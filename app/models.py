@@ -1,6 +1,8 @@
 from datetime import datetime
+import secrets
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import event
 
 
 class User(db.Model):
@@ -144,6 +146,7 @@ class Order(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     invoice = db.Column(db.String(100), unique=True, nullable=False)
+    order_number = db.Column(db.String(40), unique=True, nullable=True, index=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
@@ -170,6 +173,14 @@ class Order(db.Model):
     cancelled_at = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship("User", backref="orders")
+
+
+@event.listens_for(Order, "before_insert")
+def assign_order_number(mapper, connection, target):
+    """Beri nomor order publik yang mudah dicari untuk setiap pesanan baru."""
+    if not target.order_number:
+        stamp = datetime.utcnow().strftime("%Y%m%d")
+        target.order_number = f"ORD-{stamp}-{secrets.token_hex(4).upper()}"
 
 
 class Payment(db.Model):

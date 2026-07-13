@@ -938,7 +938,21 @@ def delete_faq(id):
 @admin_bp.route("/orders")
 @login_required
 def orders():
-    return render_template("admin/orders.html", orders=Order.query.order_by(Order.id.desc()).all())
+    search = request.args.get("q", "").strip()
+    query = Order.query
+    if search:
+        like = f"%{search}%"
+        query = query.filter(db.or_(
+            Order.order_number.ilike(like),
+            Order.invoice.ilike(like),
+            Order.customer_name.ilike(like),
+            Order.customer_email.ilike(like),
+            Order.customer_phone.ilike(like),
+            Order.game_user_id.ilike(like),
+            Order.game_server_id.ilike(like),
+        ))
+    orders_data = query.order_by(Order.id.desc()).all()
+    return render_template("admin/orders.html", orders=orders_data, search=search)
 
 
 @admin_bp.route("/orders/<int:id>/update", methods=["POST"])

@@ -32,6 +32,7 @@
         <div class="invoice-grid">
             <div class="invoice-box">
                 <h2>Detail Pesanan</h2>
+                <div class="summary-row"><span>Nomor Order</span><b>{{ order.order_number or ('ORD-' ~ order.id) }}</b></div>
                 <div class="summary-row"><span>Produk</span><b>{{ order.product.name }}</b></div>
                 <div class="summary-row"><span>Game</span><b>{{ order.product.category.name if order.product.category else '-' }}</b></div>
                 {% set category_text = ((order.product.category.name if order.product and order.product.category else '') ~ ' ' ~ (order.product.category.slug if order.product and order.product.category else ''))|lower %}

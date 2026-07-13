@@ -32,9 +32,9 @@
         <div class="profile-card order-history">
             <h2>Pesanan Terbaru</h2>
             {% if orders %}
-            <div class="history-table"><table><thead><tr><th>Invoice</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+            <div class="history-table"><table><thead><tr><th>Nomor Order</th><th>Invoice</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
             {% for order in orders %}<tr>
-                <td>{{ order.invoice }}</td><td>{{ order.product.name if order.product else '-' }}</td>
+                <td><strong>{{ order.order_number or ('ORD-' ~ order.id) }}</strong></td><td>{{ order.invoice }}</td><td>{{ order.product.name if order.product else '-' }}</td>
                 <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td>
                 <td><span class="status-pill {{ order.order_status }}">{{ order.order_status|upper }}</span></td>
                 <td><a href="{{ url_for('home.checkout', invoice=order.invoice) }}">Detail</a></td>

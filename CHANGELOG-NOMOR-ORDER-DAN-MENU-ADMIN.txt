@@ -1,0 +1,8 @@
+UPDATE NOMOR ORDER & MENU ADMIN
+
+1. Menu Pesanan, Top Up Saldo, dan Live Chat dipindahkan tepat di bawah Dashboard.
+2. Setiap pesanan baru otomatis memiliki nomor order unik: ORD-YYYYMMDD-XXXXXXXX.
+3. Pesanan lama otomatis diberi nomor order saat aplikasi dijalankan.
+4. Panel Admin Pesanan memiliki pencarian berdasarkan nomor order, invoice, nama/email/telepon user, dan target.
+5. Nomor order tampil di panel admin, halaman checkout, riwayat pesanan user, dan dashboard user.
+6. Mendukung SQLite dan PostgreSQL melalui migrasi runtime ringan.
