@@ -1,0 +1,8 @@
+FORM TOPUP DIPERBAIKI
+- Kategori sosial media tidak lagi menampilkan Zone/Server ID meski konfigurasi produk lama salah.
+- Deskripsi layanan tampil jelas setelah layanan dipilih.
+- Ringkasan menampilkan target, harga, biaya admin, dan total.
+- Validasi target sosial media, email, nomor HP, serta Zone/Server.
+- Tombol Bayar baru aktif setelah layanan, target, pembayaran, dan konfirmasi lengkap.
+- Checkbox konfirmasi target dan peringatan kesalahan target.
+- Dropdown dan form lebih nyaman pada desktop dan HP.

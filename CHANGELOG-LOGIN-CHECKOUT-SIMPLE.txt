@@ -1,0 +1,12 @@
+PEMBARUAN LOGIN & CHECKOUT SEDERHANA
+
+1. Background login user dapat diunggah dari Super Admin > Pengaturan Website.
+2. Background mengikuti sistem media aktif (lokal atau Cloudinary).
+3. Login user dibuat lebih fokus, responsif, dan memiliki opsi Ingat Saya.
+4. Tombol login menampilkan status Memproses saat dikirim.
+5. Checkout disederhanakan menjadi 3 tahap: Pilih Layanan, Isi Target, Pembayaran.
+6. Data pembeli tidak lagi ditampilkan di checkout; data tetap diambil dari akun/profil.
+7. Voucher dipindahkan ke dalam bagian Pembayaran dan dapat dibuka/tutup.
+8. Ringkasan menampilkan produk, layanan, target, harga, biaya admin, voucher, dan total.
+9. Zone/Server hanya tampil pada layanan yang memerlukannya.
+10. Tampilan desktop dan mobile dirapikan.

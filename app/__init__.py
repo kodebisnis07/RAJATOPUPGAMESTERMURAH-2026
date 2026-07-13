@@ -287,10 +287,26 @@ def create_app():
         if base_url and not base_url.startswith(("http://", "https://")):
             base_url = "https://" + base_url
         base_url = base_url.rstrip("/")
+        def support_url(kind, value):
+            raw = (value or "").strip()
+            if not raw:
+                return ""
+            if raw.startswith(("http://", "https://")):
+                return raw
+            if kind == "whatsapp":
+                digits = "".join(ch for ch in raw if ch.isdigit())
+                if digits.startswith("0"):
+                    digits = "62" + digits[1:]
+                return f"https://wa.me/{digits}" if digits else ""
+            username = raw.lstrip("@").strip()
+            return f"https://t.me/{username}" if username else ""
+
         return {
             "global_settings": settings,
             "site_url": base_url,
             "canonical_url": base_url + request.path,
+            "support_whatsapp_url": support_url("whatsapp", settings.get("whatsapp")),
+            "support_telegram_url": support_url("telegram", settings.get("telegram")),
         }
 
     @app.context_processor

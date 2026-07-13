@@ -5,7 +5,7 @@ from datetime import datetime
 from urllib.parse import urlencode
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify
 from app.extensions import db
-from app.models import User, Order, FavoriteGame, Category, UserNotification, PaymentMethod, WalletTopup, ChatThread, ChatMessage
+from app.models import User, Order, FavoriteGame, Category, UserNotification, PaymentMethod, WalletTopup, ChatThread, ChatMessage, Voucher
 from app.utils import save_uploaded_image, delete_uploaded_image, media_url
 from app.email_service import send_password_reset_email
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
@@ -203,6 +203,7 @@ def login():
             session["username"] = user.username
             session["user_email"] = user.email
             session["user_phone"] = user.phone
+            session.permanent = request.form.get("remember_me") == "1"
             flash("Login berhasil.", "success")
             return redirect(url_for("auth.dashboard"))
 
@@ -271,7 +272,19 @@ def dashboard():
         return redirect(url_for("auth.login"))
     latest_orders = Order.query.filter_by(user_id=user.id).order_by(Order.created_at.desc()).limit(5).all()
     favorites = FavoriteGame.query.filter_by(user_id=user.id).order_by(FavoriteGame.created_at.desc()).limit(6).all()
-    return render_template("auth/dashboard.html", user=user, stats=_user_stats(user), orders=latest_orders, favorites=favorites, avatar_url=_avatar_url(user))
+    stats = _user_stats(user)
+    now = datetime.utcnow()
+    start_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    stats["orders_today"] = Order.query.filter(Order.user_id == user.id, Order.created_at >= start_today).count()
+    stats["orders_month"] = Order.query.filter(Order.user_id == user.id, Order.created_at >= start_month).count()
+    stats["total_cashback"] = int(user.bonus_coins or 0)
+    stats["active_vouchers"] = Voucher.query.filter_by(is_active=True).count()
+    level_targets = {"Bronze": 500000, "Silver": 2000000, "Gold": 5000000, "Platinum": 5000000}
+    target = level_targets.get(stats["member_level"], 500000)
+    stats["member_progress"] = min(100, int((stats["total_spent"] / target) * 100)) if target else 100
+    stats["next_member"] = {"Bronze": "Silver", "Silver": "Gold", "Gold": "Platinum", "Platinum": "Platinum"}.get(stats["member_level"], "Silver")
+    return render_template("auth/dashboard.html", user=user, stats=stats, orders=latest_orders, favorites=favorites, avatar_url=_avatar_url(user))
 
 
 @auth_bp.route("/profil")

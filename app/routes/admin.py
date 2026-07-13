@@ -230,12 +230,40 @@ def _delete_payment_image(filename):
 @admin_bp.app_context_processor
 def inject_admin_context():
     admin = current_admin()
+    menu_counts = {
+        "orders": 0,
+        "payments": 0,
+        "wallet_topups": 0,
+        "live_chat": 0,
+    }
+    if admin:
+        try:
+            menu_counts["orders"] = Order.query.filter(
+                Order.order_status.in_(["pending", "processing"])
+            ).count()
+        except Exception:
+            pass
+        try:
+            menu_counts["payments"] = Payment.query.filter_by(status="pending").count()
+        except Exception:
+            pass
+        try:
+            menu_counts["wallet_topups"] = WalletTopup.query.filter_by(status="pending").count()
+        except Exception:
+            pass
+        try:
+            menu_counts["live_chat"] = ChatMessage.query.filter_by(
+                sender_type="user", is_read_by_admin=False
+            ).count()
+        except Exception:
+            pass
     return {
         "current_admin": admin,
         "is_super_admin": bool(admin and admin.role == "super_admin"),
         "is_admin_role": bool(admin and admin.role in ["super_admin", "admin"]),
         "is_operator": bool(admin and admin.role == "operator"),
         "can_reset_user_password": can_reset_user_password(),
+        "admin_menu_counts": menu_counts,
     }
 
 
@@ -1682,6 +1710,18 @@ def settings():
             if old_favicon and old_favicon != new_favicon:
                 delete_uploaded_image_file(old_favicon, site_asset_folder)
             set_setting("favicon_logo", new_favicon)
+
+        login_bg_file = request.files.get("login_background_file")
+        remove_login_bg = request.form.get("remove_login_background") == "1"
+        old_login_bg = get_setting("login_background", "") or ""
+        if remove_login_bg:
+            delete_uploaded_image_file(old_login_bg, site_asset_folder)
+            set_setting("login_background", "")
+        elif login_bg_file and login_bg_file.filename:
+            new_login_bg = save_uploaded_image(login_bg_file, site_asset_folder)
+            if old_login_bg and old_login_bg != new_login_bg:
+                delete_uploaded_image_file(old_login_bg, site_asset_folder)
+            set_setting("login_background", new_login_bg)
 
         db.session.commit()
         log_admin_activity("ubah_pengaturan", f"Memperbarui pengaturan website/payment gateway; nama website: {site_name}")

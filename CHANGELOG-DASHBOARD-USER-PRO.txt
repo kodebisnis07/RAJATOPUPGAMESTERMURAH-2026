@@ -1,0 +1,8 @@
+DASHBOARD USER PRO
+- Header login disederhanakan menjadi Saldo, Notifikasi, dan menu akun.
+- Dropdown akun diperluas.
+- Dashboard dibuat lebih padat dengan saldo, bonus, level member, dan progress.
+- Statistik order hari ini, bulan ini, serta voucher aktif ditambahkan.
+- Pesanan terbaru menampilkan tanggal, nomor order, invoice, status, dan detail.
+- Empty state game favorit diperbaiki.
+- Tampilan responsif untuk desktop dan HP.

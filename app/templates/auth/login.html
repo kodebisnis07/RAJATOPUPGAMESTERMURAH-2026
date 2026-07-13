@@ -7,43 +7,38 @@
     <title>Login User - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     {% set favicon_logo = global_settings.get('favicon_logo') or global_settings.get('site_logo') %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=fix-sosmed-20260701">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=login-checkout-pro-20260713">
 </head>
-<body class="site-body auth-page auth-login-page">
 {% set site_logo = global_settings.get('site_logo') %}
-<div class="auth-shell">
-    <section class="auth-banner" aria-label="Banner {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">
+{% set login_background = global_settings.get('login_background') %}
+<body class="site-body auth-page auth-login-page auth-login-pro"{% if login_background %} style="--login-bg:url('{{ image_url(login_background, 'img/site') }}')"{% endif %}>
+<div class="auth-shell auth-shell-pro">
+    <section class="auth-banner auth-banner-pro" aria-label="Banner {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">
         <div class="auth-banner-overlay"></div>
-        <div class="auth-brand-badge">
-            <div class="auth-crown">{% if site_logo %}<img class="auth-brand-image" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}♛{% endif %}</div>
-            <div>
-                <span>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</span>
-                <strong>GAMES</strong>
-            </div>
-        </div>
-        <div class="auth-banner-content">
-            <p class="auth-kicker">Top Up Cepat • Aman • Terpercaya</p>
+        <div class="auth-banner-content auth-banner-content-pro">
+            <div class="auth-hero-logo">{% if site_logo %}<img src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}<span>RTG</span>{% endif %}</div>
             <h1>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</h1>
-            <p class="auth-banner-text">Login untuk lanjut membeli diamond, voucher, dan kebutuhan game favorit Anda.</p>
-            <div class="auth-benefits">
-                <div><b>⚡</b><span>Proses Cepat</span></div>
-                <div><b>🛡️</b><span>Aman 100%</span></div>
-                <div><b>🎧</b><span>Support 24 Jam</span></div>
+            <p>{{ global_settings.get('site_tagline') or 'Top Up Game Termurah & Terpercaya di Indonesia' }}</p>
+            <div class="auth-benefits auth-benefits-pro">
+                <div><b>⚡</b><span>Proses Instan<small>Tanpa menunggu lama</small></span></div>
+                <div><b>🛡️</b><span>Aman & Terpercaya<small>Transaksi terlindungi</small></span></div>
+                <div><b>🎧</b><span>Support 24/7<small>Siap membantu Anda</small></span></div>
             </div>
         </div>
+        <footer class="auth-banner-footer">© 2026 {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}. All rights reserved.</footer>
     </section>
 
-    <section class="auth-panel">
+    <section class="auth-panel auth-panel-pro">
         <div class="auth-logo-mini">
             <span>{% if site_logo %}<img class="auth-mini-logo-image" src="{{ image_url(site_logo, 'img/site') }}" alt="{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}">{% else %}♛{% endif %}</span>
             <b>{{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</b>
         </div>
         <h1>Selamat Datang Kembali!</h1>
-        <p class="auth-muted">Masuk menggunakan username Anda untuk melanjutkan.</p>
+        <p class="auth-muted">Masuk menggunakan akun Anda untuk melanjutkan.</p>
 
         {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
 
-        <form method="POST" class="auth-form">
+        <form method="POST" class="auth-form" id="loginForm">
             <label>Username</label>
             <div class="auth-input-wrap">
                 <span class="auth-input-icon">👤</span>
@@ -57,12 +52,12 @@
                 <button class="password-eye" type="button" data-target="loginPassword" aria-label="Lihat password">👁️</button>
             </div>
 
-            <div class="auth-link-row">
-                <span></span>
+            <div class="auth-options-row">
+                <label class="remember-check"><input type="checkbox" name="remember_me" value="1"><span>Ingat saya</span></label>
                 <a href="{{ url_for('auth.forgot_password') }}">Lupa password?</a>
             </div>
 
-            <button class="btn-checkout auth-submit" type="submit">Login</button>
+            <button class="btn-checkout auth-submit" type="submit" id="loginButton">Login</button>
         </form>
 
         <div class="auth-divider"><span>Belum punya akun?</span></div>
@@ -78,6 +73,11 @@ document.querySelectorAll('.password-eye').forEach(function(btn){
         input.type = input.type === 'password' ? 'text' : 'password';
         btn.textContent = input.type === 'password' ? '👁️' : '🙈';
     });
+});
+document.getElementById('loginForm').addEventListener('submit', function(){
+    var button = document.getElementById('loginButton');
+    button.disabled = true;
+    button.textContent = 'Memproses...';
 });
 </script>
 </body>

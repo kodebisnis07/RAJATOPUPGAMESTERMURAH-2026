@@ -30,6 +30,14 @@
                     <input type="text" name="message" placeholder="Tulis pesan Anda..." autocomplete="off" required>
                     <button type="submit">Kirim</button>
                 </form>
+                <div class="chat-contact-options">
+                    <span>Atau hubungi bantuan melalui:</span>
+                    <div>
+                        {% if support_whatsapp_url %}<a class="chat-contact-btn whatsapp" href="{{ support_whatsapp_url }}" target="_blank" rel="noopener">🟢 WhatsApp</a>{% endif %}
+                        {% if support_telegram_url %}<a class="chat-contact-btn telegram" href="{{ support_telegram_url }}" target="_blank" rel="noopener">✈️ Telegram</a>{% endif %}
+                    </div>
+                    {% if not support_whatsapp_url and not support_telegram_url %}<small>Kontak bantuan belum diatur oleh admin.</small>{% endif %}
+                </div>
             </div>
         </div>
     </div>

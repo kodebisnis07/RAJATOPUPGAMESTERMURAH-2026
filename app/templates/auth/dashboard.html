@@ -1,55 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Dashboard Akun - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}{% endblock %}
 {% block content %}
-<section class="profile-page">
+<section class="profile-page user-dashboard-pro">
     {% include 'auth/_account_nav.html' %}
-    <div class="profile-hero-card">
-        <div class="avatar-large">
-            {% if avatar_url %}<img src="{{ avatar_url }}" alt="Foto profil {{ user.name }}">{% else %}<span>{{ (user.name or 'U')[:1]|upper }}</span>{% endif %}
-        </div>
-        <div>
-            <span class="eyebrow">DASHBOARD USER</span>
-            <h1>Halo, {{ user.name }}</h1>
-            <p>Kelola akun, cek pesanan, simpan game favorit, dan pantau status transaksi Anda.</p>
-        </div>
+    <div class="profile-hero-card compact-user-hero">
+        <div class="avatar-large">{% if avatar_url %}<img src="{{ avatar_url }}" alt="Foto profil {{ user.name }}">{% else %}<span>{{ (user.name or 'U')[:1]|upper }}</span>{% endif %}</div>
+        <div class="hero-user-copy"><span class="eyebrow">DASHBOARD USER</span><h1>Halo, {{ user.name }}</h1><p>Kelola akun dan pantau transaksi Anda dari satu tempat.</p><div class="member-progress"><div><b>{{ stats.member_level }}</b><span>{{ stats.member_progress }}% menuju {{ stats.next_member }}</span></div><div class="progress-track"><i style="width:{{ stats.member_progress }}%"></i></div></div></div>
+        <div class="hero-balance"><span>Saldo Akun</span><strong>Rp {{ "{:,}".format(user.balance or 0).replace(",", ".") }}</strong><small>Bonus {{ user.bonus_coins or 0 }} koin</small></div>
         <div class="hero-actions"><a class="btn-checkout hero-action" href="{{ url_for('home.index') }}#games">Top Up Game</a><a class="btn-checkout hero-action outline" href="{{ url_for('auth.wallet_topup') }}">Top Up Saldo</a></div>
     </div>
-
     {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="profile-messages">{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
-
-    <div class="stat-grid">
-        <div class="stat-card"><span>Total Pesanan</span><b>{{ stats.total_orders }}</b></div>
-        <div class="stat-card"><span>Pending</span><b>{{ stats.pending_orders }}</b></div>
-        <div class="stat-card"><span>Diproses/Selesai</span><b>{{ stats.success_orders }}</b></div>
-        <div class="stat-card"><span>Dibatalkan</span><b>{{ stats.cancelled_orders }}</b></div>
-        <div class="stat-card"><span>Total Belanja</span><b>Rp {{ "{:,}".format(stats.total_spent).replace(",", ".") }}</b></div>
-        <div class="stat-card"><span>Member</span><b>{{ stats.member_level }}</b></div>
-        <div class="stat-card"><span>Saldo Akun</span><b>Rp {{ "{:,}".format(user.balance or 0).replace(",", ".") }}</b></div>
-        <div class="stat-card"><span>Koin Bonus</span><b>{{ user.bonus_coins or 0 }}</b></div>
+    <div class="stat-grid dashboard-stat-grid">
+        <div class="stat-card"><span>Total Pesanan</span><b>{{ stats.total_orders }}</b></div><div class="stat-card"><span>Order Hari Ini</span><b>{{ stats.orders_today }}</b></div><div class="stat-card"><span>Order Bulan Ini</span><b>{{ stats.orders_month }}</b></div><div class="stat-card"><span>Pending</span><b>{{ stats.pending_orders }}</b></div><div class="stat-card"><span>Diproses/Selesai</span><b>{{ stats.success_orders }}</b></div><div class="stat-card"><span>Dibatalkan</span><b>{{ stats.cancelled_orders }}</b></div><div class="stat-card"><span>Total Belanja</span><b>Rp {{ "{:,}".format(stats.total_spent).replace(",", ".") }}</b></div><div class="stat-card"><span>Voucher Aktif</span><b>{{ stats.active_vouchers }}</b></div>
     </div>
-
     <div class="profile-layout">
-        <div class="profile-card order-history">
-            <h2>Pesanan Terbaru</h2>
-            {% if orders %}
-            <div class="history-table"><table><thead><tr><th>Nomor Order</th><th>Invoice</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-            {% for order in orders %}<tr>
-                <td><strong>{{ order.order_number or ('ORD-' ~ order.id) }}</strong></td><td>{{ order.invoice }}</td><td>{{ order.product.name if order.product else '-' }}</td>
-                <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td>
-                <td><span class="status-pill {{ order.order_status }}">{{ order.order_status|upper }}</span></td>
-                <td><a href="{{ url_for('home.checkout', invoice=order.invoice) }}">Detail</a></td>
-            </tr>{% endfor %}
-            </tbody></table></div>
-            {% else %}<div class="empty-state">Belum ada pesanan.</div>{% endif %}
+        <div class="profile-card order-history"><div class="card-title-row"><h2>Pesanan Terbaru</h2><a href="{{ url_for('auth.orders') }}">Lihat semua</a></div>{% if orders %}<div class="history-table"><table><thead><tr><th>Nomor Order</th><th>Tanggal</th><th>Produk</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody>{% for order in orders %}<tr><td><strong>{{ order.order_number or ('ORD-' ~ order.id) }}</strong><small class="order-invoice">{{ order.invoice }}</small></td><td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</td><td>{{ order.product.name if order.product else '-' }}</td><td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td><td><span class="status-pill {{ order.order_status }}">{{ order.order_status|upper }}</span></td><td><a class="table-detail-link" href="{{ url_for('home.checkout', invoice=order.invoice) }}">Detail →</a></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state">Belum ada pesanan. <a href="{{ url_for('home.index') }}#games">Mulai top up</a></div>{% endif %}</div>
+        <div class="profile-card favorite-panel"><div class="card-title-row"><h2>Game Favorit</h2><a href="{{ url_for('auth.favorites') }}">Kelola</a></div>{% if favorites %}<div class="favorite-mini-list">{% for fav in favorites %}<a href="{{ url_for('home.topup', category_id=fav.category.id) }}">⭐ {{ fav.category.name }}</a>{% endfor %}</div>{% else %}<div class="empty-state favorite-empty"><span>☆</span><b>Belum ada game favorit</b><p>Simpan game yang sering Anda top up agar lebih cepat ditemukan.</p><a class="btn-small outline" href="{{ url_for('auth.favorites') }}">Tambah Favorit</a></div>{% endif %}</div>
+    </div>
+    <div class="profile-card support-bottom-card">
+        <div class="support-bottom-copy">
+            <span class="eyebrow">BANTUAN PELANGGAN</span>
+            <h2>Butuh bantuan dengan pesanan?</h2>
+            <p>Hubungi admin melalui Live Chat, WhatsApp, atau Telegram. Sertakan nomor order agar bantuan lebih cepat.</p>
         </div>
-        <div class="profile-card">
-            <h2>Game Favorit</h2>
-            {% if favorites %}
-                <div class="favorite-mini-list">{% for fav in favorites %}<a href="{{ url_for('home.topup', category_id=fav.category.id) }}">⭐ {{ fav.category.name }}</a>{% endfor %}</div>
-            {% else %}
-                <div class="empty-state">Belum ada game favorit.</div>
-            {% endif %}
-            <a class="btn-small outline profile-logout" href="{{ url_for('auth.favorites') }}">Kelola Favorit</a>
+        <div class="support-bottom-actions">
+            <a class="support-action livechat" href="{{ url_for('auth.live_chat') }}">💬 Live Chat</a>
+            {% if support_whatsapp_url %}<a class="support-action whatsapp" href="{{ support_whatsapp_url }}" target="_blank" rel="noopener">🟢 WhatsApp</a>{% endif %}
+            {% if support_telegram_url %}<a class="support-action telegram" href="{{ support_telegram_url }}" target="_blank" rel="noopener">✈️ Telegram</a>{% endif %}
         </div>
     </div>
 </section>

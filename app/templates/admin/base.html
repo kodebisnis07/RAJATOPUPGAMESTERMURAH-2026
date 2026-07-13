@@ -7,7 +7,7 @@
     {% set site_logo = global_settings.get('site_logo') %}
     {% set favicon_logo = global_settings.get('favicon_logo') or site_logo %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260713-sidebar-groups-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260713-sidebar-pro-2">
 </head>
 <body>
 <button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>
@@ -18,14 +18,32 @@
         <nav class="admin-nav">
             {% set ep = request.endpoint or '' %}
 
-            <a class="nav-dashboard{% if ep == 'admin.dashboard' %} active{% endif %}" href="{{ url_for('admin.dashboard') }}">📊 <span>Dashboard</span></a>
+            <div class="nav-section-label">Menu Utama</div>
+            <a class="nav-dashboard{% if ep == 'admin.dashboard' %} active{% endif %}" href="{{ url_for('admin.dashboard') }}">
+                <span class="nav-icon">📊</span><span>Dashboard</span>
+            </a>
 
+            <div class="nav-section-label nav-section-label-spaced">Aktivitas Hari Ini</div>
             <div class="nav-quick-grid" aria-label="Menu penting">
-                <a class="{% if ep == 'admin.orders' %}active{% endif %}" href="{{ url_for('admin.orders') }}">🧾 <span>Pesanan</span></a>
-                <a class="{% if ep == 'admin.payments' %}active{% endif %}" href="{{ url_for('admin.payments') }}">💳 <span>Pembayaran</span></a>
-                <a class="{% if ep == 'admin.wallet_topups' %}active{% endif %}" href="{{ url_for('admin.wallet_topups') }}">💰 <span>Top Up Saldo</span></a>
-                <a class="{% if ep == 'admin.live_chat' %}active{% endif %}" href="{{ url_for('admin.live_chat') }}">💬 <span>Live Chat</span></a>
+                <a class="{% if ep == 'admin.orders' %}active{% endif %}" href="{{ url_for('admin.orders') }}">
+                    <span class="quick-icon">🧾</span><span>Pesanan</span>
+                    {% if admin_menu_counts.orders %}<b class="nav-count">{{ admin_menu_counts.orders if admin_menu_counts.orders < 100 else '99+' }}</b>{% endif %}
+                </a>
+                <a class="{% if ep == 'admin.payments' %}active{% endif %}" href="{{ url_for('admin.payments') }}">
+                    <span class="quick-icon">💳</span><span>Pembayaran</span>
+                    {% if admin_menu_counts.payments %}<b class="nav-count">{{ admin_menu_counts.payments if admin_menu_counts.payments < 100 else '99+' }}</b>{% endif %}
+                </a>
+                <a class="{% if ep == 'admin.wallet_topups' %}active{% endif %}" href="{{ url_for('admin.wallet_topups') }}">
+                    <span class="quick-icon">💰</span><span>Top Up Saldo</span>
+                    {% if admin_menu_counts.wallet_topups %}<b class="nav-count">{{ admin_menu_counts.wallet_topups if admin_menu_counts.wallet_topups < 100 else '99+' }}</b>{% endif %}
+                </a>
+                <a class="{% if ep == 'admin.live_chat' %}active{% endif %}" href="{{ url_for('admin.live_chat') }}">
+                    <span class="quick-icon">💬</span><span>Live Chat</span>
+                    {% if admin_menu_counts.live_chat %}<b class="nav-count nav-count-chat">{{ admin_menu_counts.live_chat if admin_menu_counts.live_chat < 100 else '99+' }}</b>{% endif %}
+                </a>
             </div>
+
+            <div class="nav-section-label nav-section-label-spaced">Manajemen</div>
 
             <details class="nav-group" {% if ep in ['admin.omset'] %}open{% endif %}>
                 <summary><span>📦 Transaksi</span><span class="nav-chevron">⌄</span></summary>
@@ -83,6 +101,7 @@
             </details>
             {% endif %}
 
+            <div class="nav-footer-label">Akun & Akses</div>
             <div class="nav-footer-links">
                 <a class="{% if ep == 'admin.change_password' %}active{% endif %}" href="{{ url_for('admin.change_password') }}">🔐 Ganti Password</a>
                 <a href="{{ url_for('home.index') }}" target="_blank" rel="noopener">🌐 Lihat Website</a>

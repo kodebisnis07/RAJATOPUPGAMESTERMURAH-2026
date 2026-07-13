@@ -1,0 +1,9 @@
+PERUBAHAN LIVE CHAT & KONTAK BANTUAN
+
+- Live Chat dihapus dari menu navigasi akun bagian atas.
+- Live Chat dipindahkan ke kartu Bantuan Pelanggan di bagian bawah Dashboard User.
+- Ditambahkan tombol WhatsApp dan Telegram pada kartu Bantuan.
+- Ditambahkan pilihan WhatsApp dan Telegram tepat di bawah form kirim Live Chat.
+- URL WhatsApp/Telegram otomatis dibentuk dari Pengaturan Website admin.
+- Nomor WhatsApp lokal 08 otomatis diubah ke format 62 untuk wa.me.
+- Jika kontak belum diatur, tombol disembunyikan dan muncul keterangan.

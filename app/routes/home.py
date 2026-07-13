@@ -228,8 +228,15 @@ def _category_input_config(category):
 
 
 def _product_input_config(product, category):
-    """Prioritaskan Jenis Target dari produk; nilai auto memakai deteksi kategori lama."""
+    """Prioritaskan Jenis Target produk, tetapi cegah field game muncul pada kategori sosial media."""
     target_type = (getattr(product, "target_type", None) or "auto").strip().lower()
+    category_config = _category_input_config(category)
+
+    # Perlindungan dari konfigurasi produk lama/salah: kategori sosial media tidak boleh
+    # menampilkan Zone/Server ID. Admin tetap bisa memilih username atau username_link.
+    if category_config.get("type") == "social" and target_type in {"auto", "game_id", "game_id_server"}:
+        target_type = "username_link"
+
     configs = {
         "username": {"type": "username", "title": "Data Username", "help": "Masukkan username akun tujuan.", "label": "Username", "placeholder": "Contoh: @username", "needs_server": False, "required": True},
         "username_link": {"type": "username_link", "title": "Data Target Sosial Media", "help": "Masukkan username akun atau link postingan sesuai layanan.", "label": "Username / Link Target", "placeholder": "Contoh: @username atau https://link-postingan", "needs_server": False, "required": True},

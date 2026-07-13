@@ -25,6 +25,16 @@
     <input type="file" name="favicon_logo_file" accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon,image/vnd.microsoft.icon,image/svg+xml">
     <small class="field-help">Favicon adalah logo kecil yang muncul di tab browser seperti contoh yang Anda kirim.</small>
 
+    <label>Background Halaman Login User</label>
+    {% if settings.get('login_background') %}
+        <div class="brand-preview-row login-background-preview-row">
+            <img class="login-background-preview" src="{{ image_url(settings.get('login_background'), 'img/site') }}" alt="Background login">
+            <label class="tiny-check"><input type="checkbox" name="remove_login_background" value="1"> Hapus background login</label>
+        </div>
+    {% endif %}
+    <input type="file" name="login_background_file" accept="image/png,image/jpeg,image/webp">
+    <small class="field-help">Disarankan gambar landscape 1600×1000 px atau lebih besar. Gambar disimpan melalui sistem media/Cloudinary yang aktif.</small>
+
     <label>WhatsApp</label><input type="text" name="whatsapp" value="{{ settings.get('whatsapp', '') }}">
     <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">
     <label>Instagram</label><input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">

@@ -1,169 +1,121 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="topup-hero">
+<section class="topup-hero topup-hero-compact">
     <div>
         <span class="eyebrow">{{ settings.get('site_name', global_settings.get('site_name', 'RAJA TOPUP GAMES')) }}</span>
         <h1>Top Up {{ category.name }}</h1>
-        <p>{{ input_config.help if input_config else 'Pilih layanan, masukkan target, lalu selesaikan transaksi dengan aman.' }}</p>
+        <p>{{ input_config.help if input_config else 'Pilih layanan, isi target, lalu selesaikan pembayaran.' }}</p>
     </div>
 </section>
 
-<form method="POST" class="topup-layout" id="topupForm">
+<div class="checkout-stepper" aria-label="Tahapan checkout">
+    <div class="checkout-step active"><span>1</span><b>Pilih Layanan</b></div>
+    <i></i>
+    <div class="checkout-step"><span>2</span><b>Isi Target</b></div>
+    <i></i>
+    <div class="checkout-step"><span>3</span><b>Pembayaran</b></div>
+</div>
+
+<form method="POST" class="topup-layout topup-layout-clean" id="topupForm" novalidate>
     <div class="topup-main">
         <div class="step-card service-selector-card">
-            <div class="step-title"><span>1</span><div><h2>Pilih Kategori & Layanan</h2><p>Pilih kategori dan layanan yang ingin dipesan.</p></div></div>
+            <div class="step-title"><span>1</span><div><h2>Pilih Layanan</h2><p>Pilih kategori dan layanan yang ingin dipesan.</p></div></div>
             <div class="service-select-grid">
                 <label>
-                    Kategori <em>*</em>
+                    <span>Kategori <em>*</em></span>
                     <select id="categorySelect" aria-label="Pilih kategori">
-                        {% for item in service_categories %}
-                        <option value="{{ url_for('home.topup', category_id=item.id) }}" {% if item.id == category.id %}selected{% endif %}>{{ item.name }}</option>
-                        {% endfor %}
+                        {% for item in service_categories %}<option value="{{ url_for('home.topup', category_id=item.id) }}" {% if item.id == category.id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}
                     </select>
                 </label>
                 <label>
-                    Layanan <em>*</em>
+                    <span>Layanan <em>*</em></span>
                     <select id="serviceSelect" name="product_id" required aria-label="Pilih layanan">
                         <option value="" selected disabled>-- Pilih layanan --</option>
                         {% for product in products %}
                         {% set pc = product_configs.get(product.id, input_config) %}
-                        <option value="{{ product.id }}"
-                                data-name="{{ product.name|e }}"
-                                data-price="{{ product.price }}"
-                                data-description="{{ (product.description or 'Layanan diproses sesuai ketentuan. Pastikan data target sudah benar.')|e }}"
-                                data-target-title="{{ pc.title|e }}"
-                                data-target-help="{{ pc.help|e }}"
-                                data-target-label="{{ pc.label|e }}"
-                                data-target-placeholder="{{ pc.placeholder|e }}"
-                                data-needs-server="{{ '1' if pc.needs_server else '0' }}"
-                                data-server-label="{{ (pc.server_label or 'Zone / Server ID')|e }}"
-                                data-server-placeholder="{{ (pc.server_placeholder or 'Contoh: 1234')|e }}">
-                            {{ product.name }} — Rp {{ "{:,}".format(product.price).replace(",", ".") }}
-                        </option>
+                        <option value="{{ product.id }}" data-name="{{ product.name|e }}" data-price="{{ product.price }}" data-description="{{ (product.description or 'Layanan diproses sesuai ketentuan. Pastikan target sudah benar.')|e }}" data-target-type="{{ pc.type|e }}" data-target-title="{{ pc.title|e }}" data-target-help="{{ pc.help|e }}" data-target-label="{{ pc.label|e }}" data-target-placeholder="{{ pc.placeholder|e }}" data-needs-server="{{ '1' if pc.needs_server else '0' }}" data-server-label="{{ (pc.server_label or 'Zone / Server ID')|e }}" data-server-placeholder="{{ (pc.server_placeholder or 'Contoh: 1234')|e }}">{{ product.name }} — Rp {{ "{:,}".format(product.price).replace(",", ".") }}</option>
                         {% endfor %}
                     </select>
                 </label>
             </div>
-            <div class="service-description" id="serviceDescription" hidden>
-                <div class="service-description-head">
-                    <strong>❕ Deskripsi</strong>
-                    <button type="button" id="closeDescription" aria-label="Tutup deskripsi">×</button>
-                </div>
-                <div id="serviceDescriptionText"></div>
-            </div>
+            <details class="service-description clean-description" id="serviceDescription">
+                <summary>📋 Lihat deskripsi layanan</summary>
+                <div id="serviceDescriptionText">Pilih layanan untuk melihat deskripsi.</div>
+            </details>
             {% if not products %}<div class="empty-state">Belum ada layanan aktif untuk kategori ini.</div>{% endif %}
         </div>
 
         <div class="step-card">
-            <div class="step-title"><span>2</span><div><h2 id="targetTitle">{{ input_config.title if input_config else 'Data Target' }}</h2><p id="targetHelp">{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
-            <div class="form-grid compact-game-fields">
-                <label><span id="targetLabel">{{ input_config.label if input_config else 'Data Target' }}</span><input id="targetInput" type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" required></label>
-                <label id="serverField" {% if not input_config or not input_config.needs_server %}hidden{% endif %}><span id="serverLabel">{{ input_config.server_label if input_config and input_config.server_label else 'Zone / Server ID' }}</span><input id="serverInput" type="text" name="game_server_id" placeholder="{{ input_config.server_placeholder if input_config and input_config.server_placeholder else 'Contoh: 1234' }}" {% if input_config and input_config.needs_server %}required{% endif %}></label>
+            <div class="step-title"><span>2</span><div><h2 id="targetTitle">{{ input_config.title if input_config else 'Isi Target' }}</h2><p id="targetHelp">{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
+            <div class="form-grid compact-game-fields" id="targetGrid">
+                <label><span id="targetLabel">{{ input_config.label if input_config else 'Data Target' }}</span><input id="targetInput" type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" autocomplete="off" required></label>
+                <label id="serverField" {% if not input_config or not input_config.needs_server %}hidden{% endif %}><span id="serverLabel">{{ input_config.server_label if input_config and input_config.server_label else 'Zone / Server ID' }}</span><input id="serverInput" type="text" name="game_server_id" placeholder="{{ input_config.server_placeholder if input_config and input_config.server_placeholder else 'Contoh: 1234' }}" autocomplete="off" {% if input_config and input_config.needs_server %}required{% endif %}></label>
             </div>
+            <div class="target-feedback" id="targetFeedback" aria-live="polite"></div>
+            <div class="order-warning compact-warning">⚠️ Pastikan target benar. Pesanan yang sudah diproses tidak dapat dibatalkan karena kesalahan target.</div>
         </div>
 
-        <div class="step-card buyer-auto-card">
-            <div class="step-title"><span>3</span><div><h2>Data Pembeli Otomatis</h2><p>Invoice dan notifikasi memakai data akun login Anda, jadi tidak perlu diisi ulang.</p></div></div>
-            <div class="buyer-auto-box">
-                <span>{{ current_user.name if current_user else session.get('user_name') }}</span>
-                <small>{{ current_user.email if current_user else session.get('user_email') }}{% if current_user and current_user.phone %} • {{ current_user.phone }}{% endif %}</small>
-            </div>
-        </div>
-
-        <div class="step-card">
-            <div class="step-title"><span>4</span><div><h2>Kode Voucher</h2><p>Opsional. Masukkan kode diskon jika Anda punya.</p></div></div>
-            <div class="form-grid compact-game-fields">
-                <label>Kode Voucher<input type="text" name="voucher_code" placeholder="Contoh: RAJA10"></label>
-            </div>
-        </div>
-
-        <div class="step-card">
-            <div class="step-title"><span>5</span><div><h2>Metode Pembayaran</h2><p>Pilih Saldo RajaTopup atau bank/e-wallet/QRIS yang sedang online.</p></div></div>
-            <div class="payment-grid">
+        <div class="step-card payment-step-card">
+            <div class="step-title"><span>3</span><div><h2>Pembayaran</h2><p>Pilih metode pembayaran, lalu gunakan voucher bila tersedia.</p></div></div>
+            <div class="payment-grid payment-grid-clean">
                 <label class="pay-card pay-method-card wallet-pay-card" data-fee="0">
                     <input type="radio" name="payment_method_id" value="saldo" required>
-                    <div class="pay-logo wallet-logo">💰</div>
-                    <span>Saldo RajaTopup</span>
-                    <small>Saldo tersedia: Rp {{ "{:,}".format((current_user.balance if current_user else 0) or 0).replace(",", ".") }}</small>
+                    <div class="pay-logo wallet-logo">💰</div><span>Saldo Akun</span><small>Rp {{ "{:,}".format((current_user.balance if current_user else 0) or 0).replace(",", ".") }}</small>
                 </label>
                 {% for m in payment_methods %}
                 <label class="pay-card pay-method-card" data-fee="{{ m.admin_fee or 0 }}">
                     <input type="radio" name="payment_method_id" value="{{ m.id }}" required>
                     {% if m.logo %}<img class="pay-logo" src="{{ media_url(m.logo, 'payment_methods') }}" alt="{{ m.name }}">{% endif %}
-                    <span>{{ m.name }}</span>
-                    <small>{{ m.type|replace('_',' ')|title }}{% if m.admin_fee %} • Fee Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}{% endif %}</small>
+                    <span>{{ m.name }}</span><small>{{ m.type|replace('_',' ')|title }}{% if m.admin_fee %} • Fee Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}{% endif %}</small>
                 </label>
-                {% else %}
-                <div class="empty-state">Belum ada metode pembayaran yang aktif. Silakan hubungi admin.</div>
-                {% endfor %}
+                {% else %}<div class="empty-state">Belum ada metode pembayaran aktif.</div>{% endfor %}
             </div>
+
+            <details class="voucher-box-clean">
+                <summary><span>🎁 Punya kode voucher?</span><small>Tampilkan</small></summary>
+                <div class="voucher-input-row">
+                    <input type="text" name="voucher_code" placeholder="Masukkan kode voucher, contoh RAJA10" autocomplete="off">
+                    <span class="voucher-note">Voucher akan diperiksa saat pesanan dibuat.</span>
+                </div>
+            </details>
+
+            <label class="confirmation-check confirmation-check-clean">
+                <input type="checkbox" id="confirmTarget" required>
+                <span>Saya sudah memastikan layanan, target, dan metode pembayaran sudah benar.</span>
+            </label>
         </div>
     </div>
 
-    <aside class="order-summary">
+    <aside class="order-summary order-summary-clean">
         <h2>Ringkasan</h2>
         <div class="summary-row"><span>Produk</span><b>{{ category.name }}</b></div>
         <div class="summary-row"><span>Layanan</span><b id="summaryProduct">Belum dipilih</b></div>
-        <div class="summary-row"><span>Total</span><b id="summaryPrice">Rp 0</b></div>
-        <button type="submit" class="btn-checkout">Bayar Sekarang</button>
+        <div class="summary-row"><span>Target</span><b id="summaryTarget">Belum diisi</b></div>
+        <div class="summary-divider"></div>
+        <div class="summary-row"><span>Harga</span><b id="summarySubtotal">Rp 0</b></div>
+        <div class="summary-row"><span>Biaya Admin</span><b id="summaryFee">Rp 0</b></div>
+        <div class="summary-row"><span>Voucher</span><b id="summaryDiscount">- Rp 0</b></div>
+        <div class="summary-row total"><span>Total Bayar</span><b id="summaryPrice">Rp 0</b></div>
+        <button type="submit" class="btn-checkout" id="checkoutButton" disabled>Lengkapi Pesanan</button>
+        <small class="checkout-hint" id="checkoutHint">Pilih layanan, isi target, dan pilih pembayaran.</small>
+        <div class="checkout-trust-mini">🔒 Pembayaran aman • Data akun diambil dari profil</div>
         <a class="summary-back" href="{{ url_for('home.index') }}">← Kembali ke Home</a>
     </aside>
 </form>
 <script>
 function rupiah(value){ return 'Rp ' + Number(value || 0).toLocaleString('id-ID'); }
-window.selectedPrice = 0; window.selectedFee = 0;
-function updateSummaryTotal(){ document.getElementById('summaryPrice').textContent = rupiah((window.selectedPrice||0) + (window.selectedFee||0)); }
-
-const categorySelect = document.getElementById('categorySelect');
-if (categorySelect) {
-    categorySelect.addEventListener('change', function(){
-        if (this.value) window.location.href = this.value;
-    });
-}
-
-const serviceSelect = document.getElementById('serviceSelect');
-const descriptionBox = document.getElementById('serviceDescription');
-const descriptionText = document.getElementById('serviceDescriptionText');
-if (serviceSelect) {
-    serviceSelect.addEventListener('change', function(){
-        const option = this.options[this.selectedIndex];
-        document.getElementById('summaryProduct').textContent = option.dataset.name || option.textContent.trim();
-        window.selectedPrice = Number(option.dataset.price || 0);
-        updateSummaryTotal();
-        if (option.dataset.description) {
-            descriptionText.textContent = option.dataset.description;
-            descriptionBox.hidden = false;
-        }
-        const targetTitle = document.getElementById('targetTitle');
-        const targetHelp = document.getElementById('targetHelp');
-        const targetLabel = document.getElementById('targetLabel');
-        const targetInput = document.getElementById('targetInput');
-        const serverField = document.getElementById('serverField');
-        const serverLabel = document.getElementById('serverLabel');
-        const serverInput = document.getElementById('serverInput');
-        if (targetTitle) targetTitle.textContent = option.dataset.targetTitle || 'Data Target';
-        if (targetHelp) targetHelp.textContent = option.dataset.targetHelp || 'Masukkan data target pesanan.';
-        if (targetLabel) targetLabel.textContent = option.dataset.targetLabel || 'Data Target';
-        if (targetInput) targetInput.placeholder = option.dataset.targetPlaceholder || 'Masukkan data target';
-        const needsServer = option.dataset.needsServer === '1';
-        if (serverField) serverField.hidden = !needsServer;
-        if (serverLabel) serverLabel.textContent = option.dataset.serverLabel || 'Zone / Server ID';
-        if (serverInput) {
-            serverInput.placeholder = option.dataset.serverPlaceholder || 'Contoh: 1234';
-            serverInput.required = needsServer;
-            if (!needsServer) serverInput.value = '';
-        }
-    });
-}
-const closeDescription = document.getElementById('closeDescription');
-if (closeDescription) closeDescription.addEventListener('click', function(){ descriptionBox.hidden = true; });
-
-document.querySelectorAll('.pay-method-card input').forEach(function(input){
-    input.addEventListener('change', function(){
-        const card = this.closest('.pay-method-card');
-        window.selectedFee = Number(card.dataset.fee || 0);
-        updateSummaryTotal();
-    });
-});
+window.selectedPrice=0; window.selectedFee=0; window.selectedTargetType='';
+const form=document.getElementById('topupForm'), categorySelect=document.getElementById('categorySelect'), serviceSelect=document.getElementById('serviceSelect'), targetInput=document.getElementById('targetInput'), serverInput=document.getElementById('serverInput'), serverField=document.getElementById('serverField'), confirmTarget=document.getElementById('confirmTarget'), checkoutButton=document.getElementById('checkoutButton'), checkoutHint=document.getElementById('checkoutHint'), targetFeedback=document.getElementById('targetFeedback'), descriptionText=document.getElementById('serviceDescriptionText');
+function currentTargetText(){const a=(targetInput.value||'').trim(),b=serverField&&!serverField.hidden?(serverInput.value||'').trim():'';return a?(b?a+' / '+b:a):'Belum diisi';}
+function updateSummaryTotal(){document.getElementById('summarySubtotal').textContent=rupiah(window.selectedPrice);document.getElementById('summaryFee').textContent=rupiah(window.selectedFee);document.getElementById('summaryPrice').textContent=rupiah(window.selectedPrice+window.selectedFee);}
+function validateTarget(show){const v=(targetInput.value||'').trim();let ok=v.length>0,msg='',t=window.selectedTargetType;if(ok&&['phone','wallet'].includes(t)){ok=/^(?:\+62|62|0)8[0-9]{7,13}$/.test(v.replace(/[\s-]/g,''));msg=ok?'✓ Format nomor benar.':'Gunakan nomor Indonesia yang valid.';}else if(ok&&t==='email'){ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);msg=ok?'✓ Format email benar.':'Masukkan alamat email yang valid.';}else if(ok&&['social','username','username_link'].includes(t)){ok=!/^[0-9]{5,}$/.test(v);msg=ok?'✓ Target siap digunakan.':'Jangan masukkan ID game pada layanan sosial media.';}if(ok&&serverField&&!serverField.hidden&&!(serverInput.value||'').trim()){ok=false;msg='Zone / Server ID wajib diisi.';}if(show||v){targetFeedback.textContent=msg;targetFeedback.className='target-feedback '+(ok?'valid':(msg?'invalid':''));}return ok;}
+function updateFormState(){document.getElementById('summaryTarget').textContent=currentTargetText();const ready=!!serviceSelect.value&&validateTarget(false)&&!!document.querySelector('input[name="payment_method_id"]:checked')&&confirmTarget.checked;checkoutButton.disabled=!ready;checkoutButton.textContent=ready?'Bayar Sekarang':'Lengkapi Pesanan';checkoutHint.textContent=ready?'Pesanan siap dilanjutkan.':'Pilih layanan, isi target, dan pilih pembayaran.';}
+categorySelect?.addEventListener('change',function(){if(this.value)location.href=this.value;});
+serviceSelect?.addEventListener('change',function(){const o=this.options[this.selectedIndex];document.getElementById('summaryProduct').textContent=o.dataset.name||o.textContent.trim();window.selectedPrice=Number(o.dataset.price||0);window.selectedTargetType=o.dataset.targetType||'';descriptionText.textContent=o.dataset.description||'Tidak ada deskripsi layanan.';document.getElementById('targetTitle').textContent=o.dataset.targetTitle||'Isi Target';document.getElementById('targetHelp').textContent=o.dataset.targetHelp||'Masukkan data target.';document.getElementById('targetLabel').textContent=o.dataset.targetLabel||'Data Target';targetInput.placeholder=o.dataset.targetPlaceholder||'Masukkan data target';const needs=o.dataset.needsServer==='1';serverField.hidden=!needs;document.getElementById('serverLabel').textContent=o.dataset.serverLabel||'Zone / Server ID';serverInput.placeholder=o.dataset.serverPlaceholder||'Contoh: 1234';serverInput.required=needs;if(!needs)serverInput.value='';targetInput.value='';confirmTarget.checked=false;updateSummaryTotal();updateFormState();});
+[targetInput,serverInput].forEach(i=>{i.addEventListener('input',updateFormState);i.addEventListener('blur',()=>{validateTarget(true);updateFormState();});});
+document.querySelectorAll('.pay-method-card input').forEach(i=>i.addEventListener('change',function(){window.selectedFee=Number(this.closest('.pay-method-card').dataset.fee||0);updateSummaryTotal();updateFormState();}));
+confirmTarget.addEventListener('change',updateFormState);
+form.addEventListener('submit',function(e){updateFormState();if(checkoutButton.disabled||!form.checkValidity()){e.preventDefault();validateTarget(true);form.reportValidity();}});
+updateSummaryTotal();updateFormState();
 </script>
 {% endblock %}

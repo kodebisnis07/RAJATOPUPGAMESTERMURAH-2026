@@ -85,25 +85,10 @@
             <button type="submit">Cari</button>
         </form>
         <div class="market-actions">
-            <a class="market-action market-action-download" href="{{ url_for('home.index') }}#games" aria-label="Download aplikasi">📥<span>Download<br>Aplikasi</span></a>
             {% if session.get('user_id') %}
-                <a class="market-action" href="{{ url_for('auth.orders') }}">📄<span>Invoice</span></a>
-                <a class="market-action notif-link" href="{{ url_for('auth.notifications') }}">🔔<span>Inbox</span>{% if unread_notifications_count %}<em>{{ unread_notifications_count }}</em>{% endif %}</a>
-                {% if current_user %}
-                    <a class="market-wallet" href="{{ url_for('auth.wallet_topup') }}">💰<span>Saldo</span><b>Rp {{ "{:,}".format(current_user.balance or 0).replace(',', '.') }}</b></a>
-                {% endif %}
-                <div class="user-menu market-user-menu">
-                    <button class="user-menu-btn" type="button" aria-expanded="false" aria-haspopup="true">👤 Halo, {{ session.get('user_name') }} ▾</button>
-                    <div class="user-menu-panel" role="menu">
-                        <a href="{{ url_for('auth.dashboard') }}">🏠 Dashboard Akun</a>
-                        <a href="{{ url_for('auth.profile') }}">👤 Profil Saya</a>
-                        <a href="{{ url_for('auth.wallet_topup') }}">💰 Top Up Saldo</a>
-                        <a href="{{ url_for('auth.orders') }}">📄 Invoice / Pesanan</a>
-                        <a href="{{ url_for('auth.notifications') }}">🔔 Inbox</a>
-                        <a href="{{ url_for('auth.live_chat') }}">💬 Live Chat</a>
-                        <a class="danger" href="{{ url_for('auth.logout') }}">🚪 Logout</a>
-                    </div>
-                </div>
+                {% if current_user %}<a class="market-wallet" href="{{ url_for('auth.wallet_topup') }}">💰<span>Saldo</span><b>Rp {{ "{:,}".format(current_user.balance or 0).replace(',', '.') }}</b></a>{% endif %}
+                <a class="market-notification-button" href="{{ url_for('auth.notifications') }}" aria-label="Notifikasi">🔔{% if unread_notifications_count %}<em>{{ unread_notifications_count }}</em>{% endif %}</a>
+                <div class="user-menu market-user-menu"><button class="user-menu-btn" type="button" aria-expanded="false" aria-haspopup="true">👤 {{ session.get('user_name') }} ▾</button><div class="user-menu-panel account-dropdown-pro" role="menu"><div class="account-dropdown-head"><b>{{ session.get('user_name') }}</b><span>{{ current_user.member_level if current_user else 'Member' }}</span></div><a href="{{ url_for('auth.dashboard') }}">🏠 Dashboard</a><a href="{{ url_for('auth.profile') }}">👤 Profil</a><a href="{{ url_for('auth.orders') }}">📄 Pesanan</a><a href="{{ url_for('auth.wallet_topup') }}">💰 Saldo</a><a href="{{ url_for('auth.notifications') }}">🔔 Notifikasi</a><a href="{{ url_for('auth.favorites') }}">⭐ Favorit</a><div class="dropdown-separator"></div><a href="{{ url_for('auth.change_password') }}">⚙️ Pengaturan Akun</a><a class="danger" href="{{ url_for('auth.logout') }}">🚪 Logout</a></div></div>
             {% else %}
                 <a class="market-login" href="{{ url_for('auth.login') }}">Masuk</a>
                 <a class="market-register" href="{{ url_for('auth.register') }}">Daftar</a>
