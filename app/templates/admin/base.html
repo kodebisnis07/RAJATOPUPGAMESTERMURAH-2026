@@ -7,7 +7,7 @@
     {% set site_logo = global_settings.get('site_logo') %}
     {% set favicon_logo = global_settings.get('favicon_logo') or site_logo %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260710-compact-desktop-mobile-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260713-orders-responsive-1">
 </head>
 <body>
 <button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>

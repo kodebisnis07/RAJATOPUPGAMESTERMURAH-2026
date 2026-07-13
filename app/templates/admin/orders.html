@@ -1,14 +1,19 @@
 {% extends "admin/base.html" %}
 {% block content %}
-<h1>Pesanan</h1>
-<p class="muted">Operator hanya difokuskan untuk memantau pesanan dan memperbarui status pesanan.</p>
-<table class="admin-table">
+<div class="page-head orders-page-head">
+    <h1>Pesanan</h1>
+    <p>Operator difokuskan untuk memantau pesanan dan memperbarui status pesanan.</p>
+</div>
+
+<div class="orders-table-scroll" role="region" aria-label="Daftar pesanan" tabindex="0">
+<table class="admin-table orders-table">
     <thead>
         <tr>
             <th>Invoice</th>
             <th>Produk</th>
+            <th>Deskripsi</th>
             <th>Customer</th>
-            <th>Username / ID Game</th>
+            <th>Target</th>
             <th>Total</th>
             <th>Metode</th>
             <th>Status Bayar</th>
@@ -19,35 +24,49 @@
     <tbody>
     {% for order in orders %}
         <tr>
-            <td><strong>{{ order.invoice }}</strong><br><small>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</small></td>
-            <td>{{ order.product.name if order.product else '-' }}</td>
-            <td>{{ order.customer_name or '-' }}<br><small>{{ order.customer_phone or order.customer_email or '-' }}</small></td>
+            <td data-label="Invoice" class="order-invoice"><strong>{{ order.invoice }}</strong><br><small>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</small></td>
+            <td data-label="Produk" class="order-product">{{ order.product.name if order.product else '-' }}</td>
+            <td data-label="Deskripsi" class="order-description">
+                {% if order.product and order.product.description %}
+                    {{ order.product.description }}
+                {% else %}
+                    <span class="muted">Tidak ada deskripsi</span>
+                {% endif %}
+            </td>
+            <td data-label="Customer"><strong>{{ order.customer_name or '-' }}</strong><br><small>{{ order.customer_phone or order.customer_email or '-' }}</small></td>
             {% set category_text = ((order.product.category.name if order.product and order.product.category else '') ~ ' ' ~ (order.product.category.slug if order.product and order.product.category else ''))|lower %}
             {% set is_social = 'sosmed' in category_text or 'followers' in category_text or 'likes' in category_text or 'instagram' in category_text or 'tiktok' in category_text or 'facebook' in category_text %}
-            <td><small>{{ 'Username / Link' if is_social else 'ID Game' }}</small><br><strong>{{ order.game_user_id or '-' }}</strong>{% if order.game_server_id %}<br><small>Server: {{ order.game_server_id }}</small>{% endif %}</td>
-            <td>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</td>
-            <td>{{ order.payment_method or '-' }}</td>
-            <td><span class="badge">{{ order.payment_status }}</span></td>
-            <td><span class="badge">{{ order.order_status }}</span></td>
-            <td>
-                <form method="post" action="{{ url_for('admin.update_order', id=order.id) }}" class="inline-form">
-                    <select name="payment_status">
-                        {% for status in ['pending','paid','cancelled','failed','expired'] %}
-                            <option value="{{ status }}" {% if order.payment_status == status %}selected{% endif %}>{{ status }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="order_status">
-                        {% for status in ['pending','processing','success','completed','cancelled','failed'] %}
-                            <option value="{{ status }}" {% if order.order_status == status %}selected{% endif %}>{{ status }}</option>
-                        {% endfor %}
-                    </select>
+            <td data-label="{{ 'Username / Link' if is_social else 'ID Game' }}" class="order-target"><strong>{{ order.game_user_id or '-' }}</strong>{% if order.game_server_id %}<br><small>Server/Zone: {{ order.game_server_id }}</small>{% endif %}</td>
+            <td data-label="Total" class="order-total"><strong>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</strong></td>
+            <td data-label="Metode">{{ order.payment_method or '-' }}</td>
+            <td data-label="Status Bayar"><span class="badge status-{{ order.payment_status|lower }}">{{ order.payment_status }}</span></td>
+            <td data-label="Status Order"><span class="badge status-{{ order.order_status|lower }}">{{ order.order_status }}</span></td>
+            <td data-label="Aksi" class="order-actions">
+                <form method="post" action="{{ url_for('admin.update_order', id=order.id) }}" class="order-update-form">
+                    <label>
+                        <span>Status Bayar</span>
+                        <select name="payment_status">
+                            {% for status in ['pending','paid','cancelled','failed','expired'] %}
+                                <option value="{{ status }}" {% if order.payment_status == status %}selected{% endif %}>{{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>Status Order</span>
+                        <select name="order_status">
+                            {% for status in ['pending','processing','success','completed','cancelled','failed'] %}
+                                <option value="{{ status }}" {% if order.order_status == status %}selected{% endif %}>{{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
                     <button class="btn small" type="submit">Update</button>
                 </form>
             </td>
         </tr>
     {% else %}
-        <tr><td colspan="9">Belum ada pesanan.</td></tr>
+        <tr class="empty-row"><td colspan="10">Belum ada pesanan.</td></tr>
     {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

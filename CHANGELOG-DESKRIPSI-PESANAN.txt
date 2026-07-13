@@ -1,0 +1,6 @@
+PERUBAHAN: KOLOM DESKRIPSI PADA PESANAN ADMIN
+
+- Menambahkan kolom "Deskripsi" pada daftar Pesanan di panel admin.
+- Deskripsi diambil dari deskripsi produk/layanan yang dipilih pelanggan.
+- Jika produk tidak memiliki deskripsi, tampil "Tidak ada deskripsi".
+- Tampilan tabel desktop dan kartu responsif tetap didukung.

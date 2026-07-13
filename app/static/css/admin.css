@@ -712,3 +712,40 @@ input,select,textarea,button{max-width:100%;}
 /* === Site logo support === */
 .admin-site-brand-logo{width:42px;height:42px;object-fit:cover;border-radius:12px;background:#fff;border:1px solid rgba(255,255,255,.12)}
 .login-site-brand-logo{width:36px;height:36px;object-fit:cover;border-radius:10px;background:#fff;vertical-align:middle;margin-right:10px}
+
+/* ===== Orders page responsive fix 2026-07-13 ===== */
+.orders-page-head p{margin:0;color:#aeb2c7}
+.orders-table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.orders-table{table-layout:fixed;min-width:1240px;box-shadow:none}
+.orders-table th,.orders-table td{padding:12px 10px;font-size:13px;line-height:1.35;overflow-wrap:anywhere;white-space:normal!important}
+.orders-table th:nth-child(1){width:145px}.orders-table th:nth-child(2){width:165px}.orders-table th:nth-child(3){width:220px}.orders-table th:nth-child(4){width:135px}.orders-table th:nth-child(5){width:140px}.orders-table th:nth-child(6){width:95px}.orders-table th:nth-child(7){width:85px}.orders-table th:nth-child(8),.orders-table th:nth-child(9){width:105px}.orders-table th:nth-child(10){width:170px}
+.order-invoice strong{font-size:12px}.order-product{font-weight:700}.order-description{font-size:12px;color:#d8deed;max-height:96px;overflow:auto}.order-description .muted{color:#7f8aa3;font-style:italic}.order-total{white-space:nowrap!important}
+.order-update-form{display:grid;gap:7px;min-width:145px}
+.order-update-form label{display:grid;gap:3px}.order-update-form label>span{font-size:10px;color:#aeb2c7;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.order-update-form select{width:100%;min-width:0;padding:7px 8px;background:#111827;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:8px;text-transform:capitalize}
+.order-update-form .btn{width:100%;padding:8px 10px}
+.status-paid,.status-success,.status-completed{background:rgba(35,220,125,.14)!important;color:#49e68e!important;border-color:rgba(35,220,125,.35)!important}
+.status-failed,.status-cancelled,.status-expired{background:rgba(255,87,87,.14)!important;color:#ff8c8c!important;border-color:rgba(255,87,87,.35)!important}
+.status-processing{background:rgba(59,130,246,.14)!important;color:#93c5fd!important;border-color:rgba(59,130,246,.35)!important}
+
+/* Pada laptop kecil, ubah setiap pesanan menjadi kartu agar nyaman di zoom 100%. */
+@media (max-width:1250px){
+  .orders-table-scroll{overflow:visible;box-shadow:none}
+  .orders-table{display:block!important;width:100%!important;min-width:0!important;background:transparent;border:0;box-shadow:none;overflow:visible!important}
+  .orders-table thead{display:none}
+  .orders-table tbody{display:grid!important;gap:14px;width:100%!important}
+  .orders-table tr{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%!important;min-width:0!important;background:linear-gradient(180deg,#121528,#0d0f1d);border:1px solid rgba(255,255,255,.09);border-radius:16px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+  .orders-table td{display:block!important;width:auto!important;min-width:0!important;padding:12px 14px 12px 128px!important;position:relative;border-bottom:1px solid rgba(255,255,255,.07);white-space:normal!important;overflow-wrap:anywhere}
+  .orders-table td::before{content:attr(data-label);position:absolute;left:14px;top:12px;width:102px;color:#ffc400;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+  .orders-table .order-actions{grid-column:1/-1;padding-left:14px!important}
+  .orders-table .order-actions::before{position:static;display:block;width:auto;margin-bottom:8px}
+  .order-update-form{grid-template-columns:repeat(2,minmax(0,1fr)) auto;align-items:end;min-width:0}
+  .order-update-form .btn{width:auto;min-width:90px}
+  .orders-table .empty-row{display:block!important}.orders-table .empty-row td{padding:20px!important}.orders-table .empty-row td::before{display:none}
+}
+@media (max-width:650px){
+  .orders-table tr{grid-template-columns:1fr}
+  .orders-table .order-actions{grid-column:auto}
+  .order-update-form{grid-template-columns:1fr}
+  .order-update-form .btn{width:100%}
+}
