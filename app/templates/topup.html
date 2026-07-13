@@ -1,121 +1,90 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
+.checkout-shell{max-width:1220px;margin:18px auto 34px;padding:0 18px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}.checkout-left{display:grid;gap:16px}.checkout-card,.checkout-summary{background:#202b42;border:1px solid rgba(148,163,184,.22);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.16)}.checkout-card{padding:18px}.checkout-heading{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}.checkout-number{width:30px;height:30px;border-radius:9px;background:#ffbd32;color:#111827;display:grid;place-items:center;font-weight:900;flex:0 0 auto}.checkout-heading h2{margin:0;color:#ffbd32;font-size:20px}.checkout-heading p{margin:3px 0 0;color:#d5dbea;font-size:12px}.category-row{display:flex;align-items:end;gap:12px;margin-bottom:14px}.field-label{display:grid;gap:6px;color:#f8fafc;font-size:12px;font-weight:700}.field-label select,.field-label input{height:42px;border:1px solid #46526a;background:#111b2d;color:#fff;border-radius:9px;padding:0 12px;outline:none}.category-row .field-label{min-width:220px}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.service-choice{position:relative;display:block;cursor:pointer}.service-choice input{position:absolute;opacity:0;pointer-events:none}.service-tile{height:100%;min-height:94px;border:1px solid #3c4860;border-radius:12px;background:#131e31;padding:12px;display:flex;gap:10px;align-items:flex-start;transition:.18s ease}.service-tile:hover{border-color:#ffbd32;transform:translateY(-1px)}.service-choice input:checked+.service-tile{border-color:#ffbd32;box-shadow:0 0 0 2px rgba(255,189,50,.16);background:#18243a}.service-icon{width:36px;height:36px;border-radius:10px;object-fit:cover;background:#0b1322;flex:0 0 auto}.service-copy{min-width:0}.service-copy b{display:block;color:#fff;font-size:13px;line-height:1.2;margin-bottom:5px}.service-copy strong{display:block;color:#ffbd32;font-size:13px;margin-bottom:4px}.service-copy small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#aeb8ca;font-size:10px;line-height:1.3}.service-description{margin-top:12px;padding:12px 14px;border-radius:10px;background:#111b2d;border:1px solid #344158;color:#cbd5e1;font-size:12px;display:none}.service-description.show{display:block}.target-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.target-grid.single{grid-template-columns:1fr}.target-feedback{min-height:18px;margin-top:7px;font-size:12px}.target-feedback.valid{color:#86efac}.target-feedback.invalid{color:#fca5a5}.target-warning{margin-top:8px;color:#f8c76a;font-size:12px}.checkout-summary{position:sticky;top:14px;padding:16px;background:#111b2d}.checkout-summary h2{margin:0 0 14px;color:#ffbd32;font-size:19px}.summary-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid rgba(148,163,184,.16);font-size:12px}.summary-row span{color:#cbd5e1}.summary-row b{color:#fff;text-align:right;max-width:190px}.summary-row.total{font-size:16px;border-bottom:0;padding-top:13px}.summary-row.total b{color:#ffbd32;font-size:21px}.summary-divider{height:1px;background:rgba(148,163,184,.2);margin:5px 0}.summary-section{margin-top:14px;padding-top:13px;border-top:1px solid rgba(148,163,184,.2)}.summary-section-title{font-size:12px;font-weight:900;color:#fff;margin-bottom:9px}.summary-payment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.summary-pay{position:relative;cursor:pointer}.summary-pay input{position:absolute;opacity:0}.summary-pay-box{min-height:62px;border:1px solid #344158;border-radius:10px;background:#172238;padding:9px;display:flex;align-items:center;gap:8px}.summary-pay input:checked+.summary-pay-box{border-color:#ffbd32;box-shadow:0 0 0 2px rgba(255,189,50,.13)}.summary-pay img,.summary-pay .pay-emoji{width:30px;height:30px;border-radius:8px;object-fit:contain;background:#fff;display:grid;place-items:center;flex:0 0 auto}.summary-pay b{display:block;color:#fff;font-size:11px}.summary-pay small{display:block;color:#aab4c5;font-size:9px;margin-top:2px}.voucher-toggle{margin-top:11px}.voucher-toggle summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px;padding:10px 0;color:#fff;font-size:12px;font-weight:800}.voucher-toggle summary::-webkit-details-marker{display:none}.voucher-body{display:grid;gap:7px;padding-top:7px}.voucher-body input{height:40px;border:1px solid #46526a;background:#0d1728;color:#fff;border-radius:9px;padding:0 11px}.payment-state{margin-top:11px;padding:9px 10px;border:1px solid rgba(245,158,11,.38);background:rgba(245,158,11,.09);border-radius:9px;color:#fcd34d;font-size:11px;font-weight:800}.payment-state.ready{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08);color:#86efac}.checkout-button{width:100%;margin-top:12px;height:46px;border:0;border-radius:11px;background:linear-gradient(90deg,#ffd56b,#ffac25);font-weight:900;color:#111827;cursor:pointer}.checkout-button:disabled{opacity:.62;cursor:not-allowed}.checkout-hint{display:block;text-align:center;color:#c5cedd;font-size:10px;margin-top:6px}.summary-back{display:block;text-align:center;color:#f7b928;font-size:11px;text-decoration:none;margin-top:9px}.checkout-steps{max-width:1220px;margin:12px auto 6px;padding:0 18px;display:flex;gap:10px;align-items:center;color:#94a3b8;font-size:12px}.checkout-steps b{color:#fff}.checkout-steps i{height:1px;flex:1;background:#324057}.checkout-steps span{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#ffbd32;color:#111827;font-weight:900}.topup-hero-compact{padding-bottom:8px}.empty-state{padding:18px;text-align:center;color:#94a3b8;border:1px dashed #40506a;border-radius:10px}
+@media(max-width:980px){.checkout-shell{grid-template-columns:1fr}.checkout-summary{position:static}.service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.checkout-shell{padding:0 10px}.checkout-card{padding:14px}.service-grid{grid-template-columns:1fr 1fr;gap:8px}.service-tile{min-height:86px;padding:9px}.service-icon{width:30px;height:30px}.service-copy b,.service-copy strong{font-size:11px}.category-row{display:block}.category-row .field-label{min-width:0}.target-grid{grid-template-columns:1fr}.checkout-steps b{display:none}.summary-payment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 <section class="topup-hero topup-hero-compact">
-    <div>
-        <span class="eyebrow">{{ settings.get('site_name', global_settings.get('site_name', 'RAJA TOPUP GAMES')) }}</span>
-        <h1>Top Up {{ category.name }}</h1>
-        <p>{{ input_config.help if input_config else 'Pilih layanan, isi target, lalu selesaikan pembayaran.' }}</p>
-    </div>
+  <div><span class="eyebrow">{{ settings.get('site_name', global_settings.get('site_name', 'RAJA TOPUP GAMES')) }}</span><h1>Top Up {{ category.name }}</h1><p>{{ input_config.help if input_config else 'Pilih layanan, isi target, lalu selesaikan pembayaran.' }}</p></div>
 </section>
+<div class="checkout-steps"><span>1</span><b>Pilih Layanan</b><i></i><span>2</span><b>Isi Target</b><i></i><span>3</span><b>Pembayaran</b></div>
+<form method="POST" id="topupForm" novalidate>
+<div class="checkout-shell">
+  <div class="checkout-left">
+    <section class="checkout-card">
+      <div class="checkout-heading"><div class="checkout-number">1</div><div><h2>Pilih Layanan</h2><p>Pilih nominal atau paket yang ingin dipesan.</p></div></div>
+      <div class="category-row"><label class="field-label"><span>Kategori</span><select id="categorySelect">{% for item in service_categories %}<option value="{{ url_for('home.topup', category_id=item.id) }}" {% if item.id == category.id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></label></div>
+      <div class="service-grid" id="serviceGrid">
+        {% for product in products %}{% set pc = product_configs.get(product.id, input_config) %}
+        <label class="service-choice">
+          <input type="radio" name="product_id" value="{{ product.id }}" required
+            data-name="{{ product.name|e }}" data-price="{{ product.price }}" data-description="{{ (product.description or 'Layanan diproses sesuai ketentuan. Pastikan target sudah benar.')|e }}"
+            data-target-type="{{ pc.type|e }}" data-target-title="{{ pc.title|e }}" data-target-help="{{ pc.help|e }}" data-target-label="{{ pc.label|e }}" data-target-placeholder="{{ pc.placeholder|e }}"
+            data-needs-server="{{ '1' if pc.needs_server else '0' }}" data-server-label="{{ (pc.server_label or 'Zone / Server ID')|e }}" data-server-placeholder="{{ (pc.server_placeholder or 'Contoh: 1234')|e }}">
+          <span class="service-tile">
+            {% if product.image %}<img class="service-icon" src="{{ media_url(product.image, 'products') }}" alt="{{ product.name }}">{% endif %}
+            <span class="service-copy"><b>{{ product.name }}</b><strong>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</strong><small>{{ product.description or 'Klik untuk memilih layanan ini.' }}</small></span>
+          </span>
+        </label>
+        {% else %}<div class="empty-state">Belum ada layanan aktif untuk kategori ini.</div>{% endfor %}
+      </div>
+      <div class="service-description" id="serviceDescriptionText"></div>
+    </section>
 
-<div class="checkout-stepper" aria-label="Tahapan checkout">
-    <div class="checkout-step active"><span>1</span><b>Pilih Layanan</b></div>
-    <i></i>
-    <div class="checkout-step"><span>2</span><b>Isi Target</b></div>
-    <i></i>
-    <div class="checkout-step"><span>3</span><b>Pembayaran</b></div>
-</div>
+    <section class="checkout-card">
+      <div class="checkout-heading"><div class="checkout-number">2</div><div><h2 id="targetTitle">{{ input_config.title if input_config else 'Isi Target' }}</h2><p id="targetHelp">{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
+      <div class="target-grid single" id="targetGrid">
+        <label class="field-label"><span id="targetLabel">{{ input_config.label if input_config else 'Data Target' }}</span><input id="targetInput" type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" autocomplete="off" required></label>
+        <label class="field-label" id="serverField" hidden><span id="serverLabel">Zone / Server ID</span><input id="serverInput" type="text" name="game_server_id" placeholder="Contoh: 1234" autocomplete="off"></label>
+      </div>
+      <div class="target-feedback" id="targetFeedback" aria-live="polite"></div>
+      <div class="target-warning">⚠️ Pastikan target benar. Pesanan yang sudah diproses tidak dapat dibatalkan karena kesalahan target.</div>
+    </section>
+  </div>
 
-<form method="POST" class="topup-layout topup-layout-clean" id="topupForm" novalidate>
-    <div class="topup-main">
-        <div class="step-card service-selector-card">
-            <div class="step-title"><span>1</span><div><h2>Pilih Layanan</h2><p>Pilih kategori dan layanan yang ingin dipesan.</p></div></div>
-            <div class="service-select-grid">
-                <label>
-                    <span>Kategori <em>*</em></span>
-                    <select id="categorySelect" aria-label="Pilih kategori">
-                        {% for item in service_categories %}<option value="{{ url_for('home.topup', category_id=item.id) }}" {% if item.id == category.id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}
-                    </select>
-                </label>
-                <label>
-                    <span>Layanan <em>*</em></span>
-                    <select id="serviceSelect" name="product_id" required aria-label="Pilih layanan">
-                        <option value="" selected disabled>-- Pilih layanan --</option>
-                        {% for product in products %}
-                        {% set pc = product_configs.get(product.id, input_config) %}
-                        <option value="{{ product.id }}" data-name="{{ product.name|e }}" data-price="{{ product.price }}" data-description="{{ (product.description or 'Layanan diproses sesuai ketentuan. Pastikan target sudah benar.')|e }}" data-target-type="{{ pc.type|e }}" data-target-title="{{ pc.title|e }}" data-target-help="{{ pc.help|e }}" data-target-label="{{ pc.label|e }}" data-target-placeholder="{{ pc.placeholder|e }}" data-needs-server="{{ '1' if pc.needs_server else '0' }}" data-server-label="{{ (pc.server_label or 'Zone / Server ID')|e }}" data-server-placeholder="{{ (pc.server_placeholder or 'Contoh: 1234')|e }}">{{ product.name }} — Rp {{ "{:,}".format(product.price).replace(",", ".") }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-            </div>
-            <details class="service-description clean-description" id="serviceDescription">
-                <summary>📋 Lihat deskripsi layanan</summary>
-                <div id="serviceDescriptionText">Pilih layanan untuk melihat deskripsi.</div>
-            </details>
-            {% if not products %}<div class="empty-state">Belum ada layanan aktif untuk kategori ini.</div>{% endif %}
-        </div>
+  <aside class="checkout-summary">
+    <h2>Ringkasan</h2>
+    <div class="summary-row"><span>Produk</span><b>{{ category.name }}</b></div>
+    <div class="summary-row"><span>Layanan</span><b id="summaryProduct">Belum dipilih</b></div>
+    <div class="summary-row"><span>Target</span><b id="summaryTarget">Belum diisi</b></div>
+    <div class="summary-divider"></div>
+    <div class="summary-row"><span>Harga</span><b id="summarySubtotal">Rp 0</b></div>
+    <div class="summary-row"><span>Biaya Admin</span><b id="summaryFee">Rp 0</b></div>
+    <div class="summary-row"><span>Voucher</span><b id="summaryDiscount">- Rp 0</b></div>
+    <div class="summary-row total"><span>Total Bayar</span><b id="summaryPrice">Rp 0</b></div>
 
-        <div class="step-card">
-            <div class="step-title"><span>2</span><div><h2 id="targetTitle">{{ input_config.title if input_config else 'Isi Target' }}</h2><p id="targetHelp">{{ input_config.help if input_config else 'Masukkan data target pesanan.' }}</p></div></div>
-            <div class="form-grid compact-game-fields" id="targetGrid">
-                <label><span id="targetLabel">{{ input_config.label if input_config else 'Data Target' }}</span><input id="targetInput" type="text" name="game_user_id" placeholder="{{ input_config.placeholder if input_config else 'Masukkan data target' }}" autocomplete="off" required></label>
-                <label id="serverField" hidden><span id="serverLabel">Zone / Server ID</span><input id="serverInput" type="text" name="game_server_id" placeholder="Contoh: 1234" autocomplete="off"></label>
-            </div>
-            <div class="target-feedback" id="targetFeedback" aria-live="polite"></div>
-            <div class="order-warning compact-warning">⚠️ Pastikan target benar. Pesanan yang sudah diproses tidak dapat dibatalkan karena kesalahan target.</div>
-        </div>
-
-        <div class="step-card payment-step-card">
-            <div class="step-title"><span>3</span><div><h2>Pembayaran</h2><p>Pilih metode pembayaran, lalu gunakan voucher bila tersedia.</p></div></div>
-            <div class="payment-grid payment-grid-clean">
-                <label class="pay-card pay-method-card wallet-pay-card" data-fee="0">
-                    <input type="radio" name="payment_method_id" value="saldo" required>
-                    <div class="pay-logo wallet-logo">💰</div><span>Saldo Akun</span><small>Rp {{ "{:,}".format((current_user.balance if current_user else 0) or 0).replace(",", ".") }}</small>
-                </label>
-                {% for m in payment_methods %}
-                <label class="pay-card pay-method-card" data-fee="{{ m.admin_fee or 0 }}">
-                    <input type="radio" name="payment_method_id" value="{{ m.id }}" required>
-                    {% if m.logo %}<img class="pay-logo" src="{{ media_url(m.logo, 'payment_methods') }}" alt="{{ m.name }}">{% endif %}
-                    <span>{{ m.name }}</span><small>{{ m.type|replace('_',' ')|title }}{% if m.admin_fee %} • Fee Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}{% endif %}</small>
-                </label>
-                {% else %}<div class="empty-state">Belum ada metode pembayaran aktif.</div>{% endfor %}
-            </div>
-
-            <div class="payment-voucher-wrap">
-                <details class="voucher-box-clean">
-                    <summary>
-                        <span><b>🎁 Gunakan Voucher</b><small>Punya kode promo? Masukkan di sini.</small></span>
-                        <strong>Buka</strong>
-                    </summary>
-                    <div class="voucher-input-row">
-                        <label for="voucherCode">Kode Voucher</label>
-                        <input id="voucherCode" type="text" name="voucher_code" placeholder="Contoh: RAJA10" autocomplete="off">
-                        <span class="voucher-note">Kode akan divalidasi saat Anda menekan Bayar Sekarang.</span>
-                    </div>
-                </details>
-            </div>
-        </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Pilih Pembayaran</div>
+      <div class="summary-payment-grid">
+        <label class="summary-pay" data-fee="0"><input type="radio" name="payment_method_id" value="saldo" required><span class="summary-pay-box"><span class="pay-emoji">💰</span><span><b>Saldo Akun</b><small>Rp {{ "{:,}".format((current_user.balance if current_user else 0) or 0).replace(",", ".") }}</small></span></span></label>
+        {% for m in payment_methods %}
+        <label class="summary-pay" data-fee="{{ m.admin_fee or 0 }}"><input type="radio" name="payment_method_id" value="{{ m.id }}" required><span class="summary-pay-box">{% if m.logo %}<img src="{{ media_url(m.logo, 'payment_methods') }}" alt="{{ m.name }}">{% else %}<span class="pay-emoji">💳</span>{% endif %}<span><b>{{ m.name }}</b><small>{{ m.type|replace('_',' ')|title }}{% if m.admin_fee %} • Fee Rp {{ "{:,}".format(m.admin_fee).replace(",", ".") }}{% endif %}</small></span></span></label>
+        {% endfor %}
+      </div>
+      <details class="voucher-toggle"><summary><span>🎁 Gunakan Voucher</span><span>+</span></summary><div class="voucher-body"><input id="voucherCode" type="text" name="voucher_code" placeholder="Masukkan kode voucher" autocomplete="off"><small style="color:#9aa6b8">Kode akan divalidasi saat pembayaran.</small></div></details>
+      <div class="payment-state" id="paymentStatusBadge">● Menunggu data</div>
+      <button type="submit" class="checkout-button" id="checkoutButton" disabled>Pilih Layanan</button>
+      <small class="checkout-hint" id="checkoutHint">Pilih layanan terlebih dahulu.</small>
+      <a class="summary-back" href="{{ url_for('home.index') }}">← Kembali ke Home</a>
     </div>
-
-    <aside class="order-summary order-summary-clean">
-        <h2>Ringkasan</h2>
-        <div class="summary-row"><span>Produk</span><b>{{ category.name }}</b></div>
-        <div class="summary-row"><span>Layanan</span><b id="summaryProduct">Belum dipilih</b></div>
-        <div class="summary-row"><span>Target</span><b id="summaryTarget">Belum diisi</b></div>
-        <div class="summary-divider"></div>
-        <div class="summary-row"><span>Harga</span><b id="summarySubtotal">Rp 0</b></div>
-        <div class="summary-row"><span>Biaya Admin</span><b id="summaryFee">Rp 0</b></div>
-        <div class="summary-row"><span>Voucher</span><b id="summaryDiscount">- Rp 0</b></div>
-        <div class="summary-row total"><span>Total Bayar</span><b id="summaryPrice">Rp 0</b></div>
-        <button type="submit" class="btn-checkout" id="checkoutButton" disabled>Lengkapi Pesanan</button>
-        <small class="checkout-hint" id="checkoutHint">Pilih layanan, isi target, dan pilih pembayaran.</small>
-        <div class="checkout-trust-mini">🔒 Pembayaran aman • Data akun diambil dari profil</div>
-        <a class="summary-back" href="{{ url_for('home.index') }}">← Kembali ke Home</a>
-    </aside>
+  </aside>
+</div>
 </form>
 <script>
-function rupiah(value){ return 'Rp ' + Number(value || 0).toLocaleString('id-ID'); }
-window.selectedPrice=0; window.selectedFee=0; window.selectedTargetType='';
-const form=document.getElementById('topupForm'), categorySelect=document.getElementById('categorySelect'), serviceSelect=document.getElementById('serviceSelect'), targetInput=document.getElementById('targetInput'), serverInput=document.getElementById('serverInput'), serverField=document.getElementById('serverField'), checkoutButton=document.getElementById('checkoutButton'), checkoutHint=document.getElementById('checkoutHint'), targetFeedback=document.getElementById('targetFeedback'), descriptionText=document.getElementById('serviceDescriptionText');
-function currentTargetText(){const a=(targetInput.value||'').trim(),b=serverField&&!serverField.hidden?(serverInput.value||'').trim():'';return a?(b?a+' / '+b:a):'Belum diisi';}
-function updateSummaryTotal(){document.getElementById('summarySubtotal').textContent=rupiah(window.selectedPrice);document.getElementById('summaryFee').textContent=rupiah(window.selectedFee);document.getElementById('summaryPrice').textContent=rupiah(window.selectedPrice+window.selectedFee);}
-function validateTarget(show){const v=(targetInput.value||'').trim();let ok=v.length>0,msg='',t=window.selectedTargetType;if(ok&&['phone','wallet'].includes(t)){ok=/^(?:\+62|62|0)8[0-9]{7,13}$/.test(v.replace(/[\s-]/g,''));msg=ok?'✓ Format nomor benar.':'Gunakan nomor Indonesia yang valid.';}else if(ok&&t==='email'){ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);msg=ok?'✓ Format email benar.':'Masukkan alamat email yang valid.';}else if(ok&&['social','username','username_link'].includes(t)){ok=!/^[0-9]{5,}$/.test(v);msg=ok?'✓ Target siap digunakan.':'Jangan masukkan ID game pada layanan sosial media.';}if(ok&&serverField&&!serverField.hidden&&!(serverInput.value||'').trim()){ok=false;msg='Zone / Server ID wajib diisi.';}if(show||v){targetFeedback.textContent=msg;targetFeedback.className='target-feedback '+(ok?'valid':(msg?'invalid':''));}return ok;}
-function updateFormState(){document.getElementById('summaryTarget').textContent=currentTargetText();const ready=!!serviceSelect.value&&validateTarget(false)&&!!document.querySelector('input[name="payment_method_id"]:checked');checkoutButton.disabled=!ready;checkoutButton.textContent=ready?'Bayar Sekarang':'Lengkapi Pesanan';checkoutHint.textContent=ready?'Pesanan siap dilanjutkan.':'Pilih layanan, isi target, dan pilih pembayaran.';}
-categorySelect?.addEventListener('change',function(){if(this.value)location.href=this.value;});
-serviceSelect?.addEventListener('change',function(){const o=this.options[this.selectedIndex];document.getElementById('summaryProduct').textContent=o.dataset.name||o.textContent.trim();window.selectedPrice=Number(o.dataset.price||0);window.selectedTargetType=o.dataset.targetType||'';descriptionText.textContent=o.dataset.description||'Tidak ada deskripsi layanan.';document.getElementById('targetTitle').textContent=o.dataset.targetTitle||'Isi Target';document.getElementById('targetHelp').textContent=o.dataset.targetHelp||'Masukkan data target.';document.getElementById('targetLabel').textContent=o.dataset.targetLabel||'Data Target';targetInput.placeholder=o.dataset.targetPlaceholder||'Masukkan data target';const needs=o.dataset.needsServer==='1';serverField.hidden=!needs;document.getElementById('serverLabel').textContent=o.dataset.serverLabel||'Zone / Server ID';serverInput.placeholder=o.dataset.serverPlaceholder||'Contoh: 1234';serverInput.required=needs;if(!needs)serverInput.value='';targetInput.value='';updateSummaryTotal();updateFormState();});
-[targetInput,serverInput].forEach(i=>{i.addEventListener('input',updateFormState);i.addEventListener('blur',()=>{validateTarget(true);updateFormState();});});
-document.querySelectorAll('.pay-method-card input').forEach(i=>i.addEventListener('change',function(){window.selectedFee=Number(this.closest('.pay-method-card').dataset.fee||0);updateSummaryTotal();updateFormState();}));
-form.addEventListener('submit',function(e){updateFormState();if(checkoutButton.disabled||!form.checkValidity()){e.preventDefault();validateTarget(true);form.reportValidity();}});
+function rupiah(value){return 'Rp '+Number(value||0).toLocaleString('id-ID')}
+let selectedPrice=0,selectedFee=0,selectedTargetType='';
+const form=document.getElementById('topupForm'),categorySelect=document.getElementById('categorySelect'),targetInput=document.getElementById('targetInput'),serverInput=document.getElementById('serverInput'),serverField=document.getElementById('serverField'),targetGrid=document.getElementById('targetGrid'),checkoutButton=document.getElementById('checkoutButton'),checkoutHint=document.getElementById('checkoutHint'),targetFeedback=document.getElementById('targetFeedback'),descriptionText=document.getElementById('serviceDescriptionText'),paymentStatusBadge=document.getElementById('paymentStatusBadge');
+function selectedService(){return document.querySelector('input[name="product_id"]:checked')}
+function currentTargetText(){const a=(targetInput.value||'').trim(),b=!serverField.hidden?(serverInput.value||'').trim():'';return a?(b?a+' / '+b:a):'Belum diisi'}
+function updateSummaryTotal(){document.getElementById('summarySubtotal').textContent=rupiah(selectedPrice);document.getElementById('summaryFee').textContent=rupiah(selectedFee);document.getElementById('summaryPrice').textContent=rupiah(selectedPrice+selectedFee)}
+function validateTarget(show){const v=(targetInput.value||'').trim();let ok=v.length>0,msg='',t=selectedTargetType;if(ok&&['phone','wallet'].includes(t)){ok=/^(?:\+62|62|0)8[0-9]{7,13}$/.test(v.replace(/[\s-]/g,''));msg=ok?'✓ Format nomor benar.':'Gunakan nomor Indonesia yang valid.'}else if(ok&&t==='email'){ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);msg=ok?'✓ Format email benar.':'Masukkan alamat email yang valid.'}else if(ok&&['social','username','username_link'].includes(t)){ok=!/^[0-9]{5,}$/.test(v);msg=ok?'✓ Target siap digunakan.':'Jangan masukkan ID game pada layanan sosial media.'}if(ok&&!serverField.hidden&&!(serverInput.value||'').trim()){ok=false;msg='Zone / Server ID wajib diisi.'}if(show||v){targetFeedback.textContent=msg;targetFeedback.className='target-feedback '+(ok?'valid':(msg?'invalid':''))}return ok}
+function updateFormState(){document.getElementById('summaryTarget').textContent=currentTargetText();const hasService=!!selectedService(),hasTarget=validateTarget(false),hasPayment=!!document.querySelector('input[name="payment_method_id"]:checked'),ready=hasService&&hasTarget&&hasPayment;let status='Menunggu data',button='Pilih Layanan',hint='Pilih layanan terlebih dahulu.';if(hasService&&!hasTarget){status='Menunggu target';button='Isi Target';hint='Lengkapi data target pesanan.'}else if(hasService&&hasTarget&&!hasPayment){status='Pilih pembayaran';button='Pilih Pembayaran';hint='Pilih metode pembayaran di ringkasan.'}else if(ready){status='Siap dibayar';button='Bayar Sekarang';hint='Pesanan siap dilanjutkan.'}paymentStatusBadge.textContent='● '+status;paymentStatusBadge.classList.toggle('ready',ready);checkoutButton.disabled=!ready;checkoutButton.textContent=button;checkoutHint.textContent=hint}
+categorySelect?.addEventListener('change',function(){if(this.value)location.href=this.value});
+document.querySelectorAll('input[name="product_id"]').forEach(input=>input.addEventListener('change',function(){const o=this;document.getElementById('summaryProduct').textContent=o.dataset.name||'Layanan dipilih';selectedPrice=Number(o.dataset.price||0);selectedTargetType=o.dataset.targetType||'';descriptionText.textContent=o.dataset.description||'';descriptionText.classList.toggle('show',!!descriptionText.textContent);document.getElementById('targetTitle').textContent=o.dataset.targetTitle||'Isi Target';document.getElementById('targetHelp').textContent=o.dataset.targetHelp||'Masukkan data target.';document.getElementById('targetLabel').textContent=o.dataset.targetLabel||'Data Target';targetInput.placeholder=o.dataset.targetPlaceholder||'Masukkan data target';const needs=o.dataset.needsServer==='1';serverField.hidden=!needs;targetGrid.classList.toggle('single',!needs);document.getElementById('serverLabel').textContent=o.dataset.serverLabel||'Zone / Server ID';serverInput.placeholder=o.dataset.serverPlaceholder||'Contoh: 1234';serverInput.required=needs;if(!needs)serverInput.value='';targetInput.value='';updateSummaryTotal();updateFormState()}));
+[targetInput,serverInput].forEach(i=>{i.addEventListener('input',updateFormState);i.addEventListener('blur',()=>{validateTarget(true);updateFormState()})});
+document.querySelectorAll('.summary-pay input').forEach(i=>i.addEventListener('change',function(){selectedFee=Number(this.closest('.summary-pay').dataset.fee||0);updateSummaryTotal();updateFormState()}));
+form.addEventListener('submit',function(e){updateFormState();if(checkoutButton.disabled||!form.checkValidity()){e.preventDefault();validateTarget(true);form.reportValidity()}});
 updateSummaryTotal();updateFormState();
 </script>
 {% endblock %}

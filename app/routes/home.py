@@ -232,10 +232,13 @@ def _product_input_config(product, category):
     target_type = (getattr(product, "target_type", None) or "auto").strip().lower()
     category_config = _category_input_config(category)
 
-    # Perlindungan dari konfigurasi produk lama/salah: kategori sosial media tidak boleh
-    # menampilkan Zone/Server ID. Admin tetap bisa memilih username atau username_link.
-    if category_config.get("type") == "social" and target_type in {"auto", "game_id", "game_id_server"}:
-        target_type = "username_link"
+    # Perlindungan dari konfigurasi produk lama/salah:
+    # Zone/Server ID hanya boleh tampil pada kategori game. Semua kategori non-game
+    # selalu mengikuti konfigurasi kategorinya, walaupun produk lama tersimpan sebagai
+    # game_id atau game_id_server.
+    category_type = category_config.get("type")
+    if category_type != "game" and target_type in {"auto", "game_id", "game_id_server"}:
+        return category_config
 
     configs = {
         "username": {"type": "username", "title": "Data Username", "help": "Masukkan username akun tujuan.", "label": "Username", "placeholder": "Contoh: @username", "needs_server": False, "required": True},

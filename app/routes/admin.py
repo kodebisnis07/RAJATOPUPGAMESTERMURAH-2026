@@ -987,19 +987,35 @@ def orders():
 @login_required
 def update_order(id):
     order = Order.query.get_or_404(id)
-    allowed_payment_statuses = ["pending", "paid", "cancelled", "failed", "expired"]
+    allowed_payment_statuses = ["pending", "paid", "valid", "cancelled", "failed", "expired"]
     allowed_order_statuses = ["pending", "processing", "success", "completed", "cancelled", "failed"]
 
-    old_payment_status = order.payment_status
-    old_order_status = order.order_status
+    old_payment_status = (order.payment_status or "pending").lower()
+    old_order_status = (order.order_status or "pending").lower()
 
-    payment_status = request.form.get("payment_status", order.payment_status)
-    order_status = request.form.get("order_status", order.order_status)
+    payment_status = (request.form.get("payment_status", order.payment_status) or "pending").lower()
+    order_status = (request.form.get("order_status", order.order_status) or "pending").lower()
+
+    # "valid" adalah istilah admin untuk pembayaran yang sudah sah.
+    if payment_status == "valid":
+        payment_status = "paid"
 
     if payment_status not in allowed_payment_statuses:
-        payment_status = order.payment_status
+        payment_status = old_payment_status
     if order_status not in allowed_order_statuses:
-        order_status = order.order_status
+        order_status = old_order_status
+
+    # Sinkronkan keputusan admin agar status pada daftar pembayaran, kartu pesanan,
+    # dan detail order selalu sama. Pembatalan dari salah satu pilihan membatalkan
+    # keduanya; order yang diproses/diselesaikan dianggap sudah dibayar.
+    if payment_status in ["cancelled", "failed", "expired"]:
+        order_status = "failed" if payment_status in ["failed", "expired"] else "cancelled"
+    elif order_status in ["cancelled", "failed"]:
+        payment_status = "failed" if order_status == "failed" else "cancelled"
+    elif order_status in ["processing", "success", "completed"]:
+        payment_status = "paid"
+    elif payment_status == "paid" and order_status == "pending":
+        order_status = "completed"
 
     will_be_cancelled = payment_status in ["cancelled", "failed", "expired"] or order_status in ["cancelled", "failed"]
     was_already_cancelled = old_payment_status in ["cancelled", "failed", "expired"] or old_order_status in ["cancelled", "failed"]
@@ -1013,8 +1029,27 @@ def update_order(id):
     order.payment_status = payment_status
     order.order_status = order_status
 
-    if order.payment:
-        order.payment.status = payment_status
+    # Sinkronkan SEMUA record pembayaran yang terkait. Data lama kadang belum
+    # memiliki relasi order_id yang benar, jadi gunakan invoice/reference sebagai fallback.
+    matchers = [Payment.order_id == order.id]
+    if order.invoice:
+        matchers.extend([
+            Payment.reference == order.invoice,
+            Payment.payment_code == order.invoice,
+        ])
+    if order.payment_reference:
+        matchers.append(Payment.reference == order.payment_reference)
+    if order.order_number:
+        matchers.append(Payment.reference == order.order_number)
+
+    related_payments = Payment.query.filter(db.or_(*matchers)).all()
+    for payment in related_payments:
+        payment.status = payment_status
+        if payment_status == "paid":
+            if not payment.paid_at:
+                payment.paid_at = datetime.utcnow()
+        else:
+            payment.paid_at = None
 
     db.session.commit()
     log_admin_activity("ubah_status_order", f"Mengubah {order.invoice}: pembayaran={payment_status}, order={order_status}, refund_saldo={refunded_amount}")
@@ -1612,7 +1647,41 @@ def update_wallet_topup(id):
 @admin_bp.route("/payments")
 @login_required
 def payments():
-    return render_template("admin/payments.html", payments=Payment.query.order_by(Payment.id.desc()).all())
+    payments_data = Payment.query.order_by(Payment.id.desc()).all()
+
+    # Rekonsiliasi data lama agar halaman Pembayaran tidak terus menampilkan
+    # "pending" ketika status pada pesanan induk sudah berubah.
+    changed = False
+    for payment in payments_data:
+        order = payment.order
+        if not order and payment.reference:
+            order = Order.query.filter(db.or_(
+                Order.invoice == payment.reference,
+                Order.payment_reference == payment.reference,
+                Order.order_number == payment.reference,
+            )).order_by(Order.id.desc()).first()
+            if order and payment.order_id != order.id:
+                payment.order_id = order.id
+                changed = True
+
+        if order:
+            effective_status = (order.payment_status or payment.status or "pending").lower()
+            if effective_status == "valid":
+                effective_status = "paid"
+            if payment.status != effective_status:
+                payment.status = effective_status
+                changed = True
+            if effective_status == "paid" and not payment.paid_at:
+                payment.paid_at = datetime.utcnow()
+                changed = True
+            elif effective_status != "paid" and payment.paid_at is not None:
+                payment.paid_at = None
+                changed = True
+
+    if changed:
+        db.session.commit()
+
+    return render_template("admin/payments.html", payments=payments_data)
 
 
 @admin_bp.route("/seo", methods=["GET", "POST"])

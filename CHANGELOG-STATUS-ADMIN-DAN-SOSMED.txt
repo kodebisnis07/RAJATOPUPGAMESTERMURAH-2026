@@ -1,0 +1,12 @@
+PERBAIKAN STATUS ADMIN & FORM SUNTIK SOSMED
+
+1. Status Bayar dan Status Order sekarang otomatis sinkron.
+   - Paid -> Completed
+   - Completed/Success/Processing -> Paid
+   - Cancelled -> Cancelled
+   - Failed -> Failed
+   - Expired -> Order Cancelled
+2. Status pada tabel Pembayaran ikut diperbarui melalui data Payment terkait.
+3. Produk dalam kategori/katalog Suntik Sosmed selalu menggunakan Username / Link Target.
+4. Zone / Server ID tidak lagi muncul dan tidak divalidasi untuk layanan Suntik Sosmed.
+5. Form aksi admin dirapikan dengan tombol Simpan Status dan catatan sinkronisasi.
