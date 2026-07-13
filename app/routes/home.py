@@ -265,6 +265,11 @@ def _product_input_config(product, category):
     if category_type != "game" and target_type in {"auto", "game_id", "game_id_server"}:
         return category_config
 
+    # Kategori non-game tidak pernah boleh menampilkan Zone/Server, meskipun
+    # target_type produk lama salah tersimpan sebagai game_id_server.
+    if category_type in {"social", "account", "telegram", "phone", "wallet", "voucher"}:
+        return category_config
+
     configs = {
         "username": {"type": "username", "title": "Data Username", "help": "Masukkan username akun tujuan.", "label": "Username", "placeholder": "Contoh: @username", "needs_server": False, "required": True},
         "username_link": {"type": "username_link", "title": "Data Target Sosial Media", "help": "Masukkan username akun atau link postingan sesuai layanan.", "label": "Username / Link Target", "placeholder": "Contoh: @username atau https://link-postingan", "needs_server": False, "required": True},

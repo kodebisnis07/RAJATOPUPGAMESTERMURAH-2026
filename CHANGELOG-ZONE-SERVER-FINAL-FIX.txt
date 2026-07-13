@@ -1,0 +1,6 @@
+PERBAIKAN ZONE / SERVER ID FINAL
+
+- Zone / Server ID hanya boleh muncul saat jenis target produk benar-benar game_id_server.
+- E-wallet (DANA, OVO, GoPay, ShopeePay, LinkAja), sosial media, pulsa, aplikasi, Telegram, dan voucher selalu memakai satu kolom target.
+- Perlindungan diterapkan di backend dan JavaScript agar data produk lama yang salah tidak memunculkan Zone.
+- Validasi backend tidak meminta game_server_id untuk kategori non-game.
