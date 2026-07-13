@@ -153,7 +153,7 @@ def _category_text(category):
 def _category_input_config(category):
     """Atur form order sesuai jenis kategori tanpa menambah kolom database baru."""
     text = _category_text(category)
-    if any(k in text for k in ["sosmed", "followers", "likes", "instagram", "tiktok", "facebook"]):
+    if any(k in text for k in ["sosmed", "social media", "followers", "follower", "likes", "like", "views", "view", "instagram", "tiktok", "facebook", "youtube", "telegram", "twitter", "threads", "shopee", "marketplace"]):
         return {
             "type": "social",
             "title": "Username / Link Sosial Media",
@@ -237,6 +237,31 @@ def _product_input_config(product, category):
     # selalu mengikuti konfigurasi kategorinya, walaupun produk lama tersimpan sebagai
     # game_id atau game_id_server.
     category_type = category_config.get("type")
+
+    # Perlindungan tambahan berdasarkan nama produk. Beberapa database lama
+    # menaruh layanan sosial media di kategori umum/game sehingga kategori saja
+    # tidak cukup untuk mendeteksi jenis target.
+    product_text = " ".join([
+        getattr(product, "name", "") or "",
+        getattr(product, "description", "") or "",
+    ]).lower()
+    social_keywords = (
+        "sosmed", "social media", "follower", "followers", "like", "likes",
+        "view", "views", "instagram", "tiktok", "facebook", "youtube",
+        "telegram", "twitter", "threads", "shopee", "marketplace", "subscriber",
+        "subscribers", "comment", "comments", "share", "shares",
+    )
+    if any(keyword in product_text for keyword in social_keywords):
+        return {
+            "type": "username_link",
+            "title": "Username / Link Sosial Media",
+            "help": "Masukkan username akun atau link postingan sesuai layanan yang dipilih.",
+            "label": "Username atau Link Target",
+            "placeholder": "Contoh: @username atau https://link-postingan",
+            "needs_server": False,
+            "required": True,
+        }
+
     if category_type != "game" and target_type in {"auto", "game_id", "game_id_server"}:
         return category_config
 

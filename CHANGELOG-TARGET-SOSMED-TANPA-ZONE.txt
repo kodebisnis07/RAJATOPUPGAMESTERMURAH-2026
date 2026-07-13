@@ -1,0 +1,11 @@
+PERBAIKAN TARGET SOSIAL MEDIA TANPA ZONE ID
+
+- Deteksi kategori sosial media diperluas: TikTok, Instagram, Facebook, YouTube,
+  Telegram, Twitter, Threads, Shopee, followers, likes, views, subscribers,
+  comments, dan shares.
+- Ditambahkan perlindungan berdasarkan nama/deskripsi produk untuk data lama yang
+  salah kategori atau salah target_type.
+- Semua layanan sosial media selalu memakai satu input Username / Link Target.
+- Zone / Server ID hanya tampil bila produk benar-benar dikonfigurasi sebagai
+  game_id_server dan bukan layanan sosial media.
+- Validasi backend dan tampilan frontend memakai konfigurasi yang sama.
