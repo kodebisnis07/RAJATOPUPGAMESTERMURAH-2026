@@ -73,46 +73,89 @@ def ensure_sqlite_columns(app):
 
 
 def ensure_runtime_columns(app):
-    """Tambahkan kolom penting untuk database lama (SQLite/PostgreSQL) tanpa menghapus data."""
+    """Sinkronkan skema database lama secara aman tanpa menghapus data."""
     try:
+        # create_all hanya membuat tabel yang belum ada; data/tabel lama tidak dihapus.
+        db.create_all()
+
         inspector = inspect(db.engine)
         dialect = db.engine.dialect.name
         existing_tables = set(inspector.get_table_names())
-        if "orders" not in existing_tables:
-            return
-        order_columns = {col["name"] for col in inspector.get_columns("orders")}
-        user_columns = {col["name"] for col in inspector.get_columns("users")} if "users" in existing_tables else set()
-        banner_columns = {col["name"] for col in inspector.get_columns("banners")} if "banners" in existing_tables else set()
-        product_columns = {col["name"] for col in inspector.get_columns("products")} if "products" in existing_tables else set()
+
+        def columns_for(table):
+            if table not in existing_tables:
+                return set()
+            return {col["name"] for col in inspector.get_columns(table)}
+
+        order_columns = columns_for("orders")
+        user_columns = columns_for("users")
+        banner_columns = columns_for("banners")
+        product_columns = columns_for("products")
+        payment_columns = columns_for("payments")
         ddl_statements = []
-        if "cancelled_at" not in order_columns:
-            if dialect == "postgresql":
-                ddl_statements.append("ALTER TABLE orders ADD COLUMN cancelled_at TIMESTAMP")
-            else:
-                ddl_statements.append("ALTER TABLE orders ADD COLUMN cancelled_at DATETIME")
-        if "voucher_code" not in order_columns:
-            ddl_statements.append("ALTER TABLE orders ADD COLUMN voucher_code VARCHAR(60)")
-        if "discount_amount" not in order_columns:
-            ddl_statements.append("ALTER TABLE orders ADD COLUMN discount_amount INTEGER DEFAULT 0")
-        if "order_number" not in order_columns:
-            ddl_statements.append("ALTER TABLE orders ADD COLUMN order_number VARCHAR(40)")
-        if "balance" not in user_columns:
-            ddl_statements.append("ALTER TABLE users ADD COLUMN balance INTEGER DEFAULT 0")
-        if "bonus_coins" not in user_columns:
-            ddl_statements.append("ALTER TABLE users ADD COLUMN bonus_coins INTEGER DEFAULT 0")
+
+        # Kolom akun yang dibutuhkan saat login dan membuka dashboard.
+        user_definitions = {
+            "username": "VARCHAR(80)",
+            "phone": "VARCHAR(30)",
+            "avatar": "VARCHAR(500)",
+            "member_level": "VARCHAR(30) DEFAULT 'Bronze'",
+            "balance": "INTEGER DEFAULT 0",
+            "bonus_coins": "INTEGER DEFAULT 0",
+            "role": "VARCHAR(20) DEFAULT 'user'",
+            "is_active": "BOOLEAN DEFAULT TRUE" if dialect == "postgresql" else "BOOLEAN DEFAULT 1",
+        }
+        if "users" in existing_tables:
+            for column, definition in user_definitions.items():
+                if column not in user_columns:
+                    ddl_statements.append(f"ALTER TABLE users ADD COLUMN {column} {definition}")
+
+        order_definitions = {
+            "payment_url": "VARCHAR(500)",
+            "payment_reference": "VARCHAR(150)",
+            "cancelled_at": "TIMESTAMP" if dialect == "postgresql" else "DATETIME",
+            "voucher_code": "VARCHAR(60)",
+            "discount_amount": "INTEGER DEFAULT 0",
+            "order_number": "VARCHAR(40)",
+        }
+        if "orders" in existing_tables:
+            for column, definition in order_definitions.items():
+                if column not in order_columns:
+                    ddl_statements.append(f"ALTER TABLE orders ADD COLUMN {column} {definition}")
+
         if "banners" in existing_tables and "tag" not in banner_columns:
             ddl_statements.append("ALTER TABLE banners ADD COLUMN tag VARCHAR(80) DEFAULT 'RAJA TOPUP GAMES'")
-        if "products" in existing_tables and "target_type" not in product_columns:
-            ddl_statements.append("ALTER TABLE products ADD COLUMN target_type VARCHAR(40) DEFAULT 'auto'")
 
-        # Cloudinary URLs are longer than the old local filenames.
+        product_definitions = {
+            "image": "VARCHAR(500)",
+            "price_modal": "INTEGER DEFAULT 0",
+            "provider": "VARCHAR(100)",
+            "provider_code": "VARCHAR(100)",
+            "stock": "INTEGER DEFAULT 0",
+            "game_id": "INTEGER",
+            "target_type": "VARCHAR(40) DEFAULT 'auto'",
+        }
+        if "products" in existing_tables:
+            for column, definition in product_definitions.items():
+                if column not in product_columns:
+                    ddl_statements.append(f"ALTER TABLE products ADD COLUMN {column} {definition}")
+
+        payment_definitions = {
+            "provider": "VARCHAR(50)",
+            "reference": "VARCHAR(150)",
+            "checkout_url": "VARCHAR(500)",
+            "qr_url": "VARCHAR(500)",
+        }
+        if "payments" in existing_tables:
+            for column, definition in payment_definitions.items():
+                if column not in payment_columns:
+                    ddl_statements.append(f"ALTER TABLE payments ADD COLUMN {column} {definition}")
+
+        # Cloudinary URL bisa lebih panjang daripada nama file lokal lama.
         if dialect == "postgresql":
             media_columns = {
-                "users": ["avatar"],
-                "categories": ["icon"],
-                "games": ["image"],
-                "products": ["image"],
-                "payment_methods": ["logo", "qr_image"],
+                "users": ["avatar"], "categories": ["icon"], "games": ["image"],
+                "products": ["image"], "payment_methods": ["logo", "qr_image"],
                 "banners": ["image"],
             }
             for table, columns in media_columns.items():
@@ -123,29 +166,54 @@ def ensure_runtime_columns(app):
                     info = column_info.get(column)
                     current_length = getattr(info.get("type"), "length", None) if info else None
                     if info and current_length and current_length < 500:
-                        ddl_statements.append(
-                            f"ALTER TABLE {table} ALTER COLUMN {column} TYPE VARCHAR(500)"
-                        )
+                        ddl_statements.append(f"ALTER TABLE {table} ALTER COLUMN {column} TYPE VARCHAR(500)")
+
         with db.engine.begin() as conn:
             for ddl in ddl_statements:
                 conn.execute(text(ddl))
 
-            # Isi nomor order untuk data lama. Nomor baru selanjutnya dibuat otomatis oleh model Order.
-            rows = conn.execute(text("SELECT id, created_at, order_number FROM orders WHERE order_number IS NULL OR order_number = ''")).fetchall()
-            for row in rows:
-                created = row[1]
-                stamp = created.strftime("%Y%m%d") if created else "LEGACY"
-                number = f"ORD-{stamp}-{int(row[0]):08d}"
-                conn.execute(text("UPDATE orders SET order_number = :number WHERE id = :id"), {"number": number, "id": row[0]})
+        # Refresh metadata setelah ALTER TABLE.
+        inspector = inspect(db.engine)
+        existing_tables = set(inspector.get_table_names())
+        with db.engine.begin() as conn:
+            if "users" in existing_tables:
+                # Nilai NULL pada data lama dibuat aman untuk template dashboard.
+                conn.execute(text("UPDATE users SET member_level = 'Bronze' WHERE member_level IS NULL OR member_level = ''"))
+                conn.execute(text("UPDATE users SET balance = 0 WHERE balance IS NULL"))
+                conn.execute(text("UPDATE users SET bonus_coins = 0 WHERE bonus_coins IS NULL"))
+                conn.execute(text("UPDATE users SET role = 'user' WHERE role IS NULL OR role = ''"))
+                conn.execute(text("UPDATE users SET is_active = :active WHERE is_active IS NULL"), {"active": True})
 
-            if dialect == "postgresql":
+                # Buat username untuk akun lama. Tidak menimpa username yang sudah ada.
+                rows = conn.execute(text("SELECT id, name, email, username FROM users WHERE username IS NULL OR username = ''")).fetchall()
+                used = {str(row[0]).lower() for row in conn.execute(text("SELECT username FROM users WHERE username IS NOT NULL AND username <> ''")).fetchall()}
+                for row in rows:
+                    user_id, name, email = row[0], row[1], row[2]
+                    base = (email.split('@')[0] if email and '@' in email else (name or f'user{user_id}')).lower()
+                    base = ''.join(ch for ch in base if ch.isalnum() or ch in '._-').strip('._-') or f'user{user_id}'
+                    candidate = base[:60]
+                    counter = 1
+                    while candidate.lower() in used:
+                        counter += 1
+                        candidate = f"{base[:54]}-{counter}"
+                    used.add(candidate.lower())
+                    conn.execute(text("UPDATE users SET username = :username WHERE id = :id"), {"username": candidate, "id": user_id})
+
+            if "orders" in existing_tables:
+                rows = conn.execute(text("SELECT id, created_at, order_number FROM orders WHERE order_number IS NULL OR order_number = ''")).fetchall()
+                for row in rows:
+                    created = row[1]
+                    stamp = created.strftime("%Y%m%d") if created else "LEGACY"
+                    number = f"ORD-{stamp}-{int(row[0]):08d}"
+                    conn.execute(text("UPDATE orders SET order_number = :number WHERE id = :id"), {"number": number, "id": row[0]})
                 conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_orders_order_number ON orders (order_number)"))
-            elif dialect == "sqlite":
-                conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_orders_order_number ON orders (order_number)"))
+
+        # Membuat tabel fitur baru yang mungkin belum ada setelah kolom lama selesai diselaraskan.
+        db.create_all()
     except Exception:
+        db.session.rollback()
+        # Jangan membuat seluruh situs mati. Error lengkap tetap masuk ke log server.
         app.logger.exception("Migrasi kompatibilitas runtime gagal")
-        if os.environ.get("RENDER", "").lower() == "true":
-            raise
 
 def create_app():
     app = Flask(__name__)
@@ -369,11 +437,12 @@ def create_app():
     register_cli(app)
 
     with app.app_context():
+        # Selalu cek skema agar database deployment lama tetap cocok setelah update kode.
+        # Operasi ini tidak menghapus tabel maupun data.
         if app.config.get("AUTO_CREATE_DB"):
             db.create_all()
             ensure_sqlite_columns(app)
-            ensure_runtime_columns(app)
-            db.create_all()
+        ensure_runtime_columns(app)
         if app.config.get("AUTO_SEED_DB"):
             from app.seed import seed_initial_data
             seed_initial_data()

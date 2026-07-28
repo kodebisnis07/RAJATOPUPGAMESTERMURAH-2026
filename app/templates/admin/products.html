@@ -33,22 +33,23 @@
         <button type="submit">Tambah Produk</button>
     </form>
 
-    <table class="admin-table">
+    <div class="catalog-table-shell">
+    <table class="admin-table products-table">
         <thead><tr><th>ID</th><th>Gambar</th><th>Nama</th><th>Game</th><th>Jenis Target</th><th>Harga</th><th>Stok</th><th>Status</th><th>Edit Cepat</th><th>Aksi</th></tr></thead>
         <tbody>
             {% for product in products %}
             <tr>
                 <td>{{ product.id }}</td>
                 <td>{% if product.image %}<img class="admin-thumb" src="{{ media_url(product.image, 'products') }}" alt="{{ product.name }}">{% else %}<div class="admin-thumb placeholder">🎮</div>{% endif %}</td>
-                <td><strong>{{ product.name }}</strong><br><small>{{ product.description or '' }}</small></td>
+                <td class="product-info-cell"><strong>{{ product.name }}</strong><small title="{{ product.description or '' }}">{{ product.description or 'Tidak ada deskripsi' }}</small></td>
                 <td>{{ product.category.name if product.category else '-' }}</td>
                 <td><span class="badge">{{ (product.target_type or 'auto')|replace('_', ' ')|title }}</span></td>
-                <td>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</td>
+                <td class="money-cell"><span>Rp</span><strong>{{ "{:,}".format(product.price).replace(",", ".") }}</strong></td>
                 <td>{{ product.stock }}</td>
                 <td><span class="badge">{{ product.status }}</span></td>
                 <td>
                     <details>
-                        <summary>Edit</summary>
+                        <summary><span aria-hidden="true">✎</span> Edit</summary>
                         <form class="mini-edit" method="POST" action="{{ url_for('admin.edit_product', id=product.id) }}" enctype="multipart/form-data">
                             <input type="hidden" name="next" value="{{ url_for('admin.products') }}">
                             <input type="text" name="name" value="{{ product.name }}" required>
@@ -80,6 +81,7 @@
             {% else %}<tr><td colspan="10">Belum ada produk.</td></tr>{% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 <script>
 const input = document.getElementById('productImageInput');

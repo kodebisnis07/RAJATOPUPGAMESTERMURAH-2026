@@ -43,22 +43,23 @@
         <a class="btn" href="{{ url_for('admin.nominals') }}">Reset</a>
     </form>
 
-    <table class="admin-table">
+    <div class="catalog-table-shell">
+    <table class="admin-table nominals-table">
         <thead><tr><th>ID</th><th>Game</th><th>Nominal</th><th>Harga Modal</th><th>Harga Jual</th><th>Stok</th><th>Provider</th><th>Status</th><th>Edit</th><th>Aksi</th></tr></thead>
         <tbody>
         {% for product in products %}
             <tr>
                 <td>{{ product.id }}</td>
                 <td>{{ product.category.name if product.category else '-' }}</td>
-                <td><strong>{{ product.name }}</strong><br><small>{{ product.description or '' }}</small></td>
-                <td>Rp {{ "{:,}".format(product.price_modal or 0).replace(",", ".") }}</td>
-                <td>Rp {{ "{:,}".format(product.price).replace(",", ".") }}</td>
+                <td class="nominal-info-cell"><strong>{{ product.name }}</strong><small title="{{ product.description or '' }}">{{ product.description or 'Tidak ada deskripsi' }}</small></td>
+                <td class="money-cell"><span>Rp</span><strong>{{ "{:,}".format(product.price_modal or 0).replace(",", ".") }}</strong></td>
+                <td class="money-cell"><span>Rp</span><strong>{{ "{:,}".format(product.price).replace(",", ".") }}</strong></td>
                 <td>{{ product.stock }}</td>
                 <td>{{ product.provider or '-' }}<br><small>{{ product.provider_code or '' }}</small></td>
                 <td><span class="badge">{{ product.status }}</span></td>
                 <td>
                     <details>
-                        <summary>Edit</summary>
+                        <summary><span aria-hidden="true">✎</span> Edit</summary>
                         <form class="mini-edit" method="POST" action="{{ url_for('admin.edit_product', id=product.id) }}" enctype="multipart/form-data">
                             <input type="hidden" name="next" value="{{ url_for('admin.nominals', category_id=selected_category) }}">
                             <input type="text" name="name" value="{{ product.name }}" required>
@@ -92,5 +93,6 @@
         {% else %}<tr><td colspan="10">Belum ada nominal.</td></tr>{% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 {% endblock %}

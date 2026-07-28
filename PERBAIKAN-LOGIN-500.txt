@@ -1,0 +1,18 @@
+PERBAIKAN LOGIN HTTP 500
+
+Perubahan:
+- Pemeriksaan dan sinkronisasi skema database dijalankan otomatis saat aplikasi dimulai.
+- Tabel fitur baru dibuat bila belum ada tanpa menghapus data lama.
+- Kolom akun yang diperlukan dashboard (username, phone, avatar, member_level,
+  balance, bonus_coins, role, is_active) ditambahkan bila belum tersedia.
+- Kolom order, produk, pembayaran, dan banner lama ikut diselaraskan.
+- Akun lama yang belum memiliki username akan diberi username otomatis.
+- Nilai NULL lama pada saldo, koin, level member, role, dan status akun diperbaiki.
+- Kegagalan migrasi dicatat ke log tanpa langsung mematikan seluruh situs.
+
+Setelah deploy:
+1. Restart/redeploy service.
+2. Login ulang.
+3. Bila masih muncul 500, lihat server log untuk error database/permission terbaru.
+
+Perubahan skema ini tidak menjalankan DROP TABLE dan tidak menghapus data.
