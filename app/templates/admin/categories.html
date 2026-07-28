@@ -125,7 +125,8 @@
                         <td class="actions-cell">
                             <details class="category-actions">
                                 <summary>✎ Edit</summary>
-                                <div class="category-edit-popover">
+                                <div class="category-edit-popover" role="dialog" aria-modal="true">
+                                    <button type="button" class="popover-close" aria-label="Tutup" onclick="this.closest('details').removeAttribute('open')">×</button>
                                     <div class="popover-head">
                                         <div>
                                             <strong>Edit kategori</strong>
