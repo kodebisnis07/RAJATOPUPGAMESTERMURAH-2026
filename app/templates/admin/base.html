@@ -7,10 +7,11 @@
     {% set site_logo = global_settings.get('site_logo') %}
     {% set favicon_logo = global_settings.get('favicon_logo') or site_logo %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260728-catalog-table-fix-2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260728-sidebar-table-fix-3">
 </head>
 <body>
 <button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>
+<button class="sidebar-collapse-toggle" type="button" aria-label="Sembunyikan menu samping" title="Sembunyikan menu">‹</button>
 <div class="admin-backdrop" aria-hidden="true"></div>
 <div class="admin-layout">
     <aside class="sidebar" id="admin-sidebar">
@@ -132,6 +133,25 @@
   var btn = document.querySelector('.admin-menu-toggle');
   var sidebar = document.querySelector('.sidebar');
   var backdrop = document.querySelector('.admin-backdrop');
+  var collapseBtn = document.querySelector('.sidebar-collapse-toggle');
+  var collapsed = localStorage.getItem('adminSidebarCollapsed') === '1';
+  if(collapsed && window.innerWidth > 900){ document.body.classList.add('sidebar-collapsed'); }
+  function syncCollapseButton(){
+    if(!collapseBtn) return;
+    var isCollapsed = document.body.classList.contains('sidebar-collapsed');
+    collapseBtn.textContent = isCollapsed ? '›' : '‹';
+    collapseBtn.setAttribute('aria-label', isCollapsed ? 'Tampilkan menu samping' : 'Sembunyikan menu samping');
+    collapseBtn.title = isCollapsed ? 'Tampilkan menu' : 'Sembunyikan menu';
+  }
+  syncCollapseButton();
+  if(collapseBtn){
+    collapseBtn.addEventListener('click', function(){
+      if(window.innerWidth <= 900) return;
+      document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('adminSidebarCollapsed', document.body.classList.contains('sidebar-collapsed') ? '1' : '0');
+      syncCollapseButton();
+    });
+  }
   if(btn && sidebar){
     btn.addEventListener('click', function(){
       var open = sidebar.classList.toggle('open');
