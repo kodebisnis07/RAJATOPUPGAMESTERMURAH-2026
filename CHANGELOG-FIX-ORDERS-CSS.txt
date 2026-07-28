@@ -1,0 +1,7 @@
+FIX TAMPILAN MANAJEMEN PESANAN
+
+- Memperbarui versi cache file admin.css agar browser dan CDN mengambil CSS halaman pesanan terbaru.
+- Memperbaiki kasus halaman pesanan tampil sebagai HTML polos/bertumpuk setelah deploy.
+- Tidak mengubah data, route, atau alur penyimpanan status pesanan.
+
+Setelah deploy, lakukan hard refresh sekali (Ctrl+F5) apabila tab admin sudah terbuka sejak versi lama.
