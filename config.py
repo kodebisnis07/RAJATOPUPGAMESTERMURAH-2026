@@ -21,6 +21,7 @@ def _database_uri():
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY") or ("rajatopup-dev-secret-change-me" if os.environ.get("FLASK_ENV") == "development" else None)
+    SETTINGS_ENCRYPTION_KEY = os.environ.get("SETTINGS_ENCRYPTION_KEY") or SECRET_KEY
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     WTF_CSRF_TIME_LIMIT = 3600
     WTF_CSRF_SSL_STRICT = os.environ.get("WTF_CSRF_SSL_STRICT", "1") == "1"

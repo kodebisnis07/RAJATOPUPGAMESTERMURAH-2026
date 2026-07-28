@@ -241,6 +241,16 @@ def create_app():
             mimetype="application/javascript"
         )
 
+    @app.route("/readyz")
+    def readyz():
+        """Readiness probe: verifies database connectivity before receiving traffic."""
+        try:
+            db.session.execute(text("SELECT 1"))
+            return {"status": "ready"}, 200
+        except Exception:
+            db.session.rollback()
+            return {"status": "not_ready"}, 503
+
     @app.route("/healthz")
     def healthz():
         try:

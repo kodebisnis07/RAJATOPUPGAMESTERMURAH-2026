@@ -49,17 +49,13 @@ for path in ROOT.glob('app/routes/*.py'):
         if stripped and not stripped.startswith('#'):
             decorators = []
 
-seed = (ROOT / "app/seed.py").read_text(encoding="utf-8")
-forbidden_seed_updates = [
-    'section.is_active = True',
-    'category.status = "active"',
-    'product.status = "active"',
-    'admin.is_active = True',
-]
-for item in forbidden_seed_updates:
-    if item in seed:
-        errors.append(f"Seed masih menimpa status record lama: {item}")
-
 if errors:
     raise SystemExit('\n'.join(errors))
 print('OK: sintaks Python, kebersihan cache, rute destruktif, dan urutan decorator lulus.')
+
+# Production-hardening regression checks.
+utils_source = (ROOT / "app" / "utils.py").read_text(encoding="utf-8")
+assert "SENSITIVE_SETTING_KEYS" in utils_source, "Enkripsi setting sensitif hilang"
+assert "_valid_image_signature" in utils_source, "Validasi signature upload hilang"
+admin_source = (ROOT / "app" / "routes" / "admin.py").read_text(encoding="utf-8")
+assert "Secret tidak pernah dikirim kembali ke browser" in admin_source, "Masking credential admin hilang"

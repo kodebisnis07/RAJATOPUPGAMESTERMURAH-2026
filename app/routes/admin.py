@@ -1745,8 +1745,12 @@ def settings():
             "running_popup_text_color": "#fff3c4",
             "running_popup_border_color": "#fbbf24",
         }
+        sensitive_keys = {"tripay_api_key", "tripay_private_key", "duitku_api_key", "xendit_secret_key"}
         for key in keys:
             value = request.form.get(key, "")
+            # Kolom secret yang dikosongkan berarti pertahankan credential lama.
+            if key in sensitive_keys and not value.strip():
+                continue
             if key == "site_name":
                 value = site_name
             elif key == "admin_panel_path":
@@ -1802,7 +1806,11 @@ def settings():
             "success",
         )
         return redirect(url_for("admin.settings"))
-    settings = {item.key: item.value for item in Setting.query.all()}
+    settings = {item.key: get_setting(item.key, "") for item in Setting.query.all()}
+    # Secret tidak pernah dikirim kembali ke browser; kosongkan untuk mencegah kebocoran.
+    for secret_key in ("tripay_api_key", "tripay_private_key", "duitku_api_key", "xendit_secret_key"):
+        if settings.get(secret_key):
+            settings[secret_key] = ""
     return render_template("admin/settings.html", settings=settings)
 
 

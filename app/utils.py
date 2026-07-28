@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import logging
 import os
 import re
@@ -10,7 +12,13 @@ from werkzeug.utils import secure_filename
 
 from app.extensions import db
 
-ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "ico", "svg"}
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "ico"}
+SENSITIVE_SETTING_KEYS = {
+    "tripay_api_key", "tripay_private_key", "duitku_api_key",
+    "xendit_secret_key", "topup_api_key", "payment_api_key",
+    "auto_order_webhook_secret",
+}
+_ENCRYPTED_PREFIX = "enc:v1:"
 logger = logging.getLogger(__name__)
 
 
@@ -36,6 +44,54 @@ def unique_slug(model, name, current_id=None):
 
 def allowed_image(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+
+def _valid_image_signature(file):
+    """Validate common raster image signatures; do not trust filename/MIME alone."""
+    try:
+        pos = file.stream.tell()
+        head = file.stream.read(32)
+        file.stream.seek(pos)
+    except Exception:
+        return False
+    signatures = (
+        head.startswith(b"\x89PNG\r\n\x1a\n"),
+        head.startswith(b"\xff\xd8\xff"),
+        head.startswith((b"GIF87a", b"GIF89a")),
+        head.startswith(b"RIFF") and head[8:12] == b"WEBP",
+        head.startswith(b"\x00\x00\x01\x00"),
+    )
+    return any(signatures)
+
+
+def _settings_fernet():
+    try:
+        from cryptography.fernet import Fernet
+    except ImportError as exc:
+        raise RuntimeError("Dependency cryptography belum terpasang") from exc
+    raw = (current_app.config.get("SETTINGS_ENCRYPTION_KEY") or current_app.config.get("SECRET_KEY") or "").encode()
+    if not raw:
+        raise RuntimeError("SETTINGS_ENCRYPTION_KEY/SECRET_KEY belum dikonfigurasi")
+    key = base64.urlsafe_b64encode(hashlib.sha256(raw).digest())
+    return Fernet(key)
+
+
+def encrypt_setting(value):
+    value = "" if value is None else str(value)
+    if not value or value.startswith(_ENCRYPTED_PREFIX):
+        return value
+    return _ENCRYPTED_PREFIX + _settings_fernet().encrypt(value.encode()).decode()
+
+
+def decrypt_setting(value):
+    value = "" if value is None else str(value)
+    if not value.startswith(_ENCRYPTED_PREFIX):
+        return value
+    try:
+        return _settings_fernet().decrypt(value[len(_ENCRYPTED_PREFIX):].encode()).decode()
+    except Exception:
+        current_app.logger.exception("Gagal mendekripsi setting sensitif")
+        return ""
 
 
 def _cloudinary_credentials():
@@ -93,7 +149,9 @@ def save_uploaded_image(file, folder):
     if not file or not file.filename:
         return None
     if not allowed_image(file.filename):
-        raise ValueError("Format gambar harus png, jpg, jpeg, webp, gif, ico, atau svg")
+        raise ValueError("Format gambar harus png, jpg, jpeg, webp, gif, atau ico")
+    if not _valid_image_signature(file):
+        raise ValueError("Isi file bukan gambar yang valid atau format tidak didukung")
 
     if _cloudinary_enabled():
         try:
@@ -218,7 +276,9 @@ def delete_uploaded_image_file(value, folder):
 def get_setting(key, default=None):
     from app.models import Setting
     setting = Setting.query.filter_by(key=key).first()
-    return setting.value if setting and setting.value not in (None, "") else default
+    if not setting or setting.value in (None, ""):
+        return default
+    return decrypt_setting(setting.value) if key in SENSITIVE_SETTING_KEYS else setting.value
 
 
 def set_setting(key, value):
@@ -227,7 +287,7 @@ def set_setting(key, value):
     if not setting:
         setting = Setting(key=key)
         db.session.add(setting)
-    setting.value = value
+    setting.value = encrypt_setting(value) if key in SENSITIVE_SETTING_KEYS else value
     return setting
 
 

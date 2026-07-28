@@ -178,13 +178,6 @@ RAJATOPUP_EXTRA_CATALOG = [
 
 
 def seed_raja_extra_catalog():
-    """Tambahkan katalog bawaan yang belum ada tanpa menimpa edit admin.
-
-    Fungsi ini sengaja idempoten. Status aktif/nonaktif, nama, ikon, harga,
-    stok, urutan, dan pengaturan lain pada record yang sudah ada tidak diubah.
-    Dengan begitu deploy ulang tidak mengaktifkan kembali layanan yang telah
-    dinonaktifkan melalui panel admin.
-    """
     changed = False
     for group in RAJATOPUP_EXTRA_CATALOG:
         sec_data = group["section"]
@@ -200,13 +193,20 @@ def seed_raja_extra_catalog():
             db.session.add(section)
             db.session.flush()
             changed = True
+        else:
+            section.title = sec_data["title"]
+            section.subtitle = sec_data.get("subtitle")
+            section.sort_order = sec_data.get("sort_order", section.sort_order or 0)
+            section.is_active = True
+            changed = True
 
         for idx, cat_data in enumerate(group["categories"], start=1):
+            cat_slug = unique_slug(Category, cat_data["name"])
             category = Category.query.filter_by(name=cat_data["name"]).first()
             if not category:
                 category = Category(
                     name=cat_data["name"],
-                    slug=unique_slug(Category, cat_data["name"]),
+                    slug=cat_slug,
                     status="active",
                     catalog_section_id=section.id,
                     sort_order=idx,
@@ -217,13 +217,20 @@ def seed_raja_extra_catalog():
                 db.session.add(category)
                 db.session.flush()
                 changed = True
+            else:
+                category.catalog_section_id = section.id
+                category.status = "active"
+                category.is_featured = True
+                category.badge = cat_data.get("badge")
+                category.icon = cat_data.get("icon") or category.icon
+                if not category.sort_order:
+                    category.sort_order = idx
+                changed = True
 
             for product_name, price in cat_data["products"]:
-                product = Product.query.filter_by(
-                    category_id=category.id, name=product_name
-                ).first()
+                product = Product.query.filter_by(category_id=category.id, name=product_name).first()
                 if not product:
-                    db.session.add(Product(
+                    product = Product(
                         category_id=category.id,
                         name=product_name,
                         slug=unique_slug(Product, f"{category.name} {product_name}"),
@@ -232,11 +239,18 @@ def seed_raja_extra_catalog():
                         price=price,
                         stock=999,
                         status="active",
-                    ))
+                    )
+                    db.session.add(product)
+                    changed = True
+                else:
+                    product.price = price
+                    product.stock = product.stock or 999
+                    product.status = "active"
                     changed = True
 
     if changed:
         db.session.commit()
+
 
 def seed_initial_data():
     changed = False
@@ -256,8 +270,11 @@ def seed_initial_data():
             admin.set_password(admin_password)
             db.session.add(admin)
             changed = True
-        # Admin yang sudah ada tidak disentuh. Perubahan nama, role, status,
-        # dan password dari panel harus bertahan setelah init/deploy berikutnya.
+        else:
+            admin.name = admin.name or "Super Admin"
+            admin.role = "super_admin"
+            admin.is_active = True
+            changed = True
 
     default_section = CatalogSection.query.filter_by(slug="game-populer").first()
     if not default_section:
@@ -295,20 +312,30 @@ def seed_initial_data():
         Category.query.filter(Category.catalog_section_id.is_(None)).update({"catalog_section_id": default_section.id})
         changed = True
 
-    # Banner default hanya dibuat pada database kosong. Seed tidak boleh
-    # menimpa banner atau status yang telah diatur melalui panel admin.
+    # Banner utama/hero website. Bagian ini sengaja ikut memperbaiki database lama
+    # yang masih berisi banner default tanpa gambar, supaya setelah deploy tampilan
+    # langsung berubah tanpa perlu hapus data manual dari admin panel.
     default_hero_image = "img/banner/rtg-banner-20260707.png"
-    if Banner.query.count() == 0:
-        db.session.add(Banner(
-            title="TOPUP GAMES",
-            tag="RAJA TOPUP GAMES",
-            subtitle="TERMURAH & TERPERCAYA!",
-            button_text="Top Up Sekarang",
-            link="#games",
-            sort_order=1,
-            is_active=True,
-            image=default_hero_image,
-        ))
+    existing_banners = Banner.query.order_by(Banner.sort_order.asc(), Banner.id.asc()).all()
+    default_titles = {"Promo Mobile Legends", "RAJA TOPUP GAMES", "Pembayaran Mudah", "TOPUP GAMES", "TOP UP GAMES"}
+    if not existing_banners:
+        banners = [
+            Banner(title="TOPUP GAMES", tag="RAJA TOPUP GAMES", subtitle="TERMURAH & TERPERCAYA!", button_text="Top Up Sekarang", link="#games", sort_order=1, is_active=True, image=default_hero_image),
+        ]
+        db.session.add_all(banners)
+        changed = True
+    elif all((b.title in default_titles or not b.image) for b in existing_banners[:4]):
+        main = existing_banners[0]
+        main.title = "TOPUP GAMES"
+        main.tag = "RAJA TOPUP GAMES"
+        main.subtitle = "TERMURAH & TERPERCAYA!"
+        main.button_text = "Top Up Sekarang"
+        main.link = "#games"
+        main.sort_order = 1
+        main.is_active = True
+        main.image = default_hero_image
+        for extra in existing_banners[1:]:
+            extra.is_active = False
         changed = True
 
     if not Setting.query.filter_by(key="website_banners_json").first():

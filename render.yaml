@@ -20,8 +20,10 @@ services:
         sync: false
       - key: SECRET_KEY
         generateValue: true
+      - key: SETTINGS_ENCRYPTION_KEY
+        generateValue: true
       - key: RATELIMIT_STORAGE_URI
-        value: memory://
+        sync: false
       - key: LOG_LEVEL
         value: INFO
       - key: DATABASE_URL
