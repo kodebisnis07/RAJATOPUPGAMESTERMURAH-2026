@@ -1505,8 +1505,20 @@ def auto_order():
         "payment_webhook_url",
     ]
     if request.method == "POST":
+        secret_keys = {
+            "auto_order_webhook_secret",
+            "topup_api_key",
+            "topup_private_key",
+            "payment_api_key",
+            "payment_private_key",
+        }
         for key in keys:
-            set_setting(key, request.form.get(key, ""))
+            value = request.form.get(key, "")
+            # Kolom credential sengaja kosong di browser. Jangan hapus nilai lama
+            # kecuali admin benar-benar memasukkan credential pengganti.
+            if key in secret_keys and not value.strip():
+                continue
+            set_setting(key, value)
         db.session.commit()
         log_admin_activity("ubah_auto_order", "Memperbarui pengaturan Auto Order")
         flash("Pengaturan Auto Order berhasil disimpan. Menu sudah siap untuk tahap integrasi API/webhook.", "success")
