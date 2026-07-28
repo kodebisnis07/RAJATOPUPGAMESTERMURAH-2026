@@ -49,6 +49,17 @@ for path in ROOT.glob('app/routes/*.py'):
         if stripped and not stripped.startswith('#'):
             decorators = []
 
+seed = (ROOT / "app/seed.py").read_text(encoding="utf-8")
+forbidden_seed_updates = [
+    'section.is_active = True',
+    'category.status = "active"',
+    'product.status = "active"',
+    'admin.is_active = True',
+]
+for item in forbidden_seed_updates:
+    if item in seed:
+        errors.append(f"Seed masih menimpa status record lama: {item}")
+
 if errors:
     raise SystemExit('\n'.join(errors))
 print('OK: sintaks Python, kebersihan cache, rute destruktif, dan urutan decorator lulus.')

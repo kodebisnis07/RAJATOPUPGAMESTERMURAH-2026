@@ -1,0 +1,15 @@
+FIX PERSISTENSI STATUS SAAT DEPLOY ULANG
+
+Perubahan:
+1. Seed katalog sekarang hanya membuat section, kategori, dan produk yang belum ada.
+2. Seed tidak lagi mengaktifkan kembali section/kategori/produk yang sudah dinonaktifkan admin.
+3. Seed tidak lagi menimpa harga, stok, ikon, badge, urutan, atau relasi record lama.
+4. Seed tidak lagi mengaktifkan atau mengubah role Super Admin yang sudah ada.
+5. Banner default hanya dibuat jika tabel banner benar-benar kosong.
+6. Perintah `flask init-db` tetap aman dijalankan berulang kali karena seed bersifat idempoten.
+7. Render tetap wajib memakai PostgreSQL melalui DATABASE_URL; SQLite lokal tidak digunakan di Render.
+
+Pengujian:
+- Nonaktifkan kategori/aplikasi dari panel admin.
+- Deploy ulang commit yang sama.
+- Status harus tetap nonaktif.
