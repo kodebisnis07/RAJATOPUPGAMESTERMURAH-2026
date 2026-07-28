@@ -215,8 +215,8 @@ def login():
 
 
 @auth_bp.route("/lupa-password", methods=["GET", "POST"])
-@limiter.limit("3 per 10 minutes", methods=["POST"])
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("3 per 10 minutes", methods=["POST"])
 def forgot_password():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()

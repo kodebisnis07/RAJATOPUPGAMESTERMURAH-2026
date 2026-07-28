@@ -1,0 +1,14 @@
+Perbaikan deployment Render
+============================
+
+Masalah:
+Flask gagal startup dengan pesan:
+  AssertionError: View function mapping is overwriting an existing endpoint function: auth.forgot_password
+
+Penyebab:
+Decorator @limiter.limit berada di antara dua decorator alias route untuk fungsi forgot_password.
+Limiter membungkus fungsi sebelum route kedua didaftarkan sehingga Flask melihat dua objek fungsi berbeda dengan endpoint sama.
+
+Perbaikan:
+Semua decorator @auth_bp.route sekarang dikelompokkan berurutan, lalu @limiter.limit ditempatkan paling dekat dengan fungsi.
+Ditambahkan pemeriksaan regresi di tests_static.py agar pola decorator berbahaya ini terdeteksi sebelum deployment.
