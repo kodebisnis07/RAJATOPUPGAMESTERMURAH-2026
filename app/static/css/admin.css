@@ -861,3 +861,16 @@ input,select,textarea,button{max-width:100%;}
 @media(max-width:1250px){.auto-order-kpis{grid-template-columns:repeat(3,1fr)}.auto-config-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.auto-order-hero,.auto-order-savebar{align-items:stretch;flex-direction:column}.auto-order-state{min-width:0}.auto-order-kpis{grid-template-columns:repeat(2,1fr)}.auto-config-grid{grid-template-columns:1fr}.auto-config-grid .span-2{grid-column:auto}.connection-pill{margin-left:0}.auto-config-head{align-items:flex-start;flex-wrap:wrap}.auto-order-savebar .btn{width:100%}}
 @media(max-width:440px){.auto-order-kpis{grid-template-columns:1fr}.auto-config-card{padding:14px}}
+
+/* === Table polish === */
+.admin-table{table-layout:auto!important}
+.admin-table th,.admin-table td{padding:16px 14px!important;vertical-align:middle!important}
+.admin-table td:nth-child(3){min-width:300px;max-width:360px;white-space:normal!important;line-height:1.5}
+.admin-table td:nth-child(3) strong{display:block;margin-bottom:6px;font-size:15px}
+.admin-table td:nth-child(3) small{display:block;color:#9ca3af;max-height:84px;overflow:auto}
+.admin-thumb{width:72px!important;height:72px!important;border-radius:12px}
+.admin-table td:nth-child(6){white-space:nowrap!important;font-weight:700}
+.inline-form{display:flex!important;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+.delete-btn,.danger{min-width:84px;text-align:center}
+.badge{padding:6px 12px!important;border-radius:999px}
+.table-scroll,.table-wrap,.table-responsive,.admin-table-wrap{border-radius:18px;overflow:auto!important}
