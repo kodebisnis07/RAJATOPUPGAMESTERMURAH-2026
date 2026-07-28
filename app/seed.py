@@ -260,18 +260,21 @@ def seed_initial_data():
             db.session.add(Setting(key=key, value=value))
             changed = True
 
-    admin = Admin.query.filter_by(username="admin").first()
-    if not admin:
-        admin = Admin(username="admin", name="Super Admin", role="super_admin", is_active=True)
-        admin.set_password("Admin@123")
-        db.session.add(admin)
-        changed = True
-    else:
-        # Pastikan akun utama selalu memiliki akses penuh.
-        admin.name = admin.name or "Super Admin"
-        admin.role = "super_admin"
-        admin.is_active = True
-        changed = True
+    import os
+    admin_username = (os.environ.get("SUPERADMIN_USERNAME") or "").strip().lower()
+    admin_password = (os.environ.get("SUPERADMIN_PASSWORD") or "").strip()
+    if admin_username and admin_password:
+        admin = Admin.query.filter_by(username=admin_username).first()
+        if not admin:
+            admin = Admin(username=admin_username, name="Super Admin", role="super_admin", is_active=True)
+            admin.set_password(admin_password)
+            db.session.add(admin)
+            changed = True
+        else:
+            admin.name = admin.name or "Super Admin"
+            admin.role = "super_admin"
+            admin.is_active = True
+            changed = True
 
     default_section = CatalogSection.query.filter_by(slug="game-populer").first()
     if not default_section:

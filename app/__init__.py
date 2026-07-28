@@ -4,6 +4,7 @@ from flask import Flask, send_from_directory, render_template, request, abort
 from config import Config
 from app.extensions import db, migrate
 from sqlalchemy import inspect, text
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def ensure_sqlite_columns(app):
@@ -142,18 +143,25 @@ def ensure_runtime_columns(app):
             elif dialect == "sqlite":
                 conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_orders_order_number ON orders (order_number)"))
     except Exception:
-        # Jangan hentikan aplikasi jika migrasi ringan gagal; tabel baru tetap dibuat oleh db.create_all().
-        pass
+        app.logger.exception("Migrasi kompatibilitas runtime gagal")
+        if os.environ.get("RENDER", "").lower() == "true":
+            raise
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    if app.config.get("TRUST_PROXY_HEADERS"):
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
+    if not app.config.get("SECRET_KEY"):
+        raise RuntimeError("SECRET_KEY wajib diisi pada environment production.")
     app.config.setdefault("UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "products"))
     app.config.setdefault("AVATAR_UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "avatars"))
     app.config.setdefault("SITE_ASSET_UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "site"))
 
     db.init_app(app)
     migrate.init_app(app, db)
+    from app.security import init_security, limiter, csrf
+    init_security(app)
 
     from app import models
 
@@ -167,6 +175,7 @@ def create_app():
     app.register_blueprint(super_admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_v1_bp)
+    csrf.exempt(api_v1_bp)
     register_legacy_admin_blockers(app)
 
     from app.admin_path import (
@@ -227,7 +236,12 @@ def create_app():
 
     @app.route("/healthz")
     def healthz():
-        return {"status": "ok"}
+        try:
+            db.session.execute(text("SELECT 1"))
+            return {"status": "ok", "database": "ok"}, 200
+        except Exception:
+            app.logger.exception("Health check database gagal")
+            return {"status": "error", "database": "unavailable"}, 503
 
     @app.route("/google0b480b200ce87ddb.html")
     def google_search_console_verification():
@@ -267,6 +281,10 @@ def create_app():
         response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
         response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
         response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+        response.headers.setdefault('Cross-Origin-Opener-Policy', 'same-origin')
+        response.headers.setdefault('Content-Security-Policy', "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https: data: blob:; font-src 'self' https: data:; connect-src 'self' https:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'")
+        if request.is_secure:
+            response.headers.setdefault('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
         return response
 
     @app.context_processor
@@ -334,11 +352,13 @@ def create_app():
     register_cli(app)
 
     with app.app_context():
-        db.create_all()
-        ensure_sqlite_columns(app)
-        ensure_runtime_columns(app)
-        db.create_all()
-        from app.seed import seed_initial_data
-        seed_initial_data()
+        if app.config.get("AUTO_CREATE_DB"):
+            db.create_all()
+            ensure_sqlite_columns(app)
+            ensure_runtime_columns(app)
+            db.create_all()
+        if app.config.get("AUTO_SEED_DB"):
+            from app.seed import seed_initial_data
+            seed_initial_data()
 
     return app

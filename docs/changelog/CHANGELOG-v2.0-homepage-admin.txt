@@ -6,7 +6,7 @@ Perubahan utama:
 - Dashboard admin ditingkatkan tampilannya.
 - Menu admin baru: Banner Website, Promo, Testimoni, FAQ, Manajemen Admin.
 - Super Admin full akses dengan role: super_admin, admin, operator.
-- create_admin.py selalu menyiapkan akun Super Admin: admin / Admin@123.
+- create_admin.py selalu menyiapkan akun Super Admin: kredensial dari environment.
 - Database ditambah tabel banners, promos, testimonials, faqs.
 - Migration SQLite otomatis menambahkan kolom admin: name, role, is_active.
 - Pengaturan website ditambah: site_name, site_tagline, WhatsApp, Telegram, Instagram.
@@ -20,4 +20,4 @@ Cara menjalankan:
 
 Login Super Admin:
 Username: admin
-Password: Admin@123
+Password: [PASSWORD-DEFAULT-DIHAPUS]

@@ -25,8 +25,10 @@ def register_cli(app):
     @app.cli.command("create-superadmin")
     def create_superadmin():
         """Buat super admin default jika belum ada."""
-        username = os.environ.get("SUPERADMIN_USERNAME", "superadmin").strip().lower()
-        password = os.environ.get("SUPERADMIN_PASSWORD", "admin12345").strip()
+        username = (os.environ.get("SUPERADMIN_USERNAME") or "").strip().lower()
+        password = (os.environ.get("SUPERADMIN_PASSWORD") or "").strip()
+        if not username or len(password) < 12:
+            raise RuntimeError("SUPERADMIN_USERNAME dan SUPERADMIN_PASSWORD (minimal 12 karakter) wajib diisi.")
         admin = Admin.query.filter_by(username=username).first()
         if not admin:
             admin = Admin(username=username, name="Super Admin", role="super_admin", is_active=True)

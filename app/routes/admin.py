@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify, abort
 from app.extensions import db
+from app.security import limiter
 from app.models import Admin, Category, CatalogSection, Product, Order, User, Payment, PaymentMethod, Setting, Banner, Promo, Testimonial, FAQ, FavoriteGame, AdminActivityLog, WalletTopup, UserNotification, ChatThread, ChatMessage, Voucher, ResellerProfile, ApiClient, ApiOrder, ApiRequestLog
 from app.utils import unique_slug, save_uploaded_image, delete_uploaded_image, set_setting, get_setting, refund_wallet_order, delete_uploaded_image_file
 from app.admin_path import validate_panel_slug, DEFAULT_ADMIN_PATH, DEFAULT_SUPER_ADMIN_PATH
@@ -299,6 +300,7 @@ def log_admin_activity(action, description=""):
 
 
 @admin_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute; 20 per hour", methods=["POST"])
 def login():
     """Login Admin/Operator. Super Admin juga boleh login lewat link ini.
 
@@ -326,6 +328,7 @@ def super_index():
 
 
 @super_admin_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute; 20 per hour", methods=["POST"])
 def login():
     """Login khusus Super Admin."""
     if request.method == "POST":
@@ -500,7 +503,7 @@ def edit_category(id):
     return redirect(url_for("admin.categories"))
 
 
-@admin_bp.route("/categories/delete/<int:id>")
+@admin_bp.route("/categories/delete/<int:id>", methods=["POST"])
 @role_required("super_admin", "admin")
 def delete_category(id):
     category = Category.query.get_or_404(id)
@@ -612,7 +615,7 @@ def edit_product(id):
     return redirect(target)
 
 
-@admin_bp.route("/products/delete/<int:id>", methods=["GET", "POST"])
+@admin_bp.route("/products/delete/<int:id>", methods=["POST"])
 @role_required("super_admin", "admin")
 def delete_product(id):
     product = Product.query.get_or_404(id)

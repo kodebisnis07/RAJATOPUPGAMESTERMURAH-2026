@@ -20,8 +20,12 @@ def _database_uri():
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "rajatopup-dev-secret-change-me")
+    SECRET_KEY = os.environ.get("SECRET_KEY") or ("rajatopup-dev-secret-change-me" if os.environ.get("FLASK_ENV") == "development" else None)
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    WTF_CSRF_TIME_LIMIT = 3600
+    WTF_CSRF_SSL_STRICT = os.environ.get("WTF_CSRF_SSL_STRICT", "1") == "1"
+    RATELIMIT_STORAGE_URI = os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
+    TRUST_PROXY_HEADERS = os.environ.get("TRUST_PROXY_HEADERS", "1") == "1"
 
     SQLALCHEMY_DATABASE_URI = _database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -49,8 +53,11 @@ class Config:
     # Session production
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
-    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "1") == "1"
-    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "1" if os.environ.get("RENDER", "").lower() == "true" else "0") == "1"
+    SESSION_COOKIE_NAME = os.environ.get("SESSION_COOKIE_NAME", "rtg_session")
+    PERMANENT_SESSION_LIFETIME = timedelta(days=int(os.environ.get("SESSION_DAYS", "7")))
+    AUTO_CREATE_DB = os.environ.get("AUTO_CREATE_DB", "1" if os.environ.get("RENDER", "").lower() != "true" else "0") == "1"
+    AUTO_SEED_DB = os.environ.get("AUTO_SEED_DB", "1" if os.environ.get("RENDER", "").lower() != "true" else "0") == "1"
 
     # Website/SEO defaults, bisa dioverride lewat tabel settings/panel admin.
     SITE_NAME = os.environ.get("SITE_NAME", "Raja Topup Games")

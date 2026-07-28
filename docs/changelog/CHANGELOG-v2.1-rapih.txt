@@ -13,7 +13,7 @@ Perubahan:
 
 Akun admin utama:
 Username: admin
-Password: Admin@123
+Password: [PASSWORD-DEFAULT-DIHAPUS]
 
 Cara menjalankan:
 1. pip install -r requirements.txt

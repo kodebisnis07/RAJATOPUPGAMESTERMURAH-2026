@@ -75,7 +75,7 @@
                         </form>
                     </details>
                 </td>
-                <td><a class="delete-btn" href="{{ url_for('admin.delete_product', id=product.id) }}" onclick="return confirm('Hapus produk ini?')">Hapus</a></td>
+                <td><form method="post" action="{{ url_for('admin.delete_product', id=product.id) }}" class="inline-form" onsubmit="return confirm('Hapus produk ini?')"><button class="delete-btn" type="submit">Hapus</button></form></td>
             </tr>
             {% else %}<tr><td colspan="10">Belum ada produk.</td></tr>{% endfor %}
         </tbody>

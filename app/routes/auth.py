@@ -5,6 +5,7 @@ from datetime import datetime
 from urllib.parse import urlencode
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, jsonify
 from app.extensions import db
+from app.security import limiter
 from app.models import User, Order, FavoriteGame, Category, UserNotification, PaymentMethod, WalletTopup, ChatThread, ChatMessage, Voucher
 from app.utils import save_uploaded_image, delete_uploaded_image, media_url
 from app.email_service import send_password_reset_email
@@ -191,6 +192,7 @@ def register():
     return render_template("auth/register.html")
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("8 per minute; 40 per hour", methods=["POST"])
 def login():
     if request.method == "POST":
         username = _normalize_username(request.form.get("username"))
@@ -213,6 +215,7 @@ def login():
 
 
 @auth_bp.route("/lupa-password", methods=["GET", "POST"])
+@limiter.limit("3 per 10 minutes", methods=["POST"])
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":

@@ -100,7 +100,7 @@
                 <td>{{ category.sort_order or 0 }}</td>
                 <td>{{ category.status }}</td>
                 <td>
-                    <a class="delete-btn" href="{{ url_for('admin.delete_category', id=category.id) }}" onclick="return confirm('Hapus kategori ini? Produk di kategori ini bisa ikut bermasalah.')">Hapus</a>
+                    <form method="post" action="{{ url_for('admin.delete_category', id=category.id) }}" class="inline-form" onsubmit="return confirm('Hapus kategori ini? Produk di kategori ini bisa ikut bermasalah.')"><button class="delete-btn" type="submit">Hapus</button></form>
                 </td>
             </tr>
             {% else %}

@@ -9,7 +9,7 @@ Perubahan utama:
 2. Admin default diperbaiki.
    - create_admin.py sekarang selalu menyiapkan akun admin.
    - Username: admin
-   - Password: Admin@123
+   - Password: [PASSWORD-DEFAULT-DIHAPUS]
 
 3. Seeder database diperbaiki.
    - Admin default dibuat otomatis jika belum ada.
@@ -45,4 +45,4 @@ Cara menjalankan:
 
 Login admin:
 Username: admin
-Password: Admin@123
+Password: [PASSWORD-DEFAULT-DIHAPUS]

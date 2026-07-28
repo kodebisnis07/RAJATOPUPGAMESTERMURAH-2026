@@ -4,6 +4,7 @@ from xml.sax.saxutils import escape
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, flash, Response, current_app
 from app.models import Category, CatalogSection, Product, Order, Banner, Promo, Testimonial, FAQ, Setting, PaymentMethod, Payment, UserNotification, User, Voucher, ResellerProfile
 from app.extensions import db
+from app.security import csrf
 from app.payments import create_payment
 from app.utils import refund_wallet_order
 
@@ -530,6 +531,7 @@ def reseller_register():
 
 
 @home_bp.route("/tripay/callback", methods=["POST"])
+@csrf.exempt
 def tripay_callback():
     import hashlib
     import hmac
@@ -542,10 +544,11 @@ def tripay_callback():
     raw_body = request.get_data()
     callback_signature = request.headers.get("X-Callback-Signature", "")
 
-    if private_key and callback_signature:
-        expected = hmac.new(private_key.encode(), raw_body, hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(expected, callback_signature):
-            return jsonify({"success": False, "message": "Invalid signature"}), 403
+    if not private_key or not callback_signature:
+        return jsonify({"success": False, "message": "Callback authentication unavailable"}), 503
+    expected = hmac.new(private_key.encode(), raw_body, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, callback_signature):
+        return jsonify({"success": False, "message": "Invalid signature"}), 403
 
     reference = payload.get("reference") or payload.get("merchant_ref")
     status = (payload.get("status") or "").upper()
@@ -555,10 +558,12 @@ def tripay_callback():
         return jsonify({"success": False, "message": "Payment not found"}), 404
 
     if status in {"PAID", "SUCCESS"}:
-        payment.status = "paid"
-        payment.order.payment_status = "paid"
-        payment.order.order_status = "processing"
-        _notify_user(payment.order.user_id, "Pembayaran diterima", f"Pembayaran untuk pesanan {payment.order.invoice} sudah diterima dan sedang diproses.", "payment_paid", payment.order.id)
+        if payment.status != "paid":
+            payment.status = "paid"
+            payment.paid_at = datetime.utcnow()
+            payment.order.payment_status = "paid"
+            payment.order.order_status = "processing"
+            _notify_user(payment.order.user_id, "Pembayaran diterima", f"Pembayaran untuk pesanan {payment.order.invoice} sudah diterima dan sedang diproses.", "payment_paid", payment.order.id)
     elif status in {"EXPIRED", "FAILED", "CANCELLED"}:
         payment.status = status.lower()
         payment.order.payment_status = status.lower()

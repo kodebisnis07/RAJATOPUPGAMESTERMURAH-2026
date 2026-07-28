@@ -12,7 +12,7 @@ CARA MENJALANKAN RAJA TOPUP GAMES
 4. Login admin:
    http://127.0.0.1:5000/admin/login
    Username: admin
-   Password: Admin@123
+   Password: [PASSWORD-DEFAULT-DIHAPUS]
 
 Catatan:
 - Menu Nominal memakai data produk yang sama, tetapi tampil sebagai pengelolaan paket top-up.
