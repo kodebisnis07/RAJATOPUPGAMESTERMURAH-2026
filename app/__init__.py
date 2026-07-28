@@ -282,14 +282,22 @@ def create_app():
         content_type = response.headers.get("Content-Type", "")
         if "text/html" in content_type and not response.direct_passthrough:
             try:
+                from app.html_minify import minify_html_document
+
                 html = response.get_data(as_text=True)
                 changed = html.replace(INTERNAL_SUPER_ADMIN_PATH, super_public)
                 changed = changed.replace(INTERNAL_ADMIN_PATH, admin_public)
+
+                # HTML tetap dapat dilihat browser, tetapi hasil render dibuat
+                # ringkas dan komentar biasa dihapus agar tidak mudah dibaca.
+                if app.config.get("HTML_MINIFY_ENABLED", True):
+                    changed = minify_html_document(changed)
+
                 if changed != html:
                     response.set_data(changed)
                     response.headers["Content-Length"] = str(len(response.get_data()))
             except Exception:
-                pass
+                app.logger.exception("Minifikasi HTML gagal")
         return response
 
 

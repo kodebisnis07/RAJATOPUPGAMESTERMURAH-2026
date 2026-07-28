@@ -29,6 +29,7 @@ class Config:
     RATELIMIT_HEADERS_ENABLED = True
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     TRUST_PROXY_HEADERS = os.environ.get("TRUST_PROXY_HEADERS", "1") == "1"
+    HTML_MINIFY_ENABLED = os.environ.get("HTML_MINIFY_ENABLED", "1") == "1"
 
     SQLALCHEMY_DATABASE_URI = _database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
