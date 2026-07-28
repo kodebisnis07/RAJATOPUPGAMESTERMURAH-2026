@@ -1,0 +1,17 @@
+ORDERS PRO + AUTO ORDER AUDIT
+
+Perubahan halaman pesanan:
+- Dashboard KPI total, menunggu bayar, sudah bayar, diproses, berhasil, gagal/batal.
+- Filter berdasarkan pencarian, status pembayaran, status order, dan metode pembayaran.
+- Kartu pesanan profesional dan responsif.
+- Tombol salin nomor order, invoice, dan target.
+- Detail customer/referensi pembayaran dapat dibuka sesuai kebutuhan.
+- Konfirmasi khusus untuk status gagal/batal karena dapat memicu refund.
+- Ringkasan status dihitung langsung dari database.
+
+Hasil audit Auto Order:
+- Panel Auto Order hanya menyimpan konfigurasi.
+- Tidak ditemukan client API Digiflazz, VIP Reseller, atau APIGames.
+- Tidak ditemukan pengiriman order provider otomatis, polling status, queue, atau retry worker.
+- Tripay hanya tersedia pada pembuatan payment; Duitku dan Xendit masih placeholder.
+- Auto Order belum berfungsi sebagai fulfillment otomatis end-to-end.

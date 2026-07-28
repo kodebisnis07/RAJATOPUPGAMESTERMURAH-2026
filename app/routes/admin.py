@@ -970,6 +970,10 @@ def delete_faq(id):
 @login_required
 def orders():
     search = request.args.get("q", "").strip()
+    payment_status = request.args.get("payment_status", "").strip().lower()
+    order_status = request.args.get("order_status", "").strip().lower()
+    payment_method = request.args.get("payment_method", "").strip()
+
     query = Order.query
     if search:
         like = f"%{search}%"
@@ -982,8 +986,33 @@ def orders():
             Order.game_user_id.ilike(like),
             Order.game_server_id.ilike(like),
         ))
+    if payment_status:
+        query = query.filter(db.func.lower(Order.payment_status) == payment_status)
+    if order_status:
+        query = query.filter(db.func.lower(Order.order_status) == order_status)
+    if payment_method:
+        query = query.filter(Order.payment_method == payment_method)
+
     orders_data = query.order_by(Order.id.desc()).all()
-    return render_template("admin/orders.html", orders=orders_data, search=search)
+    status_summary = {
+        "total": Order.query.count(),
+        "pending_payment": Order.query.filter(db.func.lower(Order.payment_status) == "pending").count(),
+        "paid": Order.query.filter(db.func.lower(Order.payment_status) == "paid").count(),
+        "processing": Order.query.filter(db.func.lower(Order.order_status) == "processing").count(),
+        "success": Order.query.filter(db.func.lower(Order.order_status).in_(["success", "completed"])).count(),
+        "failed": Order.query.filter(db.func.lower(Order.order_status).in_(["failed", "cancelled"])).count(),
+    }
+    payment_methods = [row[0] for row in db.session.query(Order.payment_method).filter(Order.payment_method.isnot(None), Order.payment_method != "").distinct().order_by(Order.payment_method.asc()).all()]
+    return render_template(
+        "admin/orders.html",
+        orders=orders_data,
+        search=search,
+        selected_payment_status=payment_status,
+        selected_order_status=order_status,
+        selected_payment_method=payment_method,
+        payment_methods=payment_methods,
+        status_summary=status_summary,
+    )
 
 
 @admin_bp.route("/orders/<int:id>/update", methods=["POST"])
@@ -1712,8 +1741,6 @@ def settings():
         keys = [
             "site_name", "site_tagline", "whatsapp", "telegram", "instagram",
             "admin_panel_path", "super_admin_panel_path",
-            "meta_title", "meta_description", "meta_keywords", "google_site_verification",
-            "google_analytics_id", "facebook_pixel_id",
             "running_popup_enabled", "running_popup_text", "running_popup_speed",
             "running_popup_bg_color", "running_popup_text_color", "running_popup_border_color",
             "payment_gateway", "tripay_mode", "tripay_api_key", "tripay_private_key",

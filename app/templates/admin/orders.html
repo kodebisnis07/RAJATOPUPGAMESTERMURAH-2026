@@ -1,83 +1,153 @@
 {% extends "admin/base.html" %}
 {% block content %}
-<div class="page-head orders-page-head">
-    <h1>Pesanan</h1>
-    <p>Operator difokuskan untuk memantau pesanan dan memperbarui status pesanan.</p>
-</div>
-
-<form class="order-search-bar" method="get" action="{{ url_for('admin.orders') }}">
-    <div class="order-search-field">
-        <label for="orderSearch">Cari Nomor Order / Invoice / User / Target</label>
-        <input id="orderSearch" type="search" name="q" value="{{ search or '' }}" placeholder="Contoh: ORD-20260713, INV..., username, nomor HP">
+<section class="orders-pro">
+    <div class="orders-pro-head">
+        <div>
+            <span class="eyebrow">Order Operations</span>
+            <h1>Manajemen Pesanan</h1>
+            <p>Pantau pembayaran, proses fulfillment, dan selesaikan kendala pesanan dari satu layar.</p>
+        </div>
+        <a class="btn secondary" href="{{ url_for('admin.orders') }}">↻ Muat ulang</a>
     </div>
-    <button class="btn" type="submit">🔎 Cari Pesanan</button>
-    {% if search %}<a class="btn secondary" href="{{ url_for('admin.orders') }}">Reset</a>{% endif %}
-</form>
 
-<div class="orders-table-scroll" role="region" aria-label="Daftar pesanan" tabindex="0">
-<table class="admin-table orders-table">
-    <thead>
-        <tr>
-            <th>Nomor Order</th>
-            <th>Invoice</th>
-            <th>Produk</th>
-            <th>Deskripsi</th>
-            <th>Customer</th>
-            <th>Target</th>
-            <th>Total</th>
-            <th>Metode</th>
-            <th>Status Bayar</th>
-            <th>Status Order</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
+    <div class="order-kpi-grid" aria-label="Ringkasan status pesanan">
+        <div class="order-kpi"><span>Total Pesanan</span><strong>{{ status_summary.total }}</strong><small>Semua transaksi</small></div>
+        <div class="order-kpi warning"><span>Menunggu Bayar</span><strong>{{ status_summary.pending_payment }}</strong><small>Perlu dipantau</small></div>
+        <div class="order-kpi info"><span>Sudah Dibayar</span><strong>{{ status_summary.paid }}</strong><small>Siap diproses</small></div>
+        <div class="order-kpi processing"><span>Diproses</span><strong>{{ status_summary.processing }}</strong><small>Dalam fulfillment</small></div>
+        <div class="order-kpi success"><span>Berhasil</span><strong>{{ status_summary.success }}</strong><small>Selesai dikirim</small></div>
+        <div class="order-kpi danger"><span>Gagal / Batal</span><strong>{{ status_summary.failed }}</strong><small>Perlu ditinjau</small></div>
+    </div>
+
+    <form class="order-filter-panel" method="get" action="{{ url_for('admin.orders') }}">
+        <div class="order-filter-search">
+            <label for="orderSearch">Cari pesanan</label>
+            <input id="orderSearch" type="search" name="q" value="{{ search or '' }}" placeholder="Nomor order, invoice, customer, HP, atau target">
+        </div>
+        <label>Status bayar
+            <select name="payment_status">
+                <option value="">Semua status</option>
+                {% for status in ['pending','paid','cancelled','failed','expired'] %}
+                <option value="{{ status }}" {% if selected_payment_status == status %}selected{% endif %}>{{ status|title }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Status order
+            <select name="order_status">
+                <option value="">Semua status</option>
+                {% for status in ['pending','processing','success','completed','cancelled','failed'] %}
+                <option value="{{ status }}" {% if selected_order_status == status %}selected{% endif %}>{{ status|title }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Metode
+            <select name="payment_method">
+                <option value="">Semua metode</option>
+                {% for method in payment_methods %}<option value="{{ method }}" {% if selected_payment_method == method %}selected{% endif %}>{{ method }}</option>{% endfor %}
+            </select>
+        </label>
+        <div class="order-filter-actions">
+            <button class="btn primary" type="submit">Terapkan Filter</button>
+            <a class="btn secondary" href="{{ url_for('admin.orders') }}">Reset</a>
+        </div>
+    </form>
+
+    <div class="order-results-head">
+        <div><strong>{{ orders|length }}</strong> pesanan ditemukan</div>
+        <small>Perubahan status disimpan per pesanan.</small>
+    </div>
+
+    <div class="orders-pro-list">
     {% for order in orders %}
-        <tr>
-            <td data-label="Nomor Order" class="order-number"><strong>{{ order.order_number or ('ORD-' ~ order.id) }}</strong></td>
-            <td data-label="Invoice" class="order-invoice"><strong>{{ order.invoice }}</strong><br><small>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '-' }}</small></td>
-            <td data-label="Produk" class="order-product">{{ order.product.name if order.product else '-' }}</td>
-            <td data-label="Deskripsi" class="order-description">
-                {% if order.product and order.product.description %}
-                    {{ order.product.description }}
-                {% else %}
-                    <span class="muted">Tidak ada deskripsi</span>
-                {% endif %}
-            </td>
-            <td data-label="Customer"><strong>{{ order.customer_name or '-' }}</strong><br><small>{{ order.customer_phone or order.customer_email or '-' }}</small></td>
-            {% set category_text = ((order.product.category.name if order.product and order.product.category else '') ~ ' ' ~ (order.product.category.slug if order.product and order.product.category else ''))|lower %}
-            {% set is_social = 'sosmed' in category_text or 'followers' in category_text or 'likes' in category_text or 'instagram' in category_text or 'tiktok' in category_text or 'facebook' in category_text %}
-            <td data-label="{{ 'Username / Link' if is_social else 'ID Game' }}" class="order-target"><strong>{{ order.game_user_id or '-' }}</strong>{% if order.game_server_id %}<br><small>Server/Zone: {{ order.game_server_id }}</small>{% endif %}</td>
-            <td data-label="Total" class="order-total"><strong>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</strong></td>
-            <td data-label="Metode">{{ order.payment_method or '-' }}</td>
-            <td data-label="Status Bayar"><span class="badge status-{{ order.payment_status|lower }}">{{ order.payment_status }}</span></td>
-            <td data-label="Status Order"><span class="badge status-{{ order.order_status|lower }}">{{ order.order_status }}</span></td>
-            <td data-label="Aksi" class="order-actions">
-                <form method="post" action="{{ url_for('admin.update_order', id=order.id) }}" class="order-update-form">
-                    <label>
-                        <span>Status Bayar</span>
+        {% set category_text = ((order.product.category.name if order.product and order.product.category else '') ~ ' ' ~ (order.product.category.slug if order.product and order.product.category else ''))|lower %}
+        {% set is_social = 'sosmed' in category_text or 'followers' in category_text or 'likes' in category_text or 'instagram' in category_text or 'tiktok' in category_text or 'facebook' in category_text %}
+        <article class="order-pro-card">
+            <header class="order-pro-card-head">
+                <div class="order-id-group">
+                    <span class="order-sequence">#{{ loop.index }}</span>
+                    <div>
+                        <div class="order-code-row"><strong>{{ order.order_number or ('ORD-' ~ order.id) }}</strong><button type="button" class="copy-order" data-copy="{{ order.order_number or ('ORD-' ~ order.id) }}" title="Salin nomor order">⧉</button></div>
+                        <small>{{ order.created_at.strftime('%d %b %Y • %H:%M') if order.created_at else '-' }}</small>
+                    </div>
+                </div>
+                <div class="order-status-stack">
+                    <span class="badge status-{{ order.payment_status|lower }}">Bayar: {{ order.payment_status|title }}</span>
+                    <span class="badge status-{{ order.order_status|lower }}">Order: {{ order.order_status|title }}</span>
+                </div>
+            </header>
+
+            <div class="order-pro-grid">
+                <section class="order-info-block">
+                    <span class="order-info-label">Invoice</span>
+                    <div class="order-copy-line"><strong>{{ order.invoice }}</strong><button type="button" class="copy-order" data-copy="{{ order.invoice }}" title="Salin invoice">⧉</button></div>
+                    <span class="order-info-label">Customer</span>
+                    <strong>{{ order.customer_name or '-' }}</strong>
+                    <small>{{ order.customer_phone or order.customer_email or '-' }}</small>
+                </section>
+
+                <section class="order-info-block product-block">
+                    <span class="order-info-label">Produk</span>
+                    <strong>{{ order.product.name if order.product else '-' }}</strong>
+                    <small>{{ order.product.description if order.product and order.product.description else 'Tidak ada deskripsi produk.' }}</small>
+                </section>
+
+                <section class="order-info-block">
+                    <span class="order-info-label">{{ 'Username / Link' if is_social else 'Target akun' }}</span>
+                    <div class="order-copy-line"><strong>{{ order.game_user_id or '-' }}</strong>{% if order.game_user_id %}<button type="button" class="copy-order" data-copy="{{ order.game_user_id }}" title="Salin target">⧉</button>{% endif %}</div>
+                    {% if order.game_server_id %}<small>Server / Zone: {{ order.game_server_id }}</small>{% endif %}
+                    {% if order.game_nickname %}<small>Nickname: {{ order.game_nickname }}</small>{% endif %}
+                </section>
+
+                <section class="order-info-block financial-block">
+                    <span class="order-info-label">Nilai transaksi</span>
+                    <strong class="order-price">Rp {{ "{:,}".format(order.price or 0).replace(",", ".") }}</strong>
+                    <small>{{ order.payment_method or 'Metode belum dipilih' }}</small>
+                </section>
+            </div>
+
+            <footer class="order-pro-actions">
+                <details class="order-detail-toggle">
+                    <summary>Lihat detail</summary>
+                    <div class="order-detail-content">
+                        <span>Email: <b>{{ order.customer_email or '-' }}</b></span>
+                        <span>Telepon: <b>{{ order.customer_phone or '-' }}</b></span>
+                        <span>Referensi pembayaran: <b>{{ order.payment_reference or '-' }}</b></span>
+                    </div>
+                </details>
+                <form method="post" action="{{ url_for('admin.update_order', id=order.id) }}" class="order-pro-update" onsubmit="return confirmOrderChange(this)">
+                    <label><span>Status Bayar</span>
                         <select name="payment_status">
-                            {% for status in ['pending','paid','cancelled','failed','expired'] %}
-                                <option value="{{ status }}" {% if order.payment_status == status %}selected{% endif %}>{{ status }}</option>
-                            {% endfor %}
+                            {% for status in ['pending','paid','cancelled','failed','expired'] %}<option value="{{ status }}" {% if order.payment_status == status %}selected{% endif %}>{{ status|title }}</option>{% endfor %}
                         </select>
                     </label>
-                    <label>
-                        <span>Status Order</span>
+                    <label><span>Status Order</span>
                         <select name="order_status">
-                            {% for status in ['pending','processing','success','completed','cancelled','failed'] %}
-                                <option value="{{ status }}" {% if order.order_status == status %}selected{% endif %}>{{ status }}</option>
-                            {% endfor %}
+                            {% for status in ['pending','processing','success','completed','cancelled','failed'] %}<option value="{{ status }}" {% if order.order_status == status %}selected{% endif %}>{{ status|title }}</option>{% endfor %}
                         </select>
                     </label>
-                    <button class="btn small" type="submit">Update</button>
+                    <button class="btn primary" type="submit">Simpan Perubahan</button>
                 </form>
-            </td>
-        </tr>
+            </footer>
+        </article>
     {% else %}
-        <tr class="empty-row"><td colspan="11">Belum ada pesanan.</td></tr>
+        <div class="orders-empty"><strong>Pesanan tidak ditemukan</strong><p>Ubah kata kunci atau filter untuk menampilkan hasil lain.</p></div>
     {% endfor %}
-    </tbody>
-</table>
-</div>
+    </div>
+</section>
+<script>
+document.querySelectorAll('.copy-order').forEach(function(button){
+    button.addEventListener('click', async function(){
+        try { await navigator.clipboard.writeText(this.dataset.copy); this.textContent='✓'; setTimeout(()=>this.textContent='⧉',1200); }
+        catch(e) { window.prompt('Salin nilai berikut:', this.dataset.copy); }
+    });
+});
+function confirmOrderChange(form){
+    const pay=form.querySelector('[name="payment_status"]').value;
+    const order=form.querySelector('[name="order_status"]').value;
+    if(['cancelled','failed','expired'].includes(pay) || ['cancelled','failed'].includes(order)){
+        return window.confirm('Status gagal/batal dapat memicu refund saldo. Yakin menyimpan perubahan ini?');
+    }
+    return true;
+}
+</script>
 {% endblock %}

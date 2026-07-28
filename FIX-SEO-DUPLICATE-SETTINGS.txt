@@ -1,0 +1,6 @@
+PERBAIKAN SEO DUPLIKAT DI PENGATURAN
+
+- Menghapus bagian SEO & Google dari halaman Pengaturan umum.
+- SEO tetap tersedia melalui menu khusus SEO Website.
+- Menonaktifkan pemrosesan field SEO pada POST /admin/settings agar penyimpanan pengaturan umum tidak mengosongkan atau menimpa SEO.
+- Data SEO yang sudah tersimpan di database tidak dihapus.
