@@ -25,6 +25,8 @@ class Config:
     WTF_CSRF_TIME_LIMIT = 3600
     WTF_CSRF_SSL_STRICT = os.environ.get("WTF_CSRF_SSL_STRICT", "1") == "1"
     RATELIMIT_STORAGE_URI = os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
+    RATELIMIT_HEADERS_ENABLED = True
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     TRUST_PROXY_HEADERS = os.environ.get("TRUST_PROXY_HEADERS", "1") == "1"
 
     SQLALCHEMY_DATABASE_URI = _database_uri()
@@ -32,6 +34,7 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle": 280,
+        "pool_timeout": int(os.environ.get("DB_POOL_TIMEOUT", "30")),
     }
 
     # Upload

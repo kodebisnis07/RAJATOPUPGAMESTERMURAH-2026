@@ -5,7 +5,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 csrf = CSRFProtect()
-limiter = Limiter(key_func=get_remote_address, storage_uri="memory://")
+limiter = Limiter(key_func=get_remote_address)
 
 _FORM_RE = re.compile(r'(<form\b[^>]*\bmethod=["\']?post["\']?[^>]*>)', re.I)
 

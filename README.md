@@ -84,3 +84,12 @@ Catatan: aplikasi tetap menjalankan `db.create_all()` agar deploy pertama tidak 
 - Sitemap: `/sitemap.xml`
 - Robots: `/robots.txt`
 - Health check: `/healthz`
+
+
+## Quality gate dan deployment
+
+- `make test` menjalankan compile check, pemeriksaan statis, dan pytest.
+- GitHub Actions tersedia di `.github/workflows/ci.yml`.
+- Docker tersedia melalui `Dockerfile` dan `docker-compose.yml`.
+- Petunjuk produksi lengkap tersedia di `DEPLOYMENT.md` dan `SECURITY.md`.
+- Endpoint `/healthz` memeriksa koneksi database. Setiap respons memiliki `X-Request-ID` untuk penelusuran log.

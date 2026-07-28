@@ -150,10 +150,17 @@ def ensure_runtime_columns(app):
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    from app.observability import init_observability
+    init_observability(app)
     if app.config.get("TRUST_PROXY_HEADERS"):
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
     if not app.config.get("SECRET_KEY"):
         raise RuntimeError("SECRET_KEY wajib diisi pada environment production.")
+    if os.environ.get("RENDER", "").lower() == "true":
+        if len(str(app.config["SECRET_KEY"])) < 32:
+            raise RuntimeError("SECRET_KEY production minimal 32 karakter.")
+        if app.config.get("RATELIMIT_STORAGE_URI") == "memory://":
+            app.logger.warning("Gunakan Redis untuk RATELIMIT_STORAGE_URI pada deployment multi-worker.")
     app.config.setdefault("UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "products"))
     app.config.setdefault("AVATAR_UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "avatars"))
     app.config.setdefault("SITE_ASSET_UPLOAD_FOLDER", os.path.join(app.root_path, "static", "img", "site"))
