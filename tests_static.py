@@ -49,6 +49,13 @@ for path in ROOT.glob('app/routes/*.py'):
         if stripped and not stripped.startswith('#'):
             decorators = []
 
+
+# Static asset URLs must not place query strings inside url_for filename.
+for template_path in ROOT.glob("app/templates/**/*.html"):
+    template_source = template_path.read_text(encoding="utf-8")
+    if "filename='css/admin.css?v=" in template_source or 'filename="css/admin.css?v=' in template_source:
+        errors.append(f"{template_path}: query string berada di dalam filename url_for; static asset akan 404.")
+
 if errors:
     raise SystemExit('\n'.join(errors))
 print('OK: sintaks Python, kebersihan cache, rute destruktif, dan urutan decorator lulus.')

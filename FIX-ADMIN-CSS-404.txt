@@ -1,0 +1,5 @@
+FIX ADMIN CSS 404
+
+- Memperbaiki URL stylesheet admin yang sebelumnya memasukkan query string ke parameter filename url_for.
+- URL lama menghasilkan path ter-encode dan menyebabkan admin.css gagal dimuat.
+- Menambahkan pemeriksaan regresi agar kesalahan serupa tidak terulang.
