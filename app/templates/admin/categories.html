@@ -64,7 +64,7 @@
                     <small>Kategori akan muncul di katalog pelanggan.</small>
                 </span>
             </label>
-            <button type="submit" class="primary-action">＋ Tambah Kategori</button>
+                                        <button type="submit" class="primary-action">＋ Tambah Kategori</button>
         </form>
     </section>
 
@@ -118,7 +118,8 @@
                             </span>
                         </td>
                         <td class="center-cell">
-                            <form method="POST" action="{{ url_for('admin.toggle_category_status', id=category.id) }}" class="status-switch-form">
+                            <form method="POST" action="{{ url_for('admin.categories') }}" class="status-switch-form">
+                                <input type="hidden" name="_toggle_id" value="{{ category.id }}">
                                 <button type="submit" class="status-switch {{ 'is-right' if category.status != 'active' else '' }}" aria-label="Ubah status {{ category.name }}" aria-pressed="{{ 'true' if category.status == 'active' else 'false' }}" title="{{ 'Aktif' if category.status == 'active' else 'Nonaktif' }} — klik untuk mengubah">
 </button>
                             </form>

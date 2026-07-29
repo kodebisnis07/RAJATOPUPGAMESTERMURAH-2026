@@ -37,6 +37,66 @@ def _toggle_response(*, ok=True, message="", **payload):
     return None
 
 
+def _toggle_category_record(category):
+    try:
+        category.status = "inactive" if category.status == "active" else "active"
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status kategori %s", category.id)
+        return _toggle_response(ok=False, message="Status kategori gagal disimpan.")
+    status_label = "aktif" if category.status == "active" else "nonaktif"
+    log_admin_activity("toggle_status_kategori", f"Mengubah status kategori ID {category.id}: {category.name} menjadi {status_label}")
+    return _toggle_response(message=f"Status {category.name} sekarang {status_label}.", status=category.status, active=category.status == "active")
+
+
+def _toggle_product_record(product):
+    try:
+        product.status = "inactive" if product.status == "active" else "active"
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status produk %s", product.id)
+        return _toggle_response(ok=False, message="Status produk gagal disimpan.")
+    status_label = "aktif" if product.status == "active" else "nonaktif"
+    log_admin_activity("toggle_status_produk", f"Mengubah status produk ID {product.id}: {product.name} menjadi {status_label}")
+    return _toggle_response(message=f"Produk {product.name} sekarang {status_label}.", status=product.status, active=product.status == "active")
+
+
+def _toggle_payment_method_record(method, action):
+    messages = {
+        "offline": f"{method.name} sekarang OFFLINE.",
+        "online": f"{method.name} sekarang ONLINE dan aktif.",
+        "deactivate": f"{method.name} dinonaktifkan.",
+        "activate": f"{method.name} diaktifkan.",
+    }
+    if action not in messages:
+        return _toggle_response(ok=False, message="Aksi status metode pembayaran tidak valid.")
+    if action == "offline":
+        method.is_offline = True
+    elif action == "online":
+        method.is_offline = False
+        method.is_active = True
+    elif action == "deactivate":
+        method.is_active = False
+    elif action == "activate":
+        method.is_active = True
+        method.is_offline = False
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status metode pembayaran %s", method.id)
+        return _toggle_response(ok=False, message="Status metode pembayaran gagal disimpan.")
+    log_admin_activity("ubah_status_metode_pembayaran", f"Mengubah status metode pembayaran: {method.name}")
+    return _toggle_response(
+        message=messages[action],
+        is_active=bool(method.is_active),
+        is_offline=bool(method.is_offline),
+        online=bool(method.is_active and not method.is_offline),
+    )
+
+
 def current_admin():
     admin_id = session.get("admin_id")
     if not admin_id:
@@ -468,6 +528,12 @@ def omset_redirect():
 @role_required("super_admin", "admin")
 def categories():
     sections = CatalogSection.query.order_by(CatalogSection.sort_order.asc(), CatalogSection.title.asc()).all()
+    if request.method == "POST" and request.form.get("_toggle_id"):
+        category = Category.query.get_or_404(int(request.form["_toggle_id"]))
+        response = _toggle_category_record(category)
+        if response:
+            return response
+        return redirect(url_for("admin.categories"))
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         status = request.form.get("status", "active")
@@ -499,23 +565,9 @@ def categories():
 @role_required("super_admin", "admin")
 def toggle_category_status(id):
     category = Category.query.get_or_404(id)
-    try:
-        category.status = "inactive" if category.status == "active" else "active"
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        current_app.logger.exception("Gagal mengubah status kategori %s", id)
-        response = _toggle_response(ok=False, message="Status kategori gagal disimpan.")
-        if response:
-            return response
-        flash("Status kategori gagal disimpan.", "error")
-        return redirect(url_for("admin.categories"))
-    status_label = "aktif" if category.status == "active" else "nonaktif"
-    log_admin_activity("toggle_status_kategori", f"Mengubah status kategori ID {category.id}: {category.name} menjadi {status_label}")
-    response = _toggle_response(message=f"Status {category.name} sekarang {status_label}.", status=category.status, active=category.status == "active")
+    response = _toggle_category_record(category)
     if response:
         return response
-    flash(f"Status {category.name} sekarang {status_label}.", "success")
     return redirect(url_for("admin.categories"))
 
 
@@ -608,6 +660,12 @@ def _save_product_from_form(product=None):
 @role_required("super_admin", "admin")
 def products():
     categories = Category.query.order_by(Category.name.asc()).all()
+    if request.method == "POST" and request.form.get("_toggle_id"):
+        product = Product.query.get_or_404(int(request.form["_toggle_id"]))
+        response = _toggle_product_record(product)
+        if response:
+            return response
+        return redirect(url_for("admin.products"))
     if request.method == "POST":
         try:
             _save_product_from_form()
@@ -627,6 +685,12 @@ def nominals():
     """Menu khusus nominal/paket. Secara database tetap memakai tabel products."""
     categories = Category.query.order_by(Category.name.asc()).all()
     selected_category = request.args.get("category_id", "")
+    if request.method == "POST" and request.form.get("_toggle_id"):
+        product = Product.query.get_or_404(int(request.form["_toggle_id"]))
+        response = _toggle_product_record(product)
+        if response:
+            return response
+        return redirect(url_for("admin.nominals"))
     if request.method == "POST":
         try:
             _save_product_from_form()
@@ -665,24 +729,9 @@ def edit_product(id):
 @role_required("super_admin", "admin")
 def toggle_product_status(id):
     product = Product.query.get_or_404(id)
-    try:
-        product.status = "inactive" if product.status == "active" else "active"
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        current_app.logger.exception("Gagal mengubah status produk %s", id)
-        response = _toggle_response(ok=False, message="Status produk gagal disimpan.")
-        if response:
-            return response
-        flash("Status produk gagal disimpan.", "error")
-        return redirect(request.form.get("next") or url_for("admin.products"))
-    status_label = "aktif" if product.status == "active" else "nonaktif"
-    log_admin_activity("toggle_status_produk", f"Mengubah status produk ID {product.id}: {product.name} menjadi {status_label}")
-    response = _toggle_response(message=f"Produk {product.name} sekarang {status_label}.", status=product.status, active=product.status == "active")
+    response = _toggle_product_record(product)
     if response:
         return response
-    flash(f"Produk {product.name} sekarang {status_label}.", "success")
-
     target = (request.form.get("next") or request.referrer or url_for("admin.products")).strip()
     if not target.startswith("/"):
         target = url_for("admin.products")
@@ -1437,6 +1486,12 @@ def super_admin_change_password():
 @admin_bp.route("/payment-methods", methods=["GET", "POST"])
 @super_admin_required
 def payment_methods():
+    if request.method == "POST" and request.form.get("_toggle_id"):
+        method = PaymentMethod.query.get_or_404(int(request.form["_toggle_id"]))
+        response = _toggle_payment_method_record(method, (request.form.get("action") or "").strip().lower())
+        if response:
+            return response
+        return redirect(url_for("admin.payment_methods"))
     if request.method == "POST":
         try:
             logo_name = save_uploaded_image(request.files.get("logo"), _payment_upload_folder())
@@ -1515,49 +1570,9 @@ def edit_payment_method(id):
 @super_admin_required
 def toggle_payment_method(id):
     method = PaymentMethod.query.get_or_404(id)
-    action = (request.form.get("action") or "").strip().lower()
-    messages = {
-        "offline": f"{method.name} sekarang OFFLINE.",
-        "online": f"{method.name} sekarang ONLINE dan aktif.",
-        "deactivate": f"{method.name} dinonaktifkan.",
-        "activate": f"{method.name} diaktifkan.",
-    }
-    if action not in messages:
-        response = _toggle_response(ok=False, message="Aksi status metode pembayaran tidak valid.")
-        if response:
-            return response
-        flash("Aksi status metode pembayaran tidak valid.", "error")
-        return redirect(url_for("admin.payment_methods"))
-    if action == "offline":
-        method.is_offline = True
-    elif action == "online":
-        method.is_offline = False
-        method.is_active = True
-    elif action == "deactivate":
-        method.is_active = False
-    elif action == "activate":
-        method.is_active = True
-        method.is_offline = False
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        current_app.logger.exception("Gagal mengubah status metode pembayaran %s", id)
-        response = _toggle_response(ok=False, message="Status metode pembayaran gagal disimpan.")
-        if response:
-            return response
-        flash("Status metode pembayaran gagal disimpan.", "error")
-        return redirect(url_for("admin.payment_methods"))
-    log_admin_activity("ubah_status_metode_pembayaran", f"Mengubah status metode pembayaran: {method.name}")
-    response = _toggle_response(
-        message=messages[action],
-        is_active=bool(method.is_active),
-        is_offline=bool(method.is_offline),
-        online=bool(method.is_active and not method.is_offline),
-    )
+    response = _toggle_payment_method_record(method, (request.form.get("action") or "").strip().lower())
     if response:
         return response
-    flash(messages[action], "success")
     return redirect(url_for("admin.payment_methods"))
 
 

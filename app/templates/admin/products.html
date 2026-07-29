@@ -30,7 +30,7 @@
         <input id="productImageInput" type="file" name="image" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
         <textarea name="description" placeholder="Deskripsi produk"></textarea>
         <div class="image-preview-wrap"><span>Preview gambar</span><img id="productImagePreview" class="admin-preview" alt="Preview" style="display:none;"></div>
-        <button type="submit">Tambah Produk</button>
+                                <button type="submit">Tambah Produk</button>
     </form>
 
     <div class="catalog-table-shell">
@@ -47,7 +47,8 @@
                 <td class="money-cell"><span>Rp</span><strong>{{ "{:,}".format(product.price).replace(",", ".") }}</strong></td>
                 <td>{{ product.stock }}</td>
                 <td>
-                    <form method="POST" action="{{ url_for('admin.toggle_product_status', id=product.id) }}" class="status-switch-form">
+                    <form method="POST" action="{{ url_for('admin.products') }}" class="status-switch-form">
+                                <input type="hidden" name="_toggle_id" value="{{ product.id }}">
                         <input type="hidden" name="next" value="{{ url_for('admin.products') }}">
                         <button type="submit" class="status-switch {{ 'is-right' if product.status != 'active' else '' }}" aria-label="Ubah status {{ product.name }}" aria-pressed="{{ 'true' if product.status == 'active' else 'false' }}" title="Klik untuk {{ 'menonaktifkan' if product.status == 'active' else 'mengaktifkan' }} produk">
 </button>

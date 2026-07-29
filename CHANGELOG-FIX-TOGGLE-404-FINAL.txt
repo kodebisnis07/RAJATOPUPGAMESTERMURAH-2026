@@ -1,0 +1,18 @@
+PERBAIKAN TOGGLE STATUS - HTTP 404
+
+Perubahan:
+1. Form toggle kategori sekarang mengirim POST ke halaman kategori yang sedang aktif.
+2. Form toggle produk sekarang mengirim POST ke halaman produk yang sedang aktif.
+3. Form toggle nominal sekarang mengirim POST ke halaman nominal yang sedang aktif.
+4. Toggle Online/Offline dan Aktif/Nonaktif metode pembayaran mengirim POST ke halaman metode pembayaran yang sedang aktif.
+5. Setiap request membawa _toggle_id, sehingga backend dapat membedakan aksi toggle dari form tambah data.
+6. Endpoint toggle lama tetap dipertahankan untuk kompatibilitas.
+7. Logika penyimpanan dipusatkan ke helper backend agar hasil dari endpoint lama dan endpoint fallback konsisten.
+8. Respons AJAX tetap JSON dan tampilan tidak reload.
+
+Tujuan:
+Menghindari HTTP 404 akibat URL panel admin dinamis atau endpoint lama yang tidak cocok setelah deploy.
+
+Setelah deploy:
+- Restart/redeploy aplikasi.
+- Lakukan Ctrl+F5 pada browser.
