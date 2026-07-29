@@ -72,7 +72,7 @@
     <meta name="theme-color" content="#0b1220">
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=seo-indexing-20260712">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=cachefix-20260729-1">
 
 </head>
 <body class="site-body marketplace-home">
@@ -320,7 +320,7 @@
     if(btn){ e.preventDefault(); var menu = btn.closest('.user-menu'); if(menu){ var open = menu.classList.toggle('open'); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); } }
   });
 })();
-if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ navigator.serviceWorker.register('{{ url_for('service_worker') }}').catch(function(err){ console.warn('SW gagal:', err); }); }); }
+if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ navigator.serviceWorker.register("{{ url_for('service_worker') }}?v=cachefix-20260729-1", { updateViaCache: 'none' }).then(function(reg){ reg.update().catch(function(){}); }).catch(function(err){ console.warn('SW gagal:', err); }); }); }
 var deferredPrompt; var installBtn = document.getElementById('install-pwa-btn');
 window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt=e; if(installBtn){installBtn.hidden=false;} });
 if(installBtn){ installBtn.addEventListener('click', async function(){ if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; installBtn.hidden=true; }); }

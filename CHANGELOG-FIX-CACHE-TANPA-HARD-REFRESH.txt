@@ -1,0 +1,10 @@
+PERBAIKAN CACHE TANPA HARD REFRESH
+Versi aset: cachefix-20260729-1
+
+- Semua referensi CSS/JavaScript lokal diberi versi deploy terbaru.
+- Registrasi Service Worker memakai updateViaCache=none dan memeriksa pembaruan saat halaman dimuat.
+- Service Worker memakai network-first untuk CSS/JavaScript dan tidak menyimpan halaman HTML.
+- Cache Service Worker lama dihapus saat aktivasi tanpa menghapus cache versi aktif.
+- Respons HTML, Service Worker, manifest, CSS, dan JavaScript diberi header revalidasi/no-cache.
+
+Setelah deploy dan restart, pengguna cukup refresh biasa. Service Worker lama akan diganti otomatis.

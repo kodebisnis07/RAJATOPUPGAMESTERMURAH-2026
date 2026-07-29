@@ -9,7 +9,7 @@
     <title>{{ 'Login Super Admin' if is_super_portal else 'Login Admin / Operator' }} - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     {% set favicon_logo = global_settings.get('favicon_logo') or global_settings.get('site_logo') %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260710-mobile-reset-3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=cachefix-20260729-1">
 </head>
 <body class="login-page {{ 'super-admin-login' if is_super_portal else 'admin-operator-login' }}">
 <div class="login-wrap">

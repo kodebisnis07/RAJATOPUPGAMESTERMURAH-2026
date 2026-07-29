@@ -7,7 +7,7 @@
     <title>Login User - {{ global_settings.get('site_name', 'RAJA TOPUP GAMES') }}</title>
     {% set favicon_logo = global_settings.get('favicon_logo') or global_settings.get('site_logo') %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=login-checkout-pro-20260713">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=cachefix-20260729-1">
 </head>
 {% set site_logo = global_settings.get('site_logo') %}
 {% set login_background = global_settings.get('login_background') %}

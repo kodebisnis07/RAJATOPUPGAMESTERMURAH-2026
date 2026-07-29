@@ -48,7 +48,7 @@
     <meta name="theme-color" content="#ffc83d">
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=invoice-professional-20260729">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=cachefix-20260729-1">
 </head>
 <body class="site-body">
 <header class="navbar">
@@ -126,7 +126,7 @@
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('{{ url_for('service_worker') }}').catch(function(err){ console.warn('SW gagal:', err); });
+    navigator.serviceWorker.register("{{ url_for('service_worker') }}?v=cachefix-20260729-1", { updateViaCache: 'none' }).then(function(reg){ reg.update().catch(function(){}); }).catch(function(err){ console.warn('SW gagal:', err); });
   });
 }
 var deferredPrompt;

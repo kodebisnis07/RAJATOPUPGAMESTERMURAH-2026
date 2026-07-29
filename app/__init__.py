@@ -362,8 +362,19 @@ def create_app():
                 response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
                 response.headers['Pragma'] = 'no-cache'
                 response.headers['Expires'] = '0'
-            if request.path == '/service-worker.js':
-                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            content_type = response.headers.get('Content-Type', '')
+            if 'text/html' in content_type:
+                response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+                response.headers['Pragma'] = 'no-cache'
+                response.headers['Expires'] = '0'
+            if request.path == '/service-worker.js' or request.path == '/manifest.webmanifest':
+                response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+                response.headers['Pragma'] = 'no-cache'
+                response.headers['Expires'] = '0'
+            if request.path.startswith('/static/') and request.path.endswith(('.css', '.js')):
+                response.headers['Cache-Control'] = 'no-cache, must-revalidate, max-age=0'
+                response.headers['Pragma'] = 'no-cache'
+                response.headers['Expires'] = '0'
             if request.path.startswith(('/static/img/products/', '/static/img/games/', '/static/img/avatars/', '/static/img/payment_methods/', '/static/img/site/')):
                 response.headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
         except Exception:
