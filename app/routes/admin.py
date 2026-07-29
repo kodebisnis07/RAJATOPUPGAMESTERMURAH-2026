@@ -1867,6 +1867,8 @@ def settings():
     if request.method == "POST":
         keys = [
             "site_name", "site_tagline", "whatsapp", "telegram", "instagram",
+            "telegram_order_enabled", "telegram_order_title", "telegram_order_description",
+            "telegram_order_button_text", "telegram_order_message",
             "admin_panel_path", "super_admin_panel_path",
             "running_popup_enabled", "running_popup_text", "running_popup_speed",
             "running_popup_bg_color", "running_popup_text_color", "running_popup_border_color",
@@ -1907,6 +1909,8 @@ def settings():
                 continue
             if key == "site_name":
                 value = site_name
+            elif key == "telegram_order_enabled":
+                value = "1" if request.form.get("telegram_order_enabled") == "1" else "0"
             elif key == "admin_panel_path":
                 value = admin_slug
             elif key == "super_admin_panel_path":

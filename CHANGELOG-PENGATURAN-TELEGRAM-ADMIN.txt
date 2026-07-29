@@ -1,0 +1,8 @@
+PENGATURAN KONFIRMASI TELEGRAM DARI PANEL ADMIN
+
+Admin > Pengaturan kini dapat mengatur:
+- Username/link Telegram admin
+- Aktif/nonaktif tombol konfirmasi setelah order
+- Judul dan keterangan
+- Tulisan tombol
+- Template pesan dengan variabel data order

@@ -83,6 +83,31 @@
                 {% endif %}
             </div>
         </div>
+        {% if global_settings.get('telegram_order_enabled', '1') == '1' and order.order_status not in ['cancelled'] and order.payment_status not in ['expired','cancelled'] %}
+            {% set telegram_template = global_settings.get('telegram_order_message', 'Halo Admin, saya sudah membuat pesanan dan mohon segera dikonfirmasi serta diproses.\n\nInvoice: {invoice}\nNomor Order: {order_number}\nProduk: {product}\nTarget: {target}\nServer: {server}\nTotal: {total}\nMetode Pembayaran: {payment_method}') %}
+            {% set telegram_message = telegram_template
+                |replace('{invoice}', order.invoice|string)
+                |replace('{order_number}', (order.order_number or ('ORD-' ~ order.id))|string)
+                |replace('{product}', (order.product.name if order.product else '-'))
+                |replace('{target}', (order.game_user_id or '-'))
+                |replace('{server}', (order.game_server_id or '-'))
+                |replace('{total}', ('Rp ' ~ "{:,}".format(order.price).replace(',', '.')))
+                |replace('{payment_method}', (order.payment_method or '-')) %}
+            <div class="order-admin-confirmation">
+                <div class="order-admin-confirmation-icon">✈️</div>
+                <div class="order-admin-confirmation-copy">
+                    <span class="eyebrow">KONFIRMASI PESANAN</span>
+                    <h2>{{ global_settings.get('telegram_order_title', 'Hubungi admin melalui Telegram') }}</h2>
+                    <p>{{ global_settings.get('telegram_order_description', 'Kirim detail pesanan kepada admin agar pembayaran dapat dicek dan pesanan segera diproses.') }}</p>
+                </div>
+                {% if support_telegram_url %}
+                    <a class="btn-telegram-confirm" href="https://t.me/share/url?url={{ site_url|urlencode }}&text={{ telegram_message|urlencode }}" target="_blank" rel="noopener">✈️ {{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}</a>
+                {% else %}
+                    <a class="btn-telegram-confirm" href="{{ url_for('auth.chat') }}">💬 Hubungi Admin</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
         <div class="invoice-actions">
             <a class="btn-small outline" href="{{ url_for('home.index') }}">Kembali ke Home</a>
             <a class="btn-small" href="{{ url_for('home.checkout', invoice=order.invoice) }}">Refresh Status</a>

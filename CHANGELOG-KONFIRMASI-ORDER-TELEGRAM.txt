@@ -1,0 +1,6 @@
+PERUBAHAN KONFIRMASI ORDER TELEGRAM
+
+- Setelah order dibuat, halaman invoice menampilkan tombol Konfirmasi via Telegram.
+- Pesan Telegram otomatis memuat invoice, nomor order, produk, target, server, total, dan metode pembayaran.
+- WhatsApp tidak digunakan pada fitur konfirmasi order ini.
+- Jika Telegram admin belum diatur, tombol diarahkan ke Live Chat.

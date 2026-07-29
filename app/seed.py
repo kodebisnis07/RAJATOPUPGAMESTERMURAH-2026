@@ -19,6 +19,11 @@ DEFAULT_SETTINGS = {
     "site_tagline": "Top Up Game Termurah, Cepat, Aman, dan Terpercaya",
     "whatsapp": "",
     "telegram": "",
+    "telegram_order_enabled": "1",
+    "telegram_order_title": "Hubungi admin melalui Telegram",
+    "telegram_order_description": "Kirim detail pesanan kepada admin agar pembayaran dapat dicek dan pesanan segera diproses.",
+    "telegram_order_button_text": "Konfirmasi via Telegram",
+    "telegram_order_message": "Halo Admin, saya sudah membuat pesanan dan mohon segera dikonfirmasi serta diproses.\n\nInvoice: {invoice}\nNomor Order: {order_number}\nProduk: {product}\nTarget: {target}\nServer: {server}\nTotal: {total}\nMetode Pembayaran: {payment_method}",
     "instagram": "",
 }
 

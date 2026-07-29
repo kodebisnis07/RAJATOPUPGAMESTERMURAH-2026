@@ -1301,3 +1301,10 @@ body.marketplace-home{font-size:16px!important;}
 .voucher-note{margin-top:0!important}
 #serverField[hidden]{display:none!important}
 @media(max-width:520px){.voucher-box-clean summary{padding:13px!important}.payment-grid-clean .pay-card{min-height:88px;padding:11px}}
+
+/* Konfirmasi pesanan melalui Telegram */
+.order-admin-confirmation{margin:20px 0 6px;padding:18px 20px;display:flex;align-items:center;gap:15px;border:1px solid rgba(56,189,248,.34);border-radius:16px;background:linear-gradient(135deg,rgba(14,165,233,.14),rgba(15,23,42,.94));box-shadow:0 12px 30px rgba(2,132,199,.08)}
+.order-admin-confirmation-icon{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border-radius:50%;font-size:24px;background:#229ed9;color:#fff;box-shadow:0 8px 20px rgba(34,158,217,.28)}
+.order-admin-confirmation-copy{flex:1;min-width:0}.order-admin-confirmation-copy h2{margin:4px 0 5px;color:#fff;font-size:19px}.order-admin-confirmation-copy p{margin:0;color:#b8c3d4;line-height:1.5}
+.btn-telegram-confirm{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:12px;background:#229ed9;color:#fff;text-decoration:none;font-weight:900;white-space:nowrap;box-shadow:0 8px 20px rgba(34,158,217,.22);transition:.18s ease}.btn-telegram-confirm:hover{transform:translateY(-1px);filter:brightness(1.08)}
+@media(max-width:760px){.order-admin-confirmation{align-items:stretch;flex-direction:column}.order-admin-confirmation-icon{align-self:flex-start}.btn-telegram-confirm{width:100%;box-sizing:border-box}}

@@ -36,7 +36,25 @@
     <small class="field-help">Disarankan gambar landscape 1600×1000 px atau lebih besar. Gambar disimpan melalui sistem media/Cloudinary yang aktif.</small>
 
     <label>WhatsApp</label><input type="text" name="whatsapp" value="{{ settings.get('whatsapp', '') }}">
-    <label>Telegram</label><input type="text" name="telegram" value="{{ settings.get('telegram', '') }}">
+
+    <h2>Konfirmasi Order via Telegram</h2>
+    <label>Username / Link Telegram Admin</label>
+    <input type="text" name="telegram" value="{{ settings.get('telegram', '') }}" placeholder="Contoh: @rajatopupadmin atau https://t.me/rajatopupadmin">
+    <small class="field-help">Pembeli akan diarahkan ke akun Telegram ini setelah membuat pesanan.</small>
+    <label class="settings-check" style="display:flex;align-items:center;gap:10px;margin:8px 0 14px;">
+        <input type="checkbox" name="telegram_order_enabled" value="1" {% if settings.get('telegram_order_enabled', '1') == '1' %}checked{% endif %} style="width:auto;">
+        Tampilkan tombol konfirmasi Telegram setelah pembeli order
+    </label>
+    <label>Judul Konfirmasi</label>
+    <input type="text" name="telegram_order_title" maxlength="100" value="{{ settings.get('telegram_order_title', 'Hubungi admin melalui Telegram') }}">
+    <label>Keterangan Konfirmasi</label>
+    <textarea name="telegram_order_description" rows="3" maxlength="300">{{ settings.get('telegram_order_description', 'Kirim detail pesanan kepada admin agar pembayaran dapat dicek dan pesanan segera diproses.') }}</textarea>
+    <label>Tulisan Tombol</label>
+    <input type="text" name="telegram_order_button_text" maxlength="60" value="{{ settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}">
+    <label>Template Pesan Telegram</label>
+    <textarea name="telegram_order_message" rows="7" maxlength="1200" placeholder="Gunakan variabel: {invoice}, {order_number}, {product}, {target}, {server}, {total}, {payment_method}">{{ settings.get('telegram_order_message', 'Halo Admin, saya sudah membuat pesanan dan mohon segera dikonfirmasi serta diproses.\n\nInvoice: {invoice}\nNomor Order: {order_number}\nProduk: {product}\nTarget: {target}\nServer: {server}\nTotal: {total}\nMetode Pembayaran: {payment_method}') }}</textarea>
+    <small class="field-help">Variabel yang tersedia: <code>{invoice}</code>, <code>{order_number}</code>, <code>{product}</code>, <code>{target}</code>, <code>{server}</code>, <code>{total}</code>, dan <code>{payment_method}</code>.</small>
+
     <label>Instagram</label><input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">
 
     <h2>Keamanan Link Panel</h2>
