@@ -1,0 +1,6 @@
+PERBAIKAN TOGGLE SWITCH STATUS
+
+- Status produk dan nominal sekarang berbentuk switch Aktif / Nonaktif.
+- Indikator bergeser ke kiri atau kanan sesuai status.
+- Aksi cepat metode pembayaran menggunakan switch Online / Offline dan Aktif / Nonaktif.
+- Klik switch langsung menyimpan perubahan status.

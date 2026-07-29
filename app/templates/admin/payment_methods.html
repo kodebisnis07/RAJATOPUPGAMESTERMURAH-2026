@@ -62,10 +62,18 @@
             </td>
             <td>{% if m.qr_image %}<img class="admin-thumb" src="{{ media_url(m.qr_image, 'payment_methods') }}" alt="QR {{ m.name }}">{% else %}-{% endif %}</td>
             <td>
-                <form method="POST" action="{{ url_for('admin.toggle_payment_method', id=m.id) }}" class="inline-form">
-                    {% if m.is_offline or not m.is_active %}<button class="btn small" name="action" value="online">Online</button>{% else %}<button class="btn small" name="action" value="offline">Offline</button>{% endif %}
-                    {% if m.is_active %}<button class="danger" name="action" value="deactivate">Nonaktif</button>{% else %}<button class="btn small" name="action" value="activate">Aktif</button>{% endif %}
-                </form>
+                <div class="payment-switches">
+                    <form method="POST" action="{{ url_for('admin.toggle_payment_method', id=m.id) }}" class="status-switch-form">
+                        <button type="submit" name="action" value="{{ 'online' if m.is_offline else 'offline' }}" class="status-switch {{ 'is-right' if m.is_offline else '' }}" aria-label="Ubah {{ m.name }} menjadi {{ 'online' if m.is_offline else 'offline' }}">
+                            <span>Online</span><span>Offline</span>
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.toggle_payment_method', id=m.id) }}" class="status-switch-form">
+                        <button type="submit" name="action" value="{{ 'activate' if not m.is_active else 'deactivate' }}" class="status-switch {{ 'is-right' if not m.is_active else '' }}" aria-label="Ubah status {{ m.name }} menjadi {{ 'aktif' if not m.is_active else 'nonaktif' }}">
+                            <span>Aktif</span><span>Nonaktif</span>
+                        </button>
+                    </form>
+                </div>
             </td>
             <td>
                 <details>
