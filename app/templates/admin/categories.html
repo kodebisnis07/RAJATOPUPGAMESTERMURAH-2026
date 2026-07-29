@@ -118,9 +118,11 @@
                             </span>
                         </td>
                         <td class="center-cell">
-                            <span class="status-pill {{ 'status-active' if category.status == 'active' else 'status-inactive' }}">
-                                <i></i>{{ 'Aktif' if category.status == 'active' else 'Nonaktif' }}
-                            </span>
+                            <form method="POST" action="{{ url_for('admin.toggle_category_status', id=category.id) }}" class="status-switch-form">
+                                <button type="submit" class="status-switch {{ 'is-right' if category.status != 'active' else '' }}" aria-label="Ubah status {{ category.name }}" aria-pressed="{{ 'true' if category.status == 'active' else 'false' }}" title="{{ 'Aktif' if category.status == 'active' else 'Nonaktif' }} — klik untuk mengubah">
+                                    <span class="sr-only">{{ 'Aktif' if category.status == 'active' else 'Nonaktif' }}</span>
+                                </button>
+                            </form>
                         </td>
                         <td class="actions-cell">
                             <details class="category-actions">

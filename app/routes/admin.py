@@ -473,6 +473,18 @@ def categories():
     return render_template("admin/categories.html", categories=categories, sections=sections)
 
 
+@admin_bp.route("/categories/<int:id>/toggle-status", methods=["POST"])
+@role_required("super_admin", "admin")
+def toggle_category_status(id):
+    category = Category.query.get_or_404(id)
+    category.status = "inactive" if category.status == "active" else "active"
+    db.session.commit()
+    status_label = "aktif" if category.status == "active" else "nonaktif"
+    log_admin_activity("toggle_status_kategori", f"Mengubah status kategori ID {category.id}: {category.name} menjadi {status_label}")
+    flash(f"Status {category.name} sekarang {status_label}.", "success")
+    return redirect(url_for("admin.categories"))
+
+
 @admin_bp.route("/categories/<int:id>/edit", methods=["POST"])
 @role_required("super_admin", "admin")
 def edit_category(id):

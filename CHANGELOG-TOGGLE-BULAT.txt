@@ -1,0 +1,6 @@
+PERBAIKAN TOGGLE BULAT
+
+- Toggle produk dan nominal diubah menjadi switch bulat geser.
+- Toggle kategori sekarang dapat diklik langsung.
+- Aksi cepat metode pembayaran memakai switch bulat untuk Online/Offline dan Aktif/Nonaktif.
+- Status tetap tersimpan melalui endpoint POST yang aman.
