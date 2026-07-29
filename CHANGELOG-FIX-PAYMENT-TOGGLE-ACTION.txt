@@ -1,0 +1,16 @@
+PERBAIKAN TOGGLE METODE PEMBAYARAN
+
+Penyebab:
+FormData(form) tidak menyertakan tombol submit yang memiliki name="action".
+Akibatnya backend menerima action kosong dan menampilkan pesan
+"Aksi status metode pembayaran tidak valid."
+
+Perbaikan:
+JavaScript sekarang menambahkan nama dan nilai tombol toggle secara eksplisit
+ke FormData sebelum request AJAX dikirim.
+
+Status yang didukung:
+- online
+- offline
+- activate
+- deactivate

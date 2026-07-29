@@ -211,9 +211,16 @@
       // tombol name="action", sehingga properti form.action tertimpa oleh
       // HTMLButtonElement dan fetch() mencoba membuka /[object HTMLButtonElement].
       var submitUrl = form.getAttribute('action') || window.location.href;
+      // FormData(form) tidak otomatis menyertakan nama/nilai tombol submit.
+      // Toggle metode pembayaran memakai button name="action", jadi tambahkan
+      // submitter secara eksplisit agar backend menerima online/offline/activate/deactivate.
+      var formData = new FormData(form);
+      if(button.name){
+        formData.set(button.name, button.value);
+      }
       var response = await fetch(submitUrl, {
         method: 'POST',
-        body: new FormData(form),
+        body: formData,
         credentials: 'same-origin',
         redirect: 'follow',
         headers: {
