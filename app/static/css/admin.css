@@ -1274,3 +1274,17 @@ input,select,textarea,button{max-width:100%;}
   .categories-page .category-edit-form{grid-template-columns:1fr!important}
   .categories-page .category-edit-form .field-wide{grid-column:auto!important}
 }
+
+
+/* Tombol status produk: klik langsung untuk aktif/nonaktif */
+.product-status-form{display:inline-block!important;margin:0!important}
+.product-status-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:72px;height:30px;padding:0 11px;border:1px solid;border-radius:999px;font-size:10px;font-weight:900;line-height:1;cursor:pointer;transition:transform .15s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease}
+.product-status-toggle i{display:block;width:7px;height:7px;border-radius:50%;transition:background .15s ease,box-shadow .15s ease}
+.product-status-toggle:hover{transform:translateY(-1px)}
+.product-status-toggle:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}
+.product-status-toggle.is-active{border-color:rgba(52,211,153,.42);background:rgba(52,211,153,.11);color:#6ee7b7;box-shadow:none}
+.product-status-toggle.is-active i{background:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.10)}
+.product-status-toggle.is-active:hover{background:rgba(52,211,153,.18);border-color:rgba(52,211,153,.65)}
+.product-status-toggle.is-inactive{border-color:rgba(248,113,113,.42);background:rgba(248,113,113,.10);color:#fca5a5;box-shadow:none}
+.product-status-toggle.is-inactive i{background:#f87171;box-shadow:0 0 0 3px rgba(248,113,113,.10)}
+.product-status-toggle.is-inactive:hover{background:rgba(248,113,113,.17);border-color:rgba(248,113,113,.65)}

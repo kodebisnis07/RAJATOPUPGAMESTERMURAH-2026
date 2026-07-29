@@ -46,7 +46,14 @@
                 <td><span class="badge">{{ (product.target_type or 'auto')|replace('_', ' ')|title }}</span></td>
                 <td class="money-cell"><span>Rp</span><strong>{{ "{:,}".format(product.price).replace(",", ".") }}</strong></td>
                 <td>{{ product.stock }}</td>
-                <td><span class="badge">{{ product.status }}</span></td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.toggle_product_status', id=product.id) }}" class="product-status-form">
+                        <input type="hidden" name="next" value="{{ url_for('admin.products') }}">
+                        <button type="submit" class="product-status-toggle {{ 'is-active' if product.status == 'active' else 'is-inactive' }}" aria-label="Ubah status {{ product.name }}" title="Klik untuk {{ 'menonaktifkan' if product.status == 'active' else 'mengaktifkan' }} produk">
+                            <i aria-hidden="true"></i><span>{{ 'Aktif' if product.status == 'active' else 'Nonaktif' }}</span>
+                        </button>
+                    </form>
+                </td>
                 <td>
                     <details>
                         <summary><span aria-hidden="true">✎</span> Edit</summary>

@@ -615,6 +615,22 @@ def edit_product(id):
     return redirect(target)
 
 
+@admin_bp.route("/products/<int:id>/toggle-status", methods=["POST"])
+@role_required("super_admin", "admin")
+def toggle_product_status(id):
+    product = Product.query.get_or_404(id)
+    product.status = "inactive" if product.status == "active" else "active"
+    db.session.commit()
+    status_label = "aktif" if product.status == "active" else "nonaktif"
+    log_admin_activity("toggle_status_produk", f"Mengubah status produk ID {product.id}: {product.name} menjadi {status_label}")
+    flash(f"Produk {product.name} sekarang {status_label}.", "success")
+
+    target = (request.form.get("next") or request.referrer or url_for("admin.products")).strip()
+    if not target.startswith("/"):
+        target = url_for("admin.products")
+    return redirect(target)
+
+
 @admin_bp.route("/products/delete/<int:id>", methods=["POST"])
 @role_required("super_admin", "admin")
 def delete_product(id):
