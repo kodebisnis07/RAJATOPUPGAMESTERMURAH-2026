@@ -7,7 +7,7 @@
     {% set site_logo = global_settings.get('site_logo') %}
     {% set favicon_logo = global_settings.get('favicon_logo') or site_logo %}
     <link rel="icon" type="image/png" href="{{ image_url(favicon_logo, 'img/site') if favicon_logo else url_for('static', filename='img/pwa/icon-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260728-category-modal-fix-4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v=20260729-toggle-ajax-fix-2">
 </head>
 <body>
 <button class="admin-menu-toggle" type="button" aria-label="Buka menu admin" aria-expanded="false">☰ Menu</button>
@@ -186,6 +186,53 @@
       });
     });
   }
+})();
+
+// Toggle status tanpa reload halaman. Ini mencegah tampilan kembali menjadi tombol teks
+// ketika respons redirect masih berasal dari cache/deployment lama.
+(function(){
+  document.addEventListener('submit', async function(event){
+    var form = event.target.closest && event.target.closest('.status-switch-form');
+    if(!form) return;
+
+    event.preventDefault();
+    var button = form.querySelector('button.status-switch');
+    if(!button || button.disabled) return;
+
+    var wasRight = button.classList.contains('is-right');
+    var oldPressed = button.getAttribute('aria-pressed');
+    button.disabled = true;
+    button.classList.toggle('is-right');
+    button.setAttribute('aria-pressed', oldPressed === 'true' ? 'false' : 'true');
+    button.setAttribute('aria-busy', 'true');
+
+    try {
+      var response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        credentials: 'same-origin',
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+      });
+      if(!response.ok) throw new Error('HTTP ' + response.status);
+
+      // Ubah nilai aksi metode pembayaran agar klik berikutnya mengirim aksi kebalikan.
+      if(button.name === 'action'){
+        var value = button.value;
+        if(value === 'online') button.value = 'offline';
+        else if(value === 'offline') button.value = 'online';
+        else if(value === 'activate') button.value = 'deactivate';
+        else if(value === 'deactivate') button.value = 'activate';
+      }
+    } catch(error) {
+      button.classList.toggle('is-right', wasRight);
+      button.setAttribute('aria-pressed', oldPressed || 'false');
+      console.error('Gagal mengubah status:', error);
+      alert('Status gagal disimpan. Silakan coba lagi.');
+    } finally {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+    }
+  });
 })();
 </script>
 </body>

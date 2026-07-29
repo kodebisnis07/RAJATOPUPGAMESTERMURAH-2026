@@ -50,8 +50,7 @@
                     <form method="POST" action="{{ url_for('admin.toggle_product_status', id=product.id) }}" class="status-switch-form">
                         <input type="hidden" name="next" value="{{ url_for('admin.products') }}">
                         <button type="submit" class="status-switch {{ 'is-right' if product.status != 'active' else '' }}" aria-label="Ubah status {{ product.name }}" aria-pressed="{{ 'true' if product.status == 'active' else 'false' }}" title="Klik untuk {{ 'menonaktifkan' if product.status == 'active' else 'mengaktifkan' }} produk">
-                            <span class="sr-only">{{ 'Aktif' if product.status == 'active' else 'Nonaktif' }}</span>
-                        </button>
+</button>
                     </form>
                 </td>
                 <td>

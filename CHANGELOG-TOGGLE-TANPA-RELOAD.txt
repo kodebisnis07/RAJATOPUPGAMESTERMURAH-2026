@@ -1,0 +1,7 @@
+PERBAIKAN TOGGLE STATUS TANPA RELOAD
+
+- Klik toggle sekarang disimpan melalui AJAX/fetch tanpa memuat ulang halaman.
+- Posisi bulatan langsung bergeser dan tetap berbentuk toggle setelah status disimpan.
+- Jika penyimpanan gagal, posisi toggle otomatis dikembalikan dan pesan kesalahan ditampilkan.
+- Berlaku untuk kategori, produk, nominal, status online/offline, dan aktif/nonaktif metode pembayaran.
+- Versi cache CSS admin diperbarui.
