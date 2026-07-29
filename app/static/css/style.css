@@ -1302,9 +1302,50 @@ body.marketplace-home{font-size:16px!important;}
 #serverField[hidden]{display:none!important}
 @media(max-width:520px){.voucher-box-clean summary{padding:13px!important}.payment-grid-clean .pay-card{min-height:88px;padding:11px}}
 
-/* Konfirmasi pesanan melalui Telegram */
-.order-admin-confirmation{margin:20px 0 6px;padding:18px 20px;display:flex;align-items:center;gap:15px;border:1px solid rgba(56,189,248,.34);border-radius:16px;background:linear-gradient(135deg,rgba(14,165,233,.14),rgba(15,23,42,.94));box-shadow:0 12px 30px rgba(2,132,199,.08)}
-.order-admin-confirmation-icon{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border-radius:50%;font-size:24px;background:#229ed9;color:#fff;box-shadow:0 8px 20px rgba(34,158,217,.28)}
-.order-admin-confirmation-copy{flex:1;min-width:0}.order-admin-confirmation-copy h2{margin:4px 0 5px;color:#fff;font-size:19px}.order-admin-confirmation-copy p{margin:0;color:#b8c3d4;line-height:1.5}
-.btn-telegram-confirm{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:12px;background:#229ed9;color:#fff;text-decoration:none;font-weight:900;white-space:nowrap;box-shadow:0 8px 20px rgba(34,158,217,.22);transition:.18s ease}.btn-telegram-confirm:hover{transform:translateY(-1px);filter:brightness(1.08)}
-@media(max-width:760px){.order-admin-confirmation{align-items:stretch;flex-direction:column}.order-admin-confirmation-icon{align-self:flex-start}.btn-telegram-confirm{width:100%;box-sizing:border-box}}
+/* Konfirmasi pesanan melalui Telegram — dibuat besar dan sangat terlihat */
+.order-admin-confirmation{margin:24px 0 10px;padding:24px;display:grid;grid-template-columns:64px minmax(0,1fr);gap:16px 18px;align-items:center;border:2px solid rgba(56,189,248,.62);border-radius:20px;background:linear-gradient(135deg,rgba(14,165,233,.24),rgba(15,23,42,.98));box-shadow:0 18px 42px rgba(2,132,199,.18),inset 0 1px 0 rgba(255,255,255,.06)}
+.order-admin-confirmation-icon{display:grid;place-items:center;width:64px;height:64px;border-radius:18px;font-size:32px;background:linear-gradient(135deg,#2aabee,#168acd);color:#fff;box-shadow:0 12px 28px rgba(34,158,217,.38)}
+.order-admin-confirmation-copy{min-width:0}.order-admin-confirmation-copy .eyebrow{display:inline-flex;padding:5px 10px;border:1px solid rgba(250,204,21,.62);border-radius:999px;background:rgba(250,204,21,.12);color:#fde047;font-size:11px;font-weight:900;letter-spacing:.04em}.order-admin-confirmation-copy h2{margin:9px 0 7px;color:#fff;font-size:clamp(21px,2.2vw,28px);line-height:1.2}.order-admin-confirmation-copy p{margin:0;color:#e2e8f0;font-size:15px;line-height:1.65}
+.btn-telegram-confirm{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:62px;padding:15px 22px;border:2px solid rgba(255,255,255,.28);border-radius:15px;background:linear-gradient(135deg,#2aabee,#168acd);color:#fff!important;text-decoration:none!important;font-size:18px;font-weight:950;line-height:1.2;letter-spacing:.01em;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.22);box-shadow:0 13px 28px rgba(34,158,217,.36);transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}.btn-telegram-confirm:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 17px 34px rgba(34,158,217,.44)}.btn-telegram-confirm:focus-visible{outline:3px solid #fff;outline-offset:3px}.btn-telegram-confirm-icon{font-size:27px;line-height:1}.btn-telegram-confirm-text{display:flex;flex-direction:column;align-items:center;gap:2px}.btn-telegram-confirm-label{font-size:18px;font-weight:950}.btn-telegram-confirm-note{font-size:12px;font-weight:700;opacity:.92}
+@media(max-width:760px){.order-admin-confirmation{grid-template-columns:52px minmax(0,1fr);padding:18px;gap:14px;border-radius:17px}.order-admin-confirmation-icon{width:52px;height:52px;border-radius:15px;font-size:27px}.order-admin-confirmation-copy h2{font-size:21px}.order-admin-confirmation-copy p{font-size:14px}.btn-telegram-confirm{min-height:60px;padding:14px 16px}.btn-telegram-confirm-label{font-size:17px}}
+@media(max-width:420px){.order-admin-confirmation{grid-template-columns:1fr;text-align:center}.order-admin-confirmation-icon{margin:0 auto}.order-admin-confirmation-copy .eyebrow{justify-content:center}.btn-telegram-confirm{gap:9px}.btn-telegram-confirm-icon{font-size:24px}.btn-telegram-confirm-label{font-size:16px}.btn-telegram-confirm-note{font-size:11px}}
+
+
+/* Invoice Professional UI 2026 */
+.invoice-page{max-width:1240px;margin:38px auto 56px;padding:0 24px}
+.invoice-card-pro{position:relative;overflow:hidden;padding:0!important;border-radius:26px!important;background:linear-gradient(155deg,#182236 0%,#111a2b 52%,#0d1524 100%)!important;border:1px solid rgba(148,163,184,.22)!important;box-shadow:0 28px 80px rgba(2,6,23,.46)!important}
+.invoice-card-pro:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#fbbf24,#f59e0b 42%,#38bdf8 75%,#229ed9)}
+.invoice-card-pro>.invoice-messages{padding:28px 28px 0}
+.invoice-head-pro{margin:0!important;padding:32px 32px 28px;border-bottom:1px solid rgba(148,163,184,.16);background:radial-gradient(circle at 12% 0%,rgba(245,158,11,.12),transparent 34%),linear-gradient(180deg,rgba(255,255,255,.025),transparent)}
+.invoice-title-wrap{display:flex;align-items:flex-start;gap:17px;min-width:0}
+.invoice-title-icon{width:52px;height:52px;display:grid;place-items:center;flex:0 0 52px;border-radius:16px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#172033;font-size:25px;font-weight:1000;box-shadow:0 12px 30px rgba(245,158,11,.28)}
+.invoice-head-pro .eyebrow{display:inline-flex;color:#fcd34d;font-size:11px;font-weight:950;letter-spacing:.14em}
+.invoice-head-pro h1{margin:7px 0 8px!important;color:#fff!important;font-size:clamp(20px,2.5vw,31px);line-height:1.15;overflow-wrap:anywhere;letter-spacing:.015em}
+.invoice-head-pro p{margin:0;color:#b9c5d8;font-size:14px;line-height:1.6}
+.invoice-status-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:0 0 auto}
+.invoice-status-wrap small{color:#8997ad;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.status-pill{display:inline-flex!important;align-items:center;gap:8px;padding:10px 15px!important;border:1px solid rgba(251,191,36,.35);font-size:12px;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.status-pill i{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 16%,transparent)}
+.invoice-grid{padding:28px 32px 0;gap:22px!important;align-items:stretch}
+.invoice-box-pro{padding:24px!important;border-radius:19px!important;background:linear-gradient(180deg,rgba(35,47,69,.78),rgba(24,34,52,.9))!important;border:1px solid rgba(148,163,184,.18)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 14px 36px rgba(2,6,23,.18)!important}
+.invoice-box-title{display:flex;align-items:center;gap:12px;padding-bottom:17px;margin-bottom:4px;border-bottom:1px solid rgba(148,163,184,.13)}
+.invoice-box-title>span{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:rgba(245,158,11,.12);font-size:20px}
+.invoice-box-title h2{margin:0!important;color:#fbbf24!important;font-size:17px;line-height:1.25}
+.invoice-box-title p{margin:3px 0 0;color:#8290a6;font-size:11px}
+.invoice-box-pro .summary-row{min-height:44px;align-items:center;padding:11px 0!important;border-bottom:1px dashed rgba(148,163,184,.17)!important}
+.invoice-box-pro .summary-row:last-child{border-bottom:0!important}
+.invoice-box-pro .summary-row span{color:#9eacc0;font-size:12px}
+.invoice-box-pro .summary-row b{max-width:62%;color:#f8fafc;font-size:12px;font-weight:850;overflow-wrap:anywhere}
+.invoice-box-pro .summary-row.total{margin-top:5px;padding:16px 0 4px!important;border-top:1px solid rgba(251,191,36,.2);border-bottom:0!important}
+.invoice-box-pro .summary-row.total span{color:#e2e8f0;font-size:13px;font-weight:800}
+.invoice-box-pro .summary-row.total b{color:#fbbf24;font-size:20px}
+.invoice-box-pro .manual-pay-detail{margin-top:8px;padding:0 11px 10px;border-radius:14px;background:rgba(8,15,28,.25);border:1px solid rgba(148,163,184,.12)}
+.invoice-box-pro .manual-note{font-size:12px;line-height:1.55;border-radius:12px}
+.invoice-card-pro .order-admin-confirmation{margin:24px 32px 0}
+.invoice-actions-pro{margin:0!important;padding:24px 32px 30px;align-items:center;flex-wrap:wrap;border-top:1px solid rgba(148,163,184,.12);background:rgba(7,12,22,.16)}
+.invoice-actions-pro .btn-small{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 17px;border-radius:12px;font-weight:850;text-decoration:none}
+.invoice-actions-pro .cancel-order-form{margin:0}
+.order-countdown{display:inline-flex;align-items:center;gap:12px;margin-top:15px;padding:9px 12px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.23)}
+.order-countdown span{color:#d6deeb;font-size:11px}.order-countdown strong{color:#fbbf24;font-size:16px;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.invoice-head-pro{padding:26px 22px}.invoice-status-wrap{align-items:flex-start;margin:18px 0 0 69px}.invoice-grid{padding:22px 22px 0}.invoice-card-pro .order-admin-confirmation{margin:22px 22px 0}.invoice-actions-pro{padding:22px}.invoice-box-pro .summary-row b{max-width:58%}}
+@media(max-width:560px){.invoice-page{margin:18px auto 34px;padding:0 10px}.invoice-card-pro{border-radius:19px!important}.invoice-head-pro{padding:23px 17px 20px}.invoice-title-wrap{gap:12px}.invoice-title-icon{width:44px;height:44px;flex-basis:44px;border-radius:13px;font-size:21px}.invoice-head-pro h1{font-size:18px}.invoice-head-pro p{font-size:12px}.invoice-status-wrap{margin:16px 0 0 56px}.invoice-grid{padding:16px 14px 0;gap:14px!important}.invoice-box-pro{padding:18px!important;border-radius:15px!important}.invoice-box-title p{display:none}.invoice-box-pro .summary-row{gap:10px}.invoice-box-pro .summary-row span{font-size:11px}.invoice-box-pro .summary-row b{font-size:11px;max-width:60%}.invoice-card-pro .order-admin-confirmation{margin:16px 14px 0}.invoice-actions-pro{padding:17px 14px;display:grid!important;grid-template-columns:1fr 1fr;gap:9px!important}.invoice-actions-pro .btn-small,.invoice-actions-pro .cancel-order-form,.invoice-actions-pro .cancel-order-form button{width:100%}.invoice-actions-pro .cancel-order-form{grid-column:1/-1}}

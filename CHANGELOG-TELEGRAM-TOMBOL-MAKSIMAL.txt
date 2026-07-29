@@ -1,0 +1,8 @@
+PERBAIKAN TAMPILAN TELEGRAM
+
+- Tombol Telegram dibuat penuh selebar kartu.
+- Ukuran teks diperbesar dan dibuat tebal.
+- Warna biru Telegram diperkuat agar kontras pada tema gelap.
+- Ditambahkan ikon besar dan teks bantuan.
+- Tampilan responsif untuk desktop dan ponsel.
+- Cache CSS diperbarui agar perubahan langsung terbaca browser.

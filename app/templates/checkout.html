@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="invoice-page">
-    <div class="invoice-card">
+    <div class="invoice-card invoice-card-pro">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="invoice-messages">
@@ -10,10 +10,12 @@
             {% endif %}
         {% endwith %}
 
-        <div class="invoice-head">
-            <div>
-                <span class="eyebrow">INVOICE</span>
-                <h1>{{ order.invoice }}</h1>
+        <div class="invoice-head invoice-head-pro">
+            <div class="invoice-title-wrap">
+                <div class="invoice-title-icon" aria-hidden="true">✓</div>
+                <div>
+                    <span class="eyebrow">INVOICE PESANAN</span>
+                    <h1>{{ order.invoice }}</h1>
                 {% if order.payment_status == 'pending' and order.order_status == 'pending' and order.payment and order.payment.expired_at %}
                     <p>Pesanan berhasil dibuat. Selesaikan pembayaran sebelum waktu habis.</p>
                     <div class="order-countdown" data-expired-at="{{ order.payment.expired_at.isoformat() }}Z">
@@ -25,13 +27,17 @@
                 {% else %}
                     <p>Pesanan berhasil dibuat. Selesaikan pembayaran agar transaksi dapat diproses.</p>
                 {% endif %}
+                </div>
             </div>
-            <span class="status-pill {{ order.payment_status }}">{{ order.payment_status|upper }}</span>
+            <div class="invoice-status-wrap">
+                <small>Status Pembayaran</small>
+                <span class="status-pill {{ order.payment_status }}"><i></i>{{ order.payment_status|upper }}</span>
+            </div>
         </div>
 
         <div class="invoice-grid">
-            <div class="invoice-box">
-                <h2>Detail Pesanan</h2>
+            <div class="invoice-box invoice-box-pro">
+                <div class="invoice-box-title"><span>🧾</span><div><h2>Detail Pesanan</h2><p>Informasi produk dan tujuan transaksi</p></div></div>
                 <div class="summary-row"><span>Nomor Order</span><b>{{ order.order_number or ('ORD-' ~ order.id) }}</b></div>
                 <div class="summary-row"><span>Produk</span><b>{{ order.product.name }}</b></div>
                 <div class="summary-row"><span>Game</span><b>{{ order.product.category.name if order.product.category else '-' }}</b></div>
@@ -43,8 +49,8 @@
                 <div class="summary-row total"><span>Total</span><b>Rp {{ "{:,}".format(order.price).replace(",", ".") }}</b></div>
             </div>
 
-            <div class="invoice-box payment-instruction">
-                <h2>Pembayaran</h2>
+            <div class="invoice-box payment-instruction invoice-box-pro">
+                <div class="invoice-box-title"><span>💳</span><div><h2>Pembayaran</h2><p>Detail metode dan status pembayaran</p></div></div>
                 <div class="summary-row"><span>Metode</span><b>{{ order.payment_method or '-' }}</b></div>
                 {% if payment_method %}
                     <div class="manual-pay-detail">
@@ -101,16 +107,28 @@
                     <p>{{ global_settings.get('telegram_order_description', 'Kirim detail pesanan kepada admin agar pembayaran dapat dicek dan pesanan segera diproses.') }}</p>
                 </div>
                 {% if support_telegram_url %}
-                    <a class="btn-telegram-confirm" href="https://t.me/share/url?url={{ site_url|urlencode }}&text={{ telegram_message|urlencode }}" target="_blank" rel="noopener">✈️ {{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}</a>
+                    <a class="btn-telegram-confirm" href="https://t.me/share/url?url={{ site_url|urlencode }}&text={{ telegram_message|urlencode }}" target="_blank" rel="noopener" aria-label="{{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}">
+                        <span class="btn-telegram-confirm-icon" aria-hidden="true">✈️</span>
+                        <span class="btn-telegram-confirm-text">
+                            <span class="btn-telegram-confirm-label">{{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}</span>
+                            <span class="btn-telegram-confirm-note">Klik untuk mengirim detail pesanan ke admin</span>
+                        </span>
+                    </a>
                 {% else %}
-                    <a class="btn-telegram-confirm" href="{{ url_for('auth.chat') }}">💬 Hubungi Admin</a>
+                    <a class="btn-telegram-confirm" href="{{ url_for('auth.chat') }}">
+                        <span class="btn-telegram-confirm-icon" aria-hidden="true">💬</span>
+                        <span class="btn-telegram-confirm-text">
+                            <span class="btn-telegram-confirm-label">Hubungi Admin</span>
+                            <span class="btn-telegram-confirm-note">Telegram belum diatur, buka layanan bantuan</span>
+                        </span>
+                    </a>
                 {% endif %}
             </div>
         {% endif %}
 
-        <div class="invoice-actions">
-            <a class="btn-small outline" href="{{ url_for('home.index') }}">Kembali ke Home</a>
-            <a class="btn-small" href="{{ url_for('home.checkout', invoice=order.invoice) }}">Refresh Status</a>
+        <div class="invoice-actions invoice-actions-pro">
+            <a class="btn-small outline" href="{{ url_for('home.index') }}"><span aria-hidden="true">←</span> Kembali ke Home</a>
+            <a class="btn-small" href="{{ url_for('home.checkout', invoice=order.invoice) }}"><span aria-hidden="true">↻</span> Refresh Status</a>
             {% if session.get('user_id') == order.user_id and order.payment_status == 'pending' and order.order_status == 'pending' %}
                 <form method="POST" action="{{ url_for('home.cancel_order', invoice=order.invoice) }}" onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?');" class="cancel-order-form">
                     <button class="btn-small danger" type="submit">Batalkan Pesanan</button>
