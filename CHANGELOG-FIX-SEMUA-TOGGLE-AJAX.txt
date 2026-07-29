@@ -1,0 +1,8 @@
+PERBAIKAN SEMUA TOGGLE STATUS
+
+- Endpoint kategori, produk/nominal, dan metode pembayaran sekarang mengembalikan JSON untuk request AJAX.
+- Penyimpanan database memakai rollback dan pesan error yang jelas jika gagal.
+- Request toggle tidak lagi menerima halaman redirect/login sebagai respons sukses.
+- Status metode pembayaran dan badge ONLINE/OFFLINE/NONAKTIF diperbarui langsung tanpa reload.
+- Sesi habis dan akses role yang tidak sesuai dikembalikan sebagai error JSON 401/403.
+- Mode submit biasa tetap didukung sebagai fallback jika JavaScript tidak aktif.

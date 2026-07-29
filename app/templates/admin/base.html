@@ -188,8 +188,7 @@
   }
 })();
 
-// Toggle status tanpa reload halaman. Ini mencegah tampilan kembali menjadi tombol teks
-// ketika respons redirect masih berasal dari cache/deployment lama.
+// Toggle status tanpa reload halaman, dengan respons JSON dari server.
 (function(){
   document.addEventListener('submit', async function(event){
     var form = event.target.closest && event.target.closest('.status-switch-form');
@@ -200,7 +199,8 @@
     if(!button || button.disabled) return;
 
     var wasRight = button.classList.contains('is-right');
-    var oldPressed = button.getAttribute('aria-pressed');
+    var oldPressed = button.getAttribute('aria-pressed') || 'false';
+    var oldValue = button.value;
     button.disabled = true;
     button.classList.toggle('is-right');
     button.setAttribute('aria-pressed', oldPressed === 'true' ? 'false' : 'true');
@@ -211,23 +211,42 @@
         method: 'POST',
         body: new FormData(form),
         credentials: 'same-origin',
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
+        redirect: 'follow',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
       });
-      if(!response.ok) throw new Error('HTTP ' + response.status);
+      var contentType = response.headers.get('content-type') || '';
+      var data = contentType.indexOf('application/json') !== -1 ? await response.json() : null;
+      if(!response.ok || !data || data.ok !== true){
+        throw new Error((data && data.message) || ('HTTP ' + response.status));
+      }
 
-      // Ubah nilai aksi metode pembayaran agar klik berikutnya mengirim aksi kebalikan.
       if(button.name === 'action'){
-        var value = button.value;
-        if(value === 'online') button.value = 'offline';
-        else if(value === 'offline') button.value = 'online';
-        else if(value === 'activate') button.value = 'deactivate';
-        else if(value === 'deactivate') button.value = 'activate';
+        if(oldValue === 'online') button.value = 'offline';
+        else if(oldValue === 'offline') button.value = 'online';
+        else if(oldValue === 'activate') button.value = 'deactivate';
+        else if(oldValue === 'deactivate') button.value = 'activate';
+
+        var row = form.closest('tr');
+        if(row && typeof data.online === 'boolean'){
+          var statusCell = row.querySelector('td:nth-child(4)');
+          var badge = statusCell && statusCell.querySelector('.badge');
+          if(badge){
+            badge.classList.remove('success-badge','offline-badge','inactive-badge');
+            if(data.online){ badge.textContent='ONLINE'; badge.classList.add('success-badge'); }
+            else if(data.is_offline){ badge.textContent='OFFLINE'; badge.classList.add('offline-badge'); }
+            else { badge.textContent='NONAKTIF'; badge.classList.add('inactive-badge'); }
+          }
+        }
       }
     } catch(error) {
       button.classList.toggle('is-right', wasRight);
-      button.setAttribute('aria-pressed', oldPressed || 'false');
+      button.setAttribute('aria-pressed', oldPressed);
+      button.value = oldValue;
       console.error('Gagal mengubah status:', error);
-      alert('Status gagal disimpan. Silakan coba lagi.');
+      alert(error.message || 'Status gagal disimpan. Silakan coba lagi.');
     } finally {
       button.disabled = false;
       button.removeAttribute('aria-busy');

@@ -25,6 +25,18 @@ admin_bp = Blueprint("admin", __name__, url_prefix=ADMIN_PANEL_PATH)
 super_admin_bp = Blueprint("super_admin", __name__, url_prefix=SUPER_ADMIN_PANEL_PATH)
 
 
+def _ajax_request():
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.accept_mimetypes.best == "application/json"
+
+
+def _toggle_response(*, ok=True, message="", **payload):
+    if _ajax_request():
+        data = {"ok": bool(ok), "message": message}
+        data.update(payload)
+        return jsonify(data), (200 if ok else 400)
+    return None
+
+
 def current_admin():
     admin_id = session.get("admin_id")
     if not admin_id:
@@ -41,6 +53,8 @@ def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not admin_required():
+            if _ajax_request():
+                return jsonify({"ok": False, "message": "Sesi admin berakhir. Silakan login kembali."}), 401
             return redirect(url_for("admin.login"))
         return view(*args, **kwargs)
     return wrapped
@@ -51,8 +65,12 @@ def super_admin_required(view):
     def wrapped(*args, **kwargs):
         admin = current_admin()
         if not admin or not admin.is_active:
+            if _ajax_request():
+                return jsonify({"ok": False, "message": "Sesi Super Admin berakhir. Silakan login kembali."}), 401
             return redirect(url_for("super_admin.login"))
         if admin.role != "super_admin":
+            if _ajax_request():
+                return jsonify({"ok": False, "message": "Hanya Super Admin yang dapat mengubah status ini."}), 403
             flash("Hanya Super Admin yang bisa membuka menu ini.", "error")
             return redirect(url_for("admin.dashboard"))
         return view(*args, **kwargs)
@@ -72,10 +90,14 @@ def role_required(*allowed_roles):
         def wrapped(*args, **kwargs):
             admin = current_admin()
             if not admin or not admin.is_active:
+                if _ajax_request():
+                    return jsonify({"ok": False, "message": "Sesi admin berakhir. Silakan login kembali."}), 401
                 return redirect(url_for("admin.login"))
             if admin.role == "super_admin":
                 return view(*args, **kwargs)
             if admin.role not in allowed_roles:
+                if _ajax_request():
+                    return jsonify({"ok": False, "message": "Role Anda tidak diizinkan mengubah status ini."}), 403
                 flash("Akses ditolak. Role Anda tidak diizinkan membuka menu ini.", "error")
                 return redirect(url_for("admin.dashboard"))
             return view(*args, **kwargs)
@@ -477,10 +499,22 @@ def categories():
 @role_required("super_admin", "admin")
 def toggle_category_status(id):
     category = Category.query.get_or_404(id)
-    category.status = "inactive" if category.status == "active" else "active"
-    db.session.commit()
+    try:
+        category.status = "inactive" if category.status == "active" else "active"
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status kategori %s", id)
+        response = _toggle_response(ok=False, message="Status kategori gagal disimpan.")
+        if response:
+            return response
+        flash("Status kategori gagal disimpan.", "error")
+        return redirect(url_for("admin.categories"))
     status_label = "aktif" if category.status == "active" else "nonaktif"
     log_admin_activity("toggle_status_kategori", f"Mengubah status kategori ID {category.id}: {category.name} menjadi {status_label}")
+    response = _toggle_response(message=f"Status {category.name} sekarang {status_label}.", status=category.status, active=category.status == "active")
+    if response:
+        return response
     flash(f"Status {category.name} sekarang {status_label}.", "success")
     return redirect(url_for("admin.categories"))
 
@@ -631,10 +665,22 @@ def edit_product(id):
 @role_required("super_admin", "admin")
 def toggle_product_status(id):
     product = Product.query.get_or_404(id)
-    product.status = "inactive" if product.status == "active" else "active"
-    db.session.commit()
+    try:
+        product.status = "inactive" if product.status == "active" else "active"
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status produk %s", id)
+        response = _toggle_response(ok=False, message="Status produk gagal disimpan.")
+        if response:
+            return response
+        flash("Status produk gagal disimpan.", "error")
+        return redirect(request.form.get("next") or url_for("admin.products"))
     status_label = "aktif" if product.status == "active" else "nonaktif"
     log_admin_activity("toggle_status_produk", f"Mengubah status produk ID {product.id}: {product.name} menjadi {status_label}")
+    response = _toggle_response(message=f"Produk {product.name} sekarang {status_label}.", status=product.status, active=product.status == "active")
+    if response:
+        return response
     flash(f"Produk {product.name} sekarang {status_label}.", "success")
 
     target = (request.form.get("next") or request.referrer or url_for("admin.products")).strip()
@@ -1469,23 +1515,49 @@ def edit_payment_method(id):
 @super_admin_required
 def toggle_payment_method(id):
     method = PaymentMethod.query.get_or_404(id)
-    action = request.form.get("action")
+    action = (request.form.get("action") or "").strip().lower()
+    messages = {
+        "offline": f"{method.name} sekarang OFFLINE.",
+        "online": f"{method.name} sekarang ONLINE dan aktif.",
+        "deactivate": f"{method.name} dinonaktifkan.",
+        "activate": f"{method.name} diaktifkan.",
+    }
+    if action not in messages:
+        response = _toggle_response(ok=False, message="Aksi status metode pembayaran tidak valid.")
+        if response:
+            return response
+        flash("Aksi status metode pembayaran tidak valid.", "error")
+        return redirect(url_for("admin.payment_methods"))
     if action == "offline":
         method.is_offline = True
-        flash(f"{method.name} sekarang OFFLINE.", "success")
     elif action == "online":
         method.is_offline = False
         method.is_active = True
-        flash(f"{method.name} sekarang ONLINE dan aktif.", "success")
     elif action == "deactivate":
         method.is_active = False
-        flash(f"{method.name} dinonaktifkan.", "success")
     elif action == "activate":
         method.is_active = True
         method.is_offline = False
-        flash(f"{method.name} diaktifkan.", "success")
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status metode pembayaran %s", id)
+        response = _toggle_response(ok=False, message="Status metode pembayaran gagal disimpan.")
+        if response:
+            return response
+        flash("Status metode pembayaran gagal disimpan.", "error")
+        return redirect(url_for("admin.payment_methods"))
     log_admin_activity("ubah_status_metode_pembayaran", f"Mengubah status metode pembayaran: {method.name}")
+    response = _toggle_response(
+        message=messages[action],
+        is_active=bool(method.is_active),
+        is_offline=bool(method.is_offline),
+        online=bool(method.is_active and not method.is_offline),
+    )
+    if response:
+        return response
+    flash(messages[action], "success")
     return redirect(url_for("admin.payment_methods"))
 
 
