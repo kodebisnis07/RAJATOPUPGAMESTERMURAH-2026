@@ -1,0 +1,10 @@
+PERBAIKAN TOGGLE METODE PEMBAYARAN HTTP 404
+
+Penyebab:
+- Tombol toggle memakai name="action".
+- Di DOM, kontrol bernama action menimpa properti form.action.
+- JavaScript fetch(form.action) menerima HTMLButtonElement, lalu browser meminta URL /[object HTMLButtonElement] dan mendapat HTTP 404.
+
+Perbaikan:
+- URL form sekarang dibaca dengan form.getAttribute("action") sehingga selalu berupa string URL.
+- Berlaku untuk seluruh form status-switch-form tanpa mengubah endpoint backend.

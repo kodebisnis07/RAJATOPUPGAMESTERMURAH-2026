@@ -207,7 +207,11 @@
     button.setAttribute('aria-busy', 'true');
 
     try {
-      var response = await fetch(form.action, {
+      // Jangan gunakan form.action di sini. Pada form metode pembayaran ada
+      // tombol name="action", sehingga properti form.action tertimpa oleh
+      // HTMLButtonElement dan fetch() mencoba membuka /[object HTMLButtonElement].
+      var submitUrl = form.getAttribute('action') || window.location.href;
+      var response = await fetch(submitUrl, {
         method: 'POST',
         body: new FormData(form),
         credentials: 'same-origin',
