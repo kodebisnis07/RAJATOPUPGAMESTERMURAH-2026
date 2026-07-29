@@ -257,7 +257,37 @@
     </div>
 </section>
 
-<a class="floating-chat" href="{{ url_for('auth.live_chat') if session.get('user_id') else url_for('auth.login') }}">💬</a>
+<aside class="contact-dock" aria-label="Hubungi kami">
+    <div class="contact-dock-title">
+        <span class="contact-dock-pulse" aria-hidden="true"></span>
+        <span>Hubungi Kami</span>
+    </div>
+
+    {% if support_telegram_url %}
+    <a class="contact-dock-link telegram" href="{{ support_telegram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Hubungi kami melalui Telegram">
+        <span class="contact-dock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img"><path d="M21.7 3.4 18.5 19c-.2 1.1-.9 1.4-1.8.9l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6 12.8l-4.8-1.5c-1-.3-1.1-1 .2-1.5L20.2 2.6c.9-.3 1.7.2 1.5.8Z"/></svg>
+        </span>
+        <span class="contact-dock-copy"><strong>Telegram</strong><small>Chat admin sekarang</small></span>
+    </a>
+    {% endif %}
+
+    {% if support_whatsapp_url %}
+    <a class="contact-dock-link whatsapp" href="{{ support_whatsapp_url }}" target="_blank" rel="noopener noreferrer" aria-label="Hubungi kami melalui WhatsApp">
+        <span class="contact-dock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.5 4.1 1.6 5.9L.2 24l6.4-1.7a11.8 11.8 0 0 0 5.5 1.4h.1C18.6 23.7 24 18.4 24 11.8c0-3.1-1.2-6.1-3.5-8.3Zm-8.4 18.2h-.1a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.8 1 1-3.7-.2-.4a9.8 9.8 0 1 1 8.5 4.7Zm5.4-7.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.2-.2.3-.8.9-1 1.1-.2.2-.4.2-.7.1-1.8-.9-3-1.6-4.2-3.7-.3-.5.3-.5.9-1.7.1-.2.1-.4 0-.6-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9 0 1.7 1.2 3.3 1.4 3.5.2.2 2.4 3.7 5.9 5.2 2.2.9 3 .9 4.1.8.7-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3Z"/></svg>
+        </span>
+        <span class="contact-dock-copy"><strong>WhatsApp</strong><small>Respon cepat admin</small></span>
+    </a>
+    {% endif %}
+
+    {% if not support_telegram_url and not support_whatsapp_url %}
+    <a class="contact-dock-link livechat" href="{{ url_for('auth.live_chat') if session.get('user_id') else url_for('auth.login') }}">
+        <span class="contact-dock-icon" aria-hidden="true">💬</span>
+        <span class="contact-dock-copy"><strong>Live Chat</strong><small>Hubungi admin</small></span>
+    </a>
+    {% endif %}
+</aside>
 <button id="install-pwa-btn" class="install-pwa-btn market-install" type="button" hidden>📲 Pasang Aplikasi</button>
 
 <footer class="market-footer">

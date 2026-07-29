@@ -107,11 +107,11 @@
                     <p>{{ global_settings.get('telegram_order_description', 'Kirim detail pesanan kepada admin agar pembayaran dapat dicek dan pesanan segera diproses.') }}</p>
                 </div>
                 {% if support_telegram_url %}
-                    <a class="btn-telegram-confirm" href="https://t.me/share/url?url={{ site_url|urlencode }}&text={{ telegram_message|urlencode }}" target="_blank" rel="noopener" aria-label="{{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}">
+                    <a class="btn-telegram-confirm" id="telegramConfirmButton" href="{{ support_telegram_url }}" target="_blank" rel="noopener noreferrer" data-telegram-message="{{ telegram_message|e }}" aria-label="{{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}">
                         <span class="btn-telegram-confirm-icon" aria-hidden="true">✈️</span>
                         <span class="btn-telegram-confirm-text">
                             <span class="btn-telegram-confirm-label">{{ global_settings.get('telegram_order_button_text', 'Konfirmasi via Telegram') }}</span>
-                            <span class="btn-telegram-confirm-note">Klik untuk mengirim detail pesanan ke admin</span>
+                            <span class="btn-telegram-confirm-note" id="telegramConfirmNote">Pesan disalin otomatis, lalu chat admin dibuka</span>
                         </span>
                     </a>
                 {% else %}
@@ -157,6 +157,41 @@
   }
   tick();
   setInterval(tick, 1000);
+})();
+
+(function(){
+  var button = document.getElementById('telegramConfirmButton');
+  if(!button){ return; }
+
+  function fallbackCopy(text){
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand('copy'); } catch (error) {}
+    document.body.removeChild(area);
+  }
+
+  button.addEventListener('click', function(){
+    var message = button.getAttribute('data-telegram-message') || '';
+    var note = document.getElementById('telegramConfirmNote');
+    if(!message){ return; }
+
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(message).then(function(){
+        if(note){ note.textContent = 'Detail pesanan sudah disalin — tempel di chat admin'; }
+      }).catch(function(){
+        fallbackCopy(message);
+        if(note){ note.textContent = 'Detail pesanan disalin — tempel di chat admin'; }
+      });
+    } else {
+      fallbackCopy(message);
+      if(note){ note.textContent = 'Detail pesanan disalin — tempel di chat admin'; }
+    }
+  });
 })();
 </script>
 {% endblock %}

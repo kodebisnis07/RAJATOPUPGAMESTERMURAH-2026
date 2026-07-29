@@ -1,0 +1,7 @@
+PERBAIKAN TELEGRAM KONFIRMASI ORDER
+
+- Tombol konfirmasi tidak lagi membuka halaman t.me/share/url.
+- Tombol sekarang membuka langsung akun Telegram admin yang diatur melalui Panel Admin.
+- Detail pesanan otomatis disalin saat tombol diklik.
+- Pembeli tinggal menempelkan pesan di chat Telegram admin lalu mengirimnya.
+- Mendukung isian @username maupun link lengkap https://t.me/username.
