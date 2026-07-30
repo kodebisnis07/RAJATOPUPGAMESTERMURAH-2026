@@ -19,3 +19,18 @@ def test_security_headers(client):
 def test_legacy_admin_path_hidden(client):
     response = client.get("/admin/login")
     assert response.status_code == 404
+
+
+def test_default_admin_recovery_path_responds(client):
+    response = client.get("/panel-rtg-2026-X7q9K/login")
+    assert response.status_code == 200
+
+
+def test_default_admin_path_is_case_insensitive(client):
+    response = client.get("/panel-rtg-2026-x7q9k/login")
+    assert response.status_code == 200
+
+
+def test_default_super_admin_recovery_path_responds(client):
+    response = client.get("/super-panel-rtg-2026-S9kL2/login")
+    assert response.status_code == 200

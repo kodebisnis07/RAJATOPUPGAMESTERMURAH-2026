@@ -79,8 +79,8 @@ Catatan: aplikasi tetap menjalankan `db.create_all()` agar deploy pertama tidak 
 - Website: `/`
 - Login user: `/login`
 - Daftar: `/daftar`
-- Admin: `/admin/login`
-- Super Admin: `/super-admin/login`
+- Admin: `/panel-rtg-2026-X7q9K/login`
+- Super Admin: `/super-panel-rtg-2026-S9kL2/login`
 - Sitemap: `/sitemap.xml`
 - Robots: `/robots.txt`
 - Health check: `/healthz`

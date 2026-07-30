@@ -1958,12 +1958,15 @@ def settings():
             set_setting("login_background", new_login_bg)
 
         db.session.commit()
+        dynamic_admin_path = current_app.extensions.get("dynamic_admin_path")
+        if dynamic_admin_path is not None:
+            dynamic_admin_path.invalidate()
         log_admin_activity("ubah_pengaturan", f"Memperbarui pengaturan website/payment gateway; nama website: {site_name}")
         flash(
             f"Pengaturan berhasil disimpan. Link Admin sekarang /{admin_slug} dan Link Super Admin /{super_slug}.",
             "success",
         )
-        return redirect(url_for("admin.settings"))
+        return redirect(f"/{admin_slug}/settings")
     settings = {item.key: get_setting(item.key, "") for item in Setting.query.all()}
     # Secret tidak pernah dikirim kembali ke browser; kosongkan untuk mencegah kebocoran.
     for secret_key in ("tripay_api_key", "tripay_private_key", "duitku_api_key", "xendit_secret_key"):

@@ -1,0 +1,23 @@
+PERBAIKAN PANEL ADMIN 404
+
+Masalah yang diperbaiki:
+- Link panel bawaan bisa menjadi 404 ketika nilai link di database berbeda.
+- Nilai ADMIN_PANEL_PATH dan SUPER_ADMIN_PANEL_PATH dari Environment sebelumnya tidak benar-benar dipakai sebagai fallback.
+- Perbedaan huruf besar/kecil pada link dapat menyebabkan 404.
+- Setelah link panel diubah dari Pengaturan, cache path lama bisa membuat redirect tidak konsisten.
+
+Perbaikan:
+- Link recovery Admin selalu aktif:
+  /panel-rtg-2026-X7q9K/login
+- Link recovery Super Admin selalu aktif:
+  /super-panel-rtg-2026-S9kL2/login
+- Link custom dari database dan Environment tetap didukung.
+- Prefix panel sekarang toleran terhadap perbedaan huruf besar/kecil.
+- Cache link panel langsung dibersihkan setelah Pengaturan disimpan.
+- Link lama /admin dan /super-admin tetap diblokir 404.
+
+Setelah upload/deploy ulang, buka:
+https://DOMAIN-ANDA/panel-rtg-2026-X7q9K/login
+
+Untuk Render gunakan:
+Manual Deploy -> Clear build cache & deploy

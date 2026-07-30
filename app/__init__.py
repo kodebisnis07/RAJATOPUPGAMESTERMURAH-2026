@@ -261,12 +261,9 @@ def create_app():
         DEFAULT_SUPER_ADMIN_PATH,
         normalize_panel_path,
     )
-    app.wsgi_app = DynamicAdminPathMiddleware(app, app.wsgi_app)
-
-    @app.before_request
-    def block_inactive_internal_admin_paths():
-        if request.environ.get("RTG_BLOCK_INTERNAL_ADMIN_PATH") == "1":
-            abort(404)
+    dynamic_admin_path = DynamicAdminPathMiddleware(app, app.wsgi_app)
+    app.wsgi_app = dynamic_admin_path
+    app.extensions["dynamic_admin_path"] = dynamic_admin_path
 
     @app.after_request
     def expose_dynamic_admin_urls(response):
